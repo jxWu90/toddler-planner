@@ -658,6 +658,15 @@ body {
   </div>
 
   <div class="card">
+    <div class="card-title" id="sideOptionsTitle">Side Dish Options</div>
+    <div class="food-list" id="sidesList"></div>
+    <div class="add-input-row">
+      <input id="addSides" placeholder="Add side dish..." onkeydown="if(event.key==='Enter')addFood('sides')">
+      <button class="btn btn-primary btn-small" onclick="addFood('sides')" id="addSidesBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title" id="mealHistoryTitle">Meal History</div>
     <div id="mealHistory" style="font-size:12px;color:var(--text-light);">Recent meals served will appear here to help avoid repetition.</div>
   </div>
@@ -710,7 +719,10 @@ body {
 
   <div class="card">
     <div class="card-title" id="chineseCharsTitle">Chinese Characters</div>
+    <div class="recipe-filters" id="charCategoryTabs" style="margin-bottom:6px;"></div>
     <div class="char-grid" id="chineseGrid"></div>
+    <div id="charPagination" style="display:flex;justify-content:center;gap:8px;margin-top:10px;"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--text-light);" id="charCountInfo"></div>
   </div>
 
   <div class="card">
@@ -725,32 +737,7 @@ body {
 
   <div class="card">
     <div class="card-title" id="learningTipsTitle">Learning Tips for 3-Year-Olds</div>
-    <div style="font-size:13px;line-height:1.6;">
-      <div class="tip-item">
-        <div class="tip-num">1</div>
-        <div class="tip-text"><strong>Keep sessions short</strong> — 10-15 min per activity. A 3yo's attention span is about 6-15 minutes.</div>
-      </div>
-      <div class="tip-item">
-        <div class="tip-num">2</div>
-        <div class="tip-text"><strong>Play-based learning</strong> — use songs, games, flashcards with pictures, and physical movement.</div>
-      </div>
-      <div class="tip-item">
-        <div class="tip-num">3</div>
-        <div class="tip-text"><strong>Repetition is key</strong> — review previously learned items at the start of each session.</div>
-      </div>
-      <div class="tip-item">
-        <div class="tip-num">4</div>
-        <div class="tip-text"><strong>Multi-sensory approach</strong> — trace letters in sand, form characters with playdough, count real objects.</div>
-      </div>
-      <div class="tip-item">
-        <div class="tip-num">5</div>
-        <div class="tip-text"><strong>Follow the child's interest</strong> — if they engage more with numbers today, extend that activity.</div>
-      </div>
-      <div class="tip-item">
-        <div class="tip-num">6</div>
-        <div class="tip-text"><strong>Celebrate small wins</strong> — stickers, high-fives, and praise reinforce positive learning attitudes.</div>
-      </div>
-    </div>
+    <div id="learningTipsContent" style="font-size:13px;line-height:1.6;"></div>
   </div>
 </div>
 
@@ -824,46 +811,7 @@ body {
 
   <div class="card">
     <div class="card-title" id="bedtimeTipsTitle">Bedtime Routine Tips</div>
-    <div class="tip-item">
-      <div class="tip-num">1</div>
-      <div class="tip-text"><strong>Consistent wind-down:</strong> Start the same routine 45 min before target bedtime — dim lights, quiet activities.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">2</div>
-      <div class="tip-text"><strong>No screens</strong> for at least 1 hour before bed. Blue light delays melatonin by 30+ minutes.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">3</div>
-      <div class="tip-text"><strong>Physical activity during the day</strong> — playground and swimming help tremendously. Keep the 5-6:30 PM active play.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">4</div>
-      <div class="tip-text"><strong>Cool, dark room</strong> — set AC to 24-25°C. Use blackout curtains if possible.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">5</div>
-      <div class="tip-text"><strong>Gradual shift:</strong> Move bedtime 15 min earlier every 3-4 days. Don't rush — sudden changes cause resistance.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">6</div>
-      <div class="tip-text"><strong>Books before bed:</strong> Reading 2-3 short books signals "sleep is coming." Let him pick the books.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">7</div>
-      <div class="tip-text"><strong>Avoid sugar after dinner.</strong> Even fruit juice can give an energy spike. Water or warm milk are better.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">8</div>
-      <div class="tip-text"><strong>Comfort object:</strong> A favorite stuffed animal or blanket provides security and self-soothing.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">9</div>
-      <div class="tip-text"><strong>White noise or soft music:</strong> Helps block out household sounds. Play at low volume consistently.</div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-num">10</div>
-      <div class="tip-text"><strong>Sticker chart:</strong> Reward good bedtime behavior. 5 stickers = a small prize. Positive reinforcement works!</div>
-    </div>
+    <div id="bedtimeTipsContent"></div>
   </div>
 
   <div class="card">
@@ -874,15 +822,11 @@ body {
 
   <div class="card">
     <div class="card-title" id="sharingSyncTitle">Sharing & Sync</div>
-    <div style="font-size:13px;line-height:1.6;margin-bottom:12px;">
-      <strong>Best format for Huawei + iPhone:</strong>
-      <ul style="margin:8px 0 0 16px;font-size:12px;">
-        <li><strong>This web app</strong> — works in any browser. Bookmark to home screen for app-like experience.</li>
-        <li><strong>Export/Import data</strong> below to sync between devices via WhatsApp or messaging.</li>
-        <li><strong>WhatsApp Group</strong> — create a family group for daily coordination & updates.</li>
-        <li><strong>Google Sheets</strong> — use a shared sheet for meal planning (everyone can edit).</li>
-      </ul>
-    </div>
+    <div id="syncUI"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="manualExportTitle">Manual Export/Import</div>
     <div class="share-box">
       <button class="btn btn-primary" onclick="exportData()" id="exportBtn">Export Data (Copy)</button>
       <div style="margin-top:8px;">
@@ -921,7 +865,7 @@ body {
 
 <script>
 // ==================== i18n ====================
-let currentLang = localStorage.getItem('plannerLang') || 'en';
+let currentLang = localStorage.getItem('plannerLang') || 'zh';
 
 const LANG = {
   appTitle: { en: 'Little Explorer Planner', zh: '小探险家计划' },
@@ -1084,7 +1028,29 @@ const LANG = {
   searchOnline: { en: 'Search Online', zh: '在线搜索' },
   viewRecipe: { en: 'View Recipe', zh: '查看食谱' },
   mins: { en: 'min', zh: '分钟' },
+  mainDishLabel: { en: 'Main Dish', zh: '主菜' },
+  sideDishLabel: { en: 'Side Dish', zh: '配菜' },
+  sideOptions: { en: 'Side Dish Options', zh: '配菜选项' },
+  addSidePlaceholder: { en: 'Add side dish...', zh: '添加配菜...' },
+  nonePicked: { en: 'None', zh: '无' },
   charDetail: { en: 'Character Detail', zh: '汉字详情' },
+  // Sync
+  syncTitle: { en: 'Cloud Sync', zh: '云同步' },
+  childCode: { en: 'Child Code', zh: '孩子代码' },
+  currentChild: { en: 'Current child', zh: '当前孩子' },
+  createChild: { en: 'Create New Child', zh: '新建孩子' },
+  joinChild: { en: 'Join Existing Code', zh: '加入已有代码' },
+  childName: { en: 'Child\'s Name', zh: '孩子姓名' },
+  enterCode: { en: 'Enter 6-digit code', zh: '输入6位代码' },
+  syncNow: { en: 'Sync Now', zh: '立即同步' },
+  lastSynced: { en: 'Last synced', zh: '上次同步' },
+  syncing: { en: 'Syncing...', zh: '同步中...' },
+  syncOk: { en: 'Synced!', zh: '已同步!' },
+  syncFail: { en: 'Sync failed', zh: '同步失败' },
+  switchChild: { en: 'Switch Child', zh: '切换孩子' },
+  shareCodeHint: { en: 'Share this code with family members so they see the same schedule.', zh: '把代码分享给家人，大家看到同一个时间表。' },
+  noChildYet: { en: 'Create a child profile or join an existing code to enable cloud sync.', zh: '创建孩子档案或加入已有代码来启用云同步。' },
+  manualExport: { en: 'Manual Export/Import', zh: '手动导出/导入' },
   meaning: { en: 'Meaning', zh: '含义' },
   markLearned: { en: 'Mark Learned', zh: '标记已学' },
   markUnlearned: { en: 'Mark Unlearned', zh: '标记未学' },
@@ -1111,10 +1077,39 @@ function fd(biStr) {
   return currentLang === 'zh' ? biStr.substring(0, slash) : biStr.substring(slash + 1);
 }
 
+// Meal data helpers — each meal slot is { main: string, side: string }
+// Old data may store a plain string; these helpers handle both.
+function getMealParts(meal) {
+  if (!meal) return { main: '', side: '' };
+  if (typeof meal === 'string') return { main: meal, side: '' };
+  return { main: meal.main || '', side: meal.side || '' };
+}
+function getMealDisplay(meal) {
+  const { main, side } = getMealParts(meal);
+  const parts = [];
+  if (main) parts.push(fd(main));
+  if (side) parts.push(fd(side));
+  return parts.join(' + ') || '';
+}
+
+// Extract Chinese name from bilingual "中文/English" string and open recipe search
+function searchOnlineRecipe(biStr) {
+  if (!biStr) return;
+  // Get Chinese portion (before the slash), or full string if no slash
+  const slash = biStr.indexOf('/');
+  const zh = slash > -1 ? biStr.substring(0, slash) : biStr;
+  const keyword = encodeURIComponent(zh + ' 做法');
+  window.open('https://www.xiachufang.com/search/?keyword=' + keyword, '_blank');
+}
+
 function updateI18nLabels() {
   const el = (id) => document.getElementById(id);
   el('appTitle').textContent = t('appTitle');
-  el('appSubtitle').textContent = t('appSubtitle');
+  // Show child name in subtitle if active
+  const activeCode = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+  el('appSubtitle').textContent = activeProfile ? `🧒 ${activeProfile.name}` : t('appSubtitle');
   el('todayBtn').textContent = t('today');
   el('langToggle').textContent = currentLang === 'en' ? '中文' : 'EN';
   // Tab bar
@@ -1135,6 +1130,8 @@ function updateI18nLabels() {
   el('dinnerOptionsTitle').textContent = t('dinnerOptions');
   el('snackOptionsTitle').textContent = t('snackOptions');
   el('mealHistoryTitle').textContent = t('mealHistory');
+  el('sideOptionsTitle').textContent = t('sideOptions');
+  el('addSidesBtn').textContent = t('add');
   el('recipesCardTitle').textContent = t('recipesTitle');
   el('addBreakfastBtn').textContent = t('add');
   el('addDinnerBtn').textContent = t('add');
@@ -1169,6 +1166,7 @@ function updateI18nLabels() {
   el('exportBtn').textContent = t('exportData');
   el('importBtn').textContent = t('importData');
   el('exportHintText').textContent = t('exportHint');
+  if (el('manualExportTitle')) el('manualExportTitle').textContent = t('manualExport');
   // Weekend tab
   if (el('parksOutdoorTitle')) el('parksOutdoorTitle').textContent = t('parksOutdoor');
   if (el('indoorVenuesTitle')) el('indoorVenuesTitle').textContent = t('indoorVenues');
@@ -1181,72 +1179,141 @@ function updateI18nLabels() {
   if (el('customEventBtn')) el('customEventBtn').textContent = t('customEvent');
 }
 
-// ==================== SVG CHAR ILLUSTRATIONS ====================
-const CHAR_SVG = {
-  '一': { svg: '<line x1="15" y1="50" x2="85" y2="50" stroke="#E74C3C" stroke-width="8" stroke-linecap="round"/>', hint: {en:'one',zh:'一'}, color: '#E74C3C' },
-  '二': { svg: '<line x1="22" y1="35" x2="78" y2="35" stroke="#E67E22" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="65" x2="85" y2="65" stroke="#E67E22" stroke-width="7" stroke-linecap="round"/>', hint: {en:'two',zh:'二'}, color: '#E67E22' },
-  '三': { svg: '<line x1="25" y1="25" x2="75" y2="25" stroke="#F1C40F" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="50" x2="80" y2="50" stroke="#F1C40F" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="75" x2="85" y2="75" stroke="#F1C40F" stroke-width="7" stroke-linecap="round"/>', hint: {en:'three',zh:'三'}, color: '#F1C40F' },
-  '大': { svg: '<line x1="50" y1="15" x2="50" y2="65" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="42" x2="85" y2="42" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="65" x2="20" y2="90" stroke="#3498DB" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="65" x2="80" y2="90" stroke="#3498DB" stroke-width="5" stroke-linecap="round"/>', hint: {en:'big',zh:'大'}, color: '#3498DB' },
-  '小': { svg: '<line x1="50" y1="20" x2="50" y2="80" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="50" x2="35" y2="70" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="75" y1="50" x2="65" y2="70" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>', hint: {en:'small',zh:'小'}, color: '#2ECC71' },
-  '上': { svg: '<line x1="50" y1="20" x2="50" y2="70" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/><line x1="30" y1="42" x2="70" y2="42" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="80" x2="80" y2="80" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/>', hint: {en:'up/above',zh:'上'}, color: '#9B59B6' },
-  '下': { svg: '<line x1="15" y1="25" x2="85" y2="25" stroke="#1ABC9C" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="25" x2="50" y2="75" stroke="#1ABC9C" stroke-width="6" stroke-linecap="round"/><line x1="35" y1="55" x2="50" y2="75" stroke="#1ABC9C" stroke-width="5" stroke-linecap="round"/><line x1="65" y1="55" x2="50" y2="75" stroke="#1ABC9C" stroke-width="5" stroke-linecap="round"/>', hint: {en:'down/below',zh:'下'}, color: '#1ABC9C' },
-  '人': { svg: '<line x1="50" y1="15" x2="25" y2="85" stroke="#E74C3C" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="15" x2="75" y2="85" stroke="#E74C3C" stroke-width="6" stroke-linecap="round"/>', hint: {en:'person',zh:'人'}, color: '#E74C3C' },
-  '口': { svg: '<rect x="25" y="25" width="50" height="50" fill="none" stroke="#E67E22" stroke-width="6" rx="3"/>', hint: {en:'mouth',zh:'口'}, color: '#E67E22' },
-  '手': { svg: '<line x1="50" y1="20" x2="50" y2="85" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="35" x2="80" y2="35" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="55" x2="75" y2="55" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>', hint: {en:'hand',zh:'手'}, color: '#2ECC71' },
-  '日': { svg: '<rect x="25" y="20" width="50" height="60" fill="none" stroke="#F39C12" stroke-width="6" rx="3"/><line x1="25" y1="50" x2="75" y2="50" stroke="#F39C12" stroke-width="5"/>', hint: {en:'sun/day',zh:'日/太阳'}, color: '#F39C12' },
-  '月': { svg: '<path d="M60 15 C25 20, 25 80, 60 85" fill="none" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="38" y1="40" x2="58" y2="40" stroke="#3498DB" stroke-width="4" stroke-linecap="round"/><line x1="38" y1="60" x2="58" y2="60" stroke="#3498DB" stroke-width="4" stroke-linecap="round"/>', hint: {en:'moon/month',zh:'月/月亮'}, color: '#3498DB' },
-  '水': { svg: '<line x1="50" y1="10" x2="50" y2="90" stroke="#00BCD4" stroke-width="5" stroke-linecap="round"/><path d="M30 30 Q40 50, 20 70" fill="none" stroke="#00BCD4" stroke-width="4" stroke-linecap="round"/><path d="M70 30 Q60 50, 80 70" fill="none" stroke="#00BCD4" stroke-width="4" stroke-linecap="round"/>', hint: {en:'water',zh:'水'}, color: '#00BCD4' },
-  '火': { svg: '<path d="M50 10 Q45 35, 30 50 Q45 45, 50 70 Q55 45, 70 50 Q55 35, 50 10Z" fill="#FF5722" stroke="#E64A19" stroke-width="3"/><ellipse cx="50" cy="58" rx="8" ry="12" fill="#FFB74D"/>', hint: {en:'fire',zh:'火'}, color: '#FF5722' },
-  '山': { svg: '<polyline points="10,80 35,30 50,55 65,15 80,50 95,80" fill="none" stroke="#4CAF50" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>', hint: {en:'mountain',zh:'山'}, color: '#4CAF50' },
-  '木': { svg: '<line x1="50" y1="15" x2="50" y2="85" stroke="#795548" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="40" x2="80" y2="40" stroke="#4CAF50" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="65" x2="25" y2="90" stroke="#795548" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="65" x2="75" y2="90" stroke="#795548" stroke-width="5" stroke-linecap="round"/>', hint: {en:'tree/wood',zh:'木/树'}, color: '#795548' },
-  '石': { svg: '<line x1="30" y1="20" x2="70" y2="20" stroke="#78909C" stroke-width="5" stroke-linecap="round"/><polygon points="25,35 75,35 80,80 20,80" fill="#B0BEC5" stroke="#78909C" stroke-width="4"/>', hint: {en:'stone',zh:'石'}, color: '#78909C' },
-  '田': { svg: '<rect x="20" y="20" width="60" height="60" fill="none" stroke="#4CAF50" stroke-width="5" rx="2"/><line x1="50" y1="20" x2="50" y2="80" stroke="#4CAF50" stroke-width="4"/><line x1="20" y1="50" x2="80" y2="50" stroke="#4CAF50" stroke-width="4"/>', hint: {en:'field',zh:'田'}, color: '#4CAF50' },
-  '天': { svg: '<line x1="20" y1="20" x2="80" y2="20" stroke="#2196F3" stroke-width="6" stroke-linecap="round"/><line x1="30" y1="45" x2="70" y2="45" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="45" x2="20" y2="85" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="45" x2="80" y2="85" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/>', hint: {en:'sky/heaven',zh:'天'}, color: '#2196F3' },
-  '地': { svg: '<rect x="15" y="30" width="25" height="40" fill="none" stroke="#8D6E63" stroke-width="4" rx="2"/><line x1="40" y1="50" x2="85" y2="50" stroke="#8D6E63" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="30" x2="60" y2="80" stroke="#8D6E63" stroke-width="4" stroke-linecap="round"/>', hint: {en:'earth/ground',zh:'地'}, color: '#8D6E63' },
-  '花': { svg: '<circle cx="50" cy="30" r="10" fill="#E91E63"/><circle cx="35" cy="38" r="8" fill="#F48FB1"/><circle cx="65" cy="38" r="8" fill="#F48FB1"/><circle cx="50" cy="30" r="5" fill="#FFF176"/><line x1="50" y1="42" x2="50" y2="85" stroke="#4CAF50" stroke-width="5" stroke-linecap="round"/>', hint: {en:'flower',zh:'花'}, color: '#E91E63' },
-  '爸': { svg: '<circle cx="50" cy="25" r="12" fill="none" stroke="#1565C0" stroke-width="4"/><line x1="50" y1="37" x2="50" y2="65" stroke="#1565C0" stroke-width="5" stroke-linecap="round"/><line x1="30" y1="48" x2="70" y2="48" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="30" y2="90" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="70" y2="90" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/>', hint: {en:'dad',zh:'爸爸'}, color: '#1565C0' },
-  '妈': { svg: '<circle cx="50" cy="25" r="12" fill="none" stroke="#E91E63" stroke-width="4"/><path d="M38 15 Q50 5, 62 15" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="50" y1="37" x2="50" y2="60" stroke="#E91E63" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="60" x2="35" y2="88" stroke="#E91E63" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="60" x2="65" y2="88" stroke="#E91E63" stroke-width="4" stroke-linecap="round"/>', hint: {en:'mom',zh:'妈妈'}, color: '#E91E63' },
-  '我': { svg: '<circle cx="50" cy="25" r="11" fill="none" stroke="#7B1FA2" stroke-width="4"/><line x1="50" y1="36" x2="50" y2="62" stroke="#7B1FA2" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="50" x2="28" y2="55" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/><circle cx="25" cy="55" r="4" fill="#7B1FA2"/><line x1="50" y1="62" x2="35" y2="88" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="65" y2="88" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/>', hint: {en:'me/I',zh:'我'}, color: '#7B1FA2' },
-  '你': { svg: '<circle cx="50" cy="25" r="11" fill="none" stroke="#00897B" stroke-width="4"/><line x1="50" y1="36" x2="50" y2="62" stroke="#00897B" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="48" x2="75" y2="40" stroke="#00897B" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="35" y2="88" stroke="#00897B" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="65" y2="88" stroke="#00897B" stroke-width="4" stroke-linecap="round"/>', hint: {en:'you',zh:'你'}, color: '#00897B' },
-  '他': { svg: '<circle cx="35" cy="25" r="10" fill="none" stroke="#558B2F" stroke-width="4"/><line x1="35" y1="35" x2="35" y2="60" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="35" y1="60" x2="22" y2="85" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="35" y1="60" x2="48" y2="85" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="25" x2="65" y2="85" stroke="#558B2F" stroke-width="3" stroke-linecap="round"/>', hint: {en:'he/him',zh:'他'}, color: '#558B2F' },
-  '好': { svg: '<circle cx="30" cy="28" r="8" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="30" y1="36" x2="30" y2="55" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="55" x2="20" y2="75" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><circle cx="65" cy="30" r="7" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="65" y1="37" x2="65" y2="50" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><line x1="56" y1="44" x2="74" y2="44" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><text x="50" y="92" text-anchor="middle" font-size="16" fill="#E91E63">&#9829;</text>', hint: {en:'good',zh:'好'}, color: '#E91E63' },
-  '家': { svg: '<polygon points="50,10 15,45 85,45" fill="none" stroke="#FF9800" stroke-width="5" stroke-linejoin="round"/><rect x="30" y="45" width="40" height="38" fill="none" stroke="#FF9800" stroke-width="4"/><rect x="42" y="58" width="16" height="25" fill="none" stroke="#FF9800" stroke-width="3"/>', hint: {en:'home/family',zh:'家'}, color: '#FF9800' },
-  '鱼': { svg: '<ellipse cx="45" cy="50" rx="28" ry="18" fill="#42A5F5" stroke="#1565C0" stroke-width="3"/><polygon points="73,50 90,35 90,65" fill="#42A5F5" stroke="#1565C0" stroke-width="3"/><circle cx="32" cy="45" r="4" fill="white"/><circle cx="33" cy="45" r="2" fill="#1565C0"/>', hint: {en:'fish',zh:'鱼'}, color: '#42A5F5' },
-  '鸟': { svg: '<ellipse cx="50" cy="50" rx="22" ry="18" fill="#EF5350" stroke="#C62828" stroke-width="3"/><circle cx="40" cy="42" r="4" fill="white"/><circle cx="41" cy="42" r="2" fill="#333"/><polygon points="62,45 80,40 62,50" fill="#FFA726" stroke="#E65100" stroke-width="2"/><line x1="42" y1="68" x2="42" y2="82" stroke="#795548" stroke-width="3" stroke-linecap="round"/><line x1="58" y1="68" x2="58" y2="82" stroke="#795548" stroke-width="3" stroke-linecap="round"/>', hint: {en:'bird',zh:'鸟'}, color: '#EF5350' },
-  '马': { svg: '<ellipse cx="50" cy="50" rx="25" ry="20" fill="#8D6E63" stroke="#4E342E" stroke-width="3"/><circle cx="33" cy="35" r="12" fill="#8D6E63" stroke="#4E342E" stroke-width="3"/><circle cx="28" cy="32" r="3" fill="white"/><circle cx="29" cy="32" r="1.5" fill="#333"/><line x1="35" y1="70" x2="30" y2="88" stroke="#4E342E" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="70" x2="65" y2="88" stroke="#4E342E" stroke-width="4" stroke-linecap="round"/>', hint: {en:'horse',zh:'马'}, color: '#8D6E63' },
-  '牛': { svg: '<line x1="20" y1="25" x2="40" y2="40" stroke="#795548" stroke-width="5" stroke-linecap="round"/><line x1="80" y1="25" x2="60" y2="40" stroke="#795548" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="55" rx="24" ry="18" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><circle cx="40" cy="48" r="3" fill="#333"/><circle cx="60" cy="48" r="3" fill="#333"/><ellipse cx="50" cy="62" rx="10" ry="7" fill="#BCAAA4" stroke="#5D4037" stroke-width="2"/>', hint: {en:'cow/ox',zh:'牛'}, color: '#795548' },
-  '羊': { svg: '<circle cx="50" cy="45" r="22" fill="#EEE" stroke="#9E9E9E" stroke-width="3"/><circle cx="40" cy="40" r="3" fill="#333"/><circle cx="60" cy="40" r="3" fill="#333"/><path d="M30 30 Q25 15, 35 25" fill="none" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><path d="M70 30 Q75 15, 65 25" fill="none" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="67" x2="35" y2="85" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="67" x2="65" y2="85" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/>', hint: {en:'sheep',zh:'羊'}, color: '#9E9E9E' },
-  '猫': { svg: '<circle cx="50" cy="50" r="22" fill="#FFB74D" stroke="#E65100" stroke-width="3"/><polygon points="30,35 22,12 38,28" fill="#FFB74D" stroke="#E65100" stroke-width="2"/><polygon points="70,35 78,12 62,28" fill="#FFB74D" stroke="#E65100" stroke-width="2"/><circle cx="40" cy="45" r="4" fill="#333"/><circle cx="60" cy="45" r="4" fill="#333"/><ellipse cx="50" cy="56" rx="4" ry="3" fill="#E91E63"/><line x1="15" y1="50" x2="30" y2="48" stroke="#E65100" stroke-width="2"/><line x1="70" y1="48" x2="85" y2="50" stroke="#E65100" stroke-width="2"/>', hint: {en:'cat',zh:'猫'}, color: '#FFB74D' },
-  '狗': { svg: '<circle cx="50" cy="48" r="22" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><circle cx="42" cy="42" r="4" fill="#333"/><circle cx="58" cy="42" r="4" fill="#333"/><ellipse cx="50" cy="55" rx="5" ry="4" fill="#333"/><path d="M25,38 Q15,20 28,30" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><path d="M75,38 Q85,20 72,30" fill="#A1887F" stroke="#5D4037" stroke-width="3"/>', hint: {en:'dog',zh:'狗'}, color: '#A1887F' },
-  '虫': { svg: '<circle cx="30" cy="50" r="10" fill="#66BB6A" stroke="#2E7D32" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="#81C784" stroke="#2E7D32" stroke-width="3"/><circle cx="70" cy="50" r="10" fill="#66BB6A" stroke="#2E7D32" stroke-width="3"/><circle cx="25" cy="48" r="2" fill="#333"/><circle cx="35" cy="48" r="2" fill="#333"/><line x1="25" y1="38" x2="22" y2="28" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/><line x1="35" y1="38" x2="38" y2="28" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>', hint: {en:'insect/bug',zh:'虫'}, color: '#66BB6A' },
+// ==================== CHARACTER DATABASE (500 chars) ====================
+const CHAR_DB = {
+  num:{en:'Numbers',zh:'数字',icon:'🔢',items:[
+    ['一','yī','one','☝️'],['二','èr','two','✌️'],['三','sān','three','3️⃣'],['四','sì','four','4️⃣'],['五','wǔ','five','🖐️'],
+    ['六','liù','six','6️⃣'],['七','qī','seven','7️⃣'],['八','bā','eight','8️⃣'],['九','jiǔ','nine','9️⃣'],['十','shí','ten','🔟'],
+    ['百','bǎi','hundred','💯'],['千','qiān','thousand','🏔️'],['万','wàn','ten thousand','🌟'],['零','líng','zero','0️⃣'],
+    ['两','liǎng','two/pair','✌️'],['半','bàn','half','½'],['双','shuāng','pair','👐'],['几','jǐ','how many','❓'],['第','dì','ordinal','🏅'],['数','shù','count','🔢']]},
+  fam:{en:'Family',zh:'家人',icon:'👨‍👩‍👦',items:[
+    ['爸','bà','dad','👨'],['妈','mā','mom','👩'],['爷','yé','grandpa','👴'],['奶','nǎi','grandma','👵'],['哥','gē','brother','👦'],
+    ['姐','jiě','sister','👧'],['弟','dì','younger brother','🧒'],['妹','mèi','younger sister','👧'],['叔','shū','uncle','👨'],
+    ['婆','pó','grandma','👵'],['公','gōng','grandpa','👴'],['儿','ér','child/son','👶'],['女','nǚ','girl','👧'],['孩','hái','child','🧒'],
+    ['男','nán','boy','👦'],['朋','péng','friend','🤝'],['友','yǒu','friend','🤝'],['亲','qīn','family','👪'],
+    ['我','wǒ','I/me','🙋'],['你','nǐ','you','🫵'],['他','tā','he','👤'],['她','tā','she','👤'],['们','men','plural','👥'],
+    ['这','zhè','this','👈'],['那','nà','that','👉'],['谁','shuí','who','❓'],['人','rén','person','🧑'],['家','jiā','home','🏠'],
+    ['好','hǎo','good','👍'],['夫','fū','husband','👨']]},
+  body:{en:'Body',zh:'身体',icon:'🫀',items:[
+    ['头','tóu','head','🗣️'],['发','fà','hair','💇'],['眼','yǎn','eye','👁️'],['耳','ěr','ear','👂'],['口','kǒu','mouth','👄'],
+    ['鼻','bí','nose','👃'],['脸','liǎn','face','😊'],['手','shǒu','hand','✋'],['指','zhǐ','finger','☝️'],['脚','jiǎo','foot','🦶'],
+    ['腿','tuǐ','leg','🦵'],['肚','dù','belly','🤰'],['心','xīn','heart','❤️'],['牙','yá','tooth','🦷'],['舌','shé','tongue','👅'],
+    ['身','shēn','body','🧍'],['骨','gǔ','bone','🦴'],['血','xuè','blood','🩸'],['皮','pí','skin','🤲'],['背','bèi','back','🔙'],
+    ['腰','yāo','waist','🧍'],['肩','jiān','shoulder','💪'],['眉','méi','eyebrow','🤨'],['脑','nǎo','brain','🧠'],['胃','wèi','stomach','🫁']]},
+  nat:{en:'Nature',zh:'自然',icon:'🌍',items:[
+    ['天','tiān','sky','🌤️'],['地','dì','earth','🌍'],['日','rì','sun','☀️'],['月','yuè','moon','🌙'],['星','xīng','star','⭐'],
+    ['山','shān','mountain','⛰️'],['水','shuǐ','water','💧'],['火','huǒ','fire','🔥'],['风','fēng','wind','💨'],['云','yún','cloud','☁️'],
+    ['雨','yǔ','rain','🌧️'],['雪','xuě','snow','❄️'],['石','shí','stone','🪨'],['田','tián','field','🌾'],['河','hé','river','🏞️'],
+    ['海','hǎi','sea','🌊'],['湖','hú','lake','🏞️'],['光','guāng','light','💡'],['阳','yáng','sunny','☀️'],['阴','yīn','cloudy','🌑'],
+    ['雷','léi','thunder','⚡'],['电','diàn','electricity','⚡'],['冰','bīng','ice','🧊'],['沙','shā','sand','🏖️'],['土','tǔ','soil','🟤'],
+    ['晴','qíng','clear sky','🌤️'],['雾','wù','fog','🌫️'],['霜','shuāng','frost','🥶'],['露','lù','dew','💧'],['泉','quán','spring','⛲']]},
+  ani:{en:'Animals',zh:'动物',icon:'🐾',items:[
+    ['鸡','jī','chicken','🐔'],['鸭','yā','duck','🦆'],['鱼','yú','fish','🐟'],['鸟','niǎo','bird','🐦'],['马','mǎ','horse','🐴'],
+    ['牛','niú','cow','🐄'],['羊','yáng','sheep','🐑'],['猫','māo','cat','🐱'],['狗','gǒu','dog','🐕'],['猪','zhū','pig','🐷'],
+    ['虫','chóng','bug','🐛'],['蛇','shé','snake','🐍'],['龙','lóng','dragon','🐲'],['兔','tù','rabbit','🐰'],['象','xiàng','elephant','🐘'],
+    ['猴','hóu','monkey','🐵'],['蝶','dié','butterfly','🦋'],['鼠','shǔ','mouse','🐭'],['蛙','wā','frog','🐸'],['熊','xióng','bear','🐻'],
+    ['虎','hǔ','tiger','🐯'],['狼','láng','wolf','🐺'],['蜂','fēng','bee','🐝'],['鹅','é','goose','🦢'],['龟','guī','turtle','🐢'],
+    ['鸽','gē','pigeon','🕊️'],['雀','què','sparrow','🐦'],['燕','yàn','swallow','🐦'],['鲸','jīng','whale','🐋'],['蚁','yǐ','ant','🐜']]},
+  pla:{en:'Plants',zh:'植物',icon:'🌱',items:[
+    ['花','huā','flower','🌸'],['草','cǎo','grass','🌿'],['木','mù','wood','🌳'],['树','shù','tree','🌲'],['叶','yè','leaf','🍃'],
+    ['果','guǒ','fruit','🍎'],['竹','zhú','bamboo','🎋'],['松','sōng','pine','🌲'],['梅','méi','plum','🌸'],['兰','lán','orchid','🌺'],
+    ['菊','jú','chrysanthemum','🌼'],['莲','lián','lotus','🪷'],['瓜','guā','melon','🍈'],['种','zhǒng','seed','🌱'],['根','gēn','root','🌱'],
+    ['桃','táo','peach','🍑'],['橘','jú','tangerine','🍊'],['梨','lí','pear','🍐'],['莓','méi','berry','🫐'],['藤','téng','vine','🌿']]},
+  food:{en:'Food',zh:'食物',icon:'🍚',items:[
+    ['饭','fàn','rice/meal','🍚'],['菜','cài','dish/veggie','🥬'],['肉','ròu','meat','🥩'],['蛋','dàn','egg','🥚'],['米','mǐ','rice','🌾'],
+    ['面','miàn','noodle','🍜'],['汤','tāng','soup','🍲'],['茶','chá','tea','🍵'],['糖','táng','candy','🍬'],['盐','yán','salt','🧂'],
+    ['油','yóu','oil','🫒'],['豆','dòu','bean','🫘'],['虾','xiā','shrimp','🦐'],['饼','bǐng','pancake','🥞'],['粥','zhōu','porridge','🥣'],
+    ['饺','jiǎo','dumpling','🥟'],['包','bāo','bun','🫓'],['酒','jiǔ','wine','🍷'],['醋','cù','vinegar','🫗'],['酱','jiàng','sauce','🥫'],
+    ['姜','jiāng','ginger','🫚'],['蒜','suàn','garlic','🧄'],['葱','cōng','scallion','🧅'],['奶','nǎi','milk','🥛'],['粉','fěn','powder','🍜']]},
+  col:{en:'Colors',zh:'颜色',icon:'🎨',items:[
+    ['红','hóng','red','🔴'],['黄','huáng','yellow','🟡'],['蓝','lán','blue','🔵'],['绿','lǜ','green','🟢'],['白','bái','white','⚪'],
+    ['黑','hēi','black','⚫'],['紫','zǐ','purple','🟣'],['橙','chéng','orange','🟠']]},
+  desc:{en:'Descriptors',zh:'描述',icon:'📏',items:[
+    ['大','dà','big','⬆️'],['小','xiǎo','small','⬇️'],['长','cháng','long','📏'],['短','duǎn','short','📐'],['高','gāo','tall','📈'],
+    ['低','dī','low','📉'],['轻','qīng','light','🪶'],['重','zhòng','heavy','🏋️'],['胖','pàng','fat','🐷'],['瘦','shòu','thin','🧍'],
+    ['快','kuài','fast','🏎️'],['慢','màn','slow','🐌'],['冷','lěng','cold','🥶'],['热','rè','hot','🥵'],['新','xīn','new','🆕'],
+    ['旧','jiù','old','♻️'],['多','duō','many','📊'],['少','shǎo','few','📉'],['美','měi','beautiful','🌹'],['丑','chǒu','ugly','👹'],
+    ['干','gān','dry','🏜️'],['净','jìng','clean','✨'],['甜','tián','sweet','🍯'],['苦','kǔ','bitter','😖'],['酸','suān','sour','🍋'],
+    ['辣','là','spicy','🌶️'],['香','xiāng','fragrant','🌹'],['软','ruǎn','soft','🧸'],['硬','yìng','hard','🪨'],['满','mǎn','full','🥛'],
+    ['空','kōng','empty','📭'],['亮','liàng','bright','💡'],['暗','àn','dark','🌑'],['暖','nuǎn','warm','🌡️'],['凉','liáng','cool','🌊']]},
+  dir:{en:'Directions',zh:'方位',icon:'🧭',items:[
+    ['上','shàng','up','⬆️'],['下','xià','down','⬇️'],['左','zuǒ','left','⬅️'],['右','yòu','right','➡️'],['前','qián','front','▶️'],
+    ['后','hòu','behind','◀️'],['里','lǐ','inside','📥'],['外','wài','outside','📤'],['中','zhōng','middle','⏺️'],['东','dōng','east','🧭'],
+    ['西','xī','west','🧭'],['南','nán','south','🧭'],['北','běi','north','🧭'],['远','yuǎn','far','🔭'],['近','jìn','near','🔍']]},
+  act:{en:'Actions',zh:'动作',icon:'🎬',items:[
+    ['吃','chī','eat','🍽️'],['喝','hē','drink','🥤'],['走','zǒu','walk','🚶'],['跑','pǎo','run','🏃'],['跳','tiào','jump','🤸'],
+    ['看','kàn','look','👀'],['听','tīng','listen','👂'],['说','shuō','speak','🗣️'],['读','dú','read','📖'],['写','xiě','write','✍️'],
+    ['画','huà','draw','🎨'],['飞','fēi','fly','🕊️'],['坐','zuò','sit','💺'],['站','zhàn','stand','🧍'],['开','kāi','open','🔓'],
+    ['关','guān','close','🔒'],['拿','ná','take','✊'],['放','fàng','put','📦'],['拉','lā','pull','🤏'],['推','tuī','push','🫸'],
+    ['打','dǎ','hit','🏓'],['切','qiē','cut','✂️'],['洗','xǐ','wash','🧼'],['穿','chuān','wear','👔'],['脱','tuō','take off','👕'],
+    ['睡','shuì','sleep','😴'],['醒','xǐng','wake','🌅'],['来','lái','come','🏃'],['去','qù','go','🚶'],['出','chū','exit','🚪'],
+    ['入','rù','enter','🚪'],['回','huí','return','🔄'],['送','sòng','send','🎁'],['买','mǎi','buy','🛒'],['卖','mài','sell','💰'],
+    ['做','zuò','make','🔨'],['用','yòng','use','🔧'],['找','zhǎo','find','🔍'],['给','gěi','give','🤲'],['问','wèn','ask','❓'],
+    ['答','dá','answer','✅'],['想','xiǎng','think','💭'],['学','xué','learn','📚'],['教','jiāo','teach','👨‍🏫'],['玩','wán','play','🎮'],
+    ['笑','xiào','laugh','😄'],['哭','kū','cry','😢'],['唱','chàng','sing','🎤'],['爬','pá','crawl','🐛'],['游','yóu','swim','🏊'],
+    ['吹','chuī','blow','💨'],['扔','rēng','throw','🤾'],['接','jiē','catch','🤲'],['抱','bào','hug','🤗'],['踢','tī','kick','⚽'],
+    ['拍','pāi','clap','👏'],['摸','mō','touch','🤚'],['选','xuǎn','choose','☑️'],['等','děng','wait','⏳'],['帮','bāng','help','🤝'],
+    ['挖','wā','dig','🏗️'],['喂','wèi','feed','🍼'],['叫','jiào','call','📢'],['记','jì','remember','📝'],['换','huàn','change','🔄']]},
+  obj:{en:'Things',zh:'物品',icon:'🏠',items:[
+    ['门','mén','door','🚪'],['窗','chuāng','window','🪟'],['床','chuáng','bed','🛏️'],['灯','dēng','lamp','💡'],['车','chē','car','🚗'],
+    ['船','chuán','boat','⛵'],['刀','dāo','knife','🔪'],['碗','wǎn','bowl','🥣'],['杯','bēi','cup','☕'],['瓶','píng','bottle','🍶'],
+    ['伞','sǎn','umbrella','☂️'],['钟','zhōng','clock','🕐'],['锁','suǒ','lock','🔒'],['箱','xiāng','box','📦'],['袋','dài','bag','👜'],
+    ['钱','qián','money','💰'],['球','qiú','ball','⚽'],['桌','zhuō','desk','🪑'],['椅','yǐ','chair','💺'],['柜','guì','cabinet','🗄️'],
+    ['镜','jìng','mirror','🪞'],['绳','shéng','rope','🧵'],['剪','jiǎn','scissors','✂️'],['尺','chǐ','ruler','📏'],
+    ['衣','yī','clothes','👔'],['服','fú','clothing','👕'],['裤','kù','pants','👖'],['裙','qún','skirt','👗'],['鞋','xié','shoes','👟'],['袜','wà','socks','🧦']]},
+  time:{en:'Time',zh:'时间',icon:'⏰',items:[
+    ['年','nián','year','📅'],['时','shí','hour','⏰'],['分','fēn','minute','⏱️'],['秒','miǎo','second','⏱️'],['今','jīn','today','📆'],
+    ['明','míng','tomorrow','🌅'],['昨','zuó','yesterday','📅'],['早','zǎo','morning','🌅'],['午','wǔ','noon','☀️'],['晚','wǎn','evening','🌙'],
+    ['春','chūn','spring','🌸'],['夏','xià','summer','☀️'],['秋','qiū','autumn','🍂'],['冬','dōng','winter','❄️'],['周','zhōu','week','📅']]},
+  com:{en:'Common',zh:'常用',icon:'📖',items:[
+    ['是','shì','is','✅'],['有','yǒu','have','📦'],['在','zài','at','📍'],['不','bù','not','❌'],['了','le','done','✔️'],
+    ['的','de','possessive','📝'],['和','hé','and','➕'],['也','yě','also','➕'],['还','hái','still','⏳'],['都','dōu','all','👥'],
+    ['很','hěn','very','💯'],['太','tài','too much','‼️'],['可','kě','can','✅'],['会','huì','will','🎓'],['能','néng','able','💪'],
+    ['要','yào','want','🙋'],['让','ràng','let','👐'],['对','duì','correct','✅'],['从','cóng','from','⬅️'],['到','dào','arrive','➡️'],
+    ['过','guò','pass','⏩'],['知','zhī','know','🧠'],['道','dào','way','🛤️'],['同','tóng','same','🟰'],['别','bié','don\'t','⛔'],
+    ['再','zài','again','🔄'],['已','yǐ','already','✔️'],['只','zhī','only','☝️'],['个','gè','mw','📦'],['把','bǎ','handle','🤏'],
+    ['被','bèi','by','📋'],['着','zhe','-ing','⏳'],['校','xiào','school','🏫'],['书','shū','book','📚'],['笔','bǐ','pen','🖊️'],
+    ['纸','zhǐ','paper','📄'],['字','zì','character','🔤'],['课','kè','class','📝'],['老','lǎo','old','👴'],['师','shī','teacher','👨‍🏫'],
+    ['路','lù','road','🛤️'],['街','jiē','street','🏘️'],['桥','qiáo','bridge','🌉'],['城','chéng','city','🏙️'],['村','cūn','village','🏘️'],
+    ['房','fáng','house','🏠'],['店','diàn','shop','🏪'],['园','yuán','garden','🏞️'],['世','shì','world','🌍'],['国','guó','country','🏳️'],
+    ['爱','ài','love','❤️'],['怕','pà','fear','😨'],['喜','xǐ','happy','😊'],['怒','nù','angry','😡'],['急','jí','urgent','😰'],
+    ['累','lèi','tired','😫'],['饿','è','hungry','🤤'],['忙','máng','busy','🏃'],['生','shēng','born','👶'],['活','huó','live','🌱'],
+    ['力','lì','power','💪'],['气','qì','air','💨'],['声','shēng','sound','🔊'],['名','míng','name','📛'],['岁','suì','age','🎂'],
+    ['机','jī','machine','✈️'],['每','měi','every','📅'],['比','bǐ','compare','🤔'],['最','zuì','most','🏆'],['加','jiā','add','➕'],
+    ['自','zì','self','🙋'],['见','jiàn','see','👀']]},
 };
 
-const CHAR_PINYIN = {
-  '一':'yī','二':'èr','三':'sān','大':'dà','小':'xiǎo','上':'shàng','下':'xià',
-  '人':'rén','口':'kǒu','手':'shǒu','日':'rì','月':'yuè','水':'shuǐ','火':'huǒ',
-  '山':'shān','木':'mù','石':'shí','田':'tián','天':'tiān','地':'dì','花':'huā',
-  '爸':'bà','妈':'mā','我':'wǒ','你':'nǐ','他':'tā','好':'hǎo','家':'jiā',
-  '鱼':'yú','鸟':'niǎo','马':'mǎ','牛':'niú','羊':'yáng','猫':'māo','狗':'gǒu','虫':'chóng',
-};
+// Build flat lookup from CHAR_DB
+const CHAR_LOOKUP = {};
+const ALL_CHARS_FLAT = [];
+for (const gk of Object.keys(CHAR_DB)) {
+  for (const item of CHAR_DB[gk].items) {
+    const obj = { c: item[0], p: item[1], e: item[2], m: item[3], g: gk };
+    CHAR_LOOKUP[item[0]] = obj;
+    ALL_CHARS_FLAT.push(obj);
+  }
+}
+
+let charGroup = 'all';
+let charPage = 0;
+const CHARS_PER_PAGE = 60;
 
 function renderCharSVG(char, size) {
-  const d = CHAR_SVG[char];
+  const d = CHAR_LOOKUP[char];
   if (!d) return '';
-  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" style="display:block;">${d.svg}</svg>`;
+  return `<span style="font-size:${size}px;line-height:1;">${d.m}</span>`;
 }
 
 function showCharDetail(char) {
-  const d = CHAR_SVG[char];
+  const d = CHAR_LOOKUP[char];
   if (!d) return;
   const isLearned = data.learning.learnedChinese.includes(char);
-  const hintText = d.hint[currentLang] || d.hint.en;
-  const pinyin = CHAR_PINYIN[char] || '';
   document.getElementById('charDetailContent').innerHTML = `
-    <div style="margin-bottom:8px;">${renderCharSVG(char, 100)}</div>
-    <div class="big-char" style="color:${d.color}">${char}</div>
-    <div style="font-size:16px;color:var(--text-light);margin-bottom:4px;">${pinyin}</div>
-    <div class="char-hint">${t('meaning')}: ${hintText}</div>
-    <div style="margin-bottom:8px;">${isLearned ? `<span class="badge badge-green">${t('markLearned')}</span>` : ''}</div>
+    <div style="font-size:64px;line-height:1;">${d.m}</div>
+    <div class="big-char" style="color:var(--primary)">${char}</div>
+    <div style="font-size:18px;color:var(--text-light);margin-bottom:4px;">${d.p}</div>
+    <div class="char-hint">${t('meaning')}: ${d.e}</div>
+    <div style="margin:8px 0;">${isLearned ? `<span class="badge badge-green">${t('markLearned')}</span>` : ''}</div>
     <div style="display:flex;gap:8px;">
       <button class="btn ${isLearned ? 'btn-outline' : 'btn-green'} btn-block" onclick="toggleLearnedFromDetail('${char}')">${isLearned ? t('markUnlearned') : t('markLearned')}</button>
       <button class="btn btn-outline btn-block" onclick="document.getElementById('charDetailOverlay').classList.remove('show')">${t('cancelBtn')}</button>
@@ -1260,86 +1327,114 @@ function toggleLearnedFromDetail(char) {
   showCharDetail(char);
 }
 
-// ==================== STORIES ====================
-const STORIES = [
-  { title:{en:'One Two Three',zh:'一二三'}, text:'一，二，三！一二三，三二一。', chars:['一','二','三'], level:1, pinyin:{} },
-  { title:{en:'Big and Small',zh:'大和小'}, text:'大大大，小小小。一个大，一个小。', chars:['一','大','小'], level:1, pinyin:{'个':'gè','和':'hé'} },
-  { title:{en:'Up and Down',zh:'上和下'}, text:'上上下下，大上小下。一上二下三上下。', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{'和':'hé'} },
-  { title:{en:'A Person',zh:'一个人'}, text:'一个人，一个口，二个手。大人小人，上下走。', chars:['一','二','大','小','上','下','人','口','手'], level:2, pinyin:{'个':'gè','走':'zǒu'} },
-  { title:{en:'Sun and Moon',zh:'日和月'}, text:'日在上，月在下。大日小月，天上的日月。', chars:['日','月','上','下','大','小','天'], level:2, pinyin:{'在':'zài','的':'de','和':'hé'} },
-  { title:{en:'Water and Fire',zh:'水和火'}, text:'水火不同。水在下，火在上。大水大火，小水小火。', chars:['水','火','上','下','大','小'], level:2, pinyin:{'不':'bù','同':'tóng','在':'zài','和':'hé'} },
-  { title:{en:'Hands and Mouth',zh:'手和口'}, text:'一个口，二个手。小手大口，大手小口。人人有手有口。', chars:['一','二','大','小','人','口','手'], level:2, pinyin:{'个':'gè','有':'yǒu','和':'hé'} },
-  { title:{en:'Day and Night',zh:'日和月'}, text:'日是白天，月是夜。日上山，月下山。天上有日月。', chars:['日','月','上','下','山','天'], level:2, pinyin:{'是':'shì','白':'bái','夜':'yè','有':'yǒu','和':'hé'} },
-  { title:{en:'The Mountain',zh:'大山'}, text:'大山上有大石，小山下有小花。山上有木，山下有田。', chars:['大','小','上','下','山','石','花','木','田'], level:3, pinyin:{'有':'yǒu'} },
-  { title:{en:'Trees and Flowers',zh:'花和木'}, text:'山上有木，地上有花。大木在山上，小花在地下。天上日月，地上山水。', chars:['山','木','花','地','天','日','月','上','下','大','小','水'], level:3, pinyin:{'有':'yǒu','在':'zài','和':'hé'} },
-  { title:{en:'In the Field',zh:'在田里'}, text:'田在山下，田在地上。田里有水，田上有花。大田小田，天天有人。', chars:['田','山','下','地','上','水','花','大','小','天','人'], level:3, pinyin:{'在':'zài','里':'lǐ','有':'yǒu'} },
-  { title:{en:'Sky and Earth',zh:'天和地'}, text:'天上有日月，地上有山水。天大地大，人在天地中。花在地上，鸟在天上。', chars:['天','地','上','日','月','山','水','大','人','花','鸟'], level:3, pinyin:{'有':'yǒu','在':'zài','中':'zhōng','和':'hé'} },
-  { title:{en:'Stone and Water',zh:'石和水'}, text:'大石在山上，小石在水下。石头大大小小，水在石下流。', chars:['大','小','山','上','下','石','水'], level:3, pinyin:{'在':'zài','头':'tou','流':'liú','和':'hé'} },
-  { title:{en:'My Family',zh:'我的家'}, text:'我有一个家。家里有爸爸妈妈。爸爸好，妈妈好，我也好。', chars:['我','家','爸','妈','好','一'], level:4, pinyin:{'有':'yǒu','个':'gè','里':'lǐ','也':'yě','的':'de'} },
-  { title:{en:'You and Me',zh:'你和我'}, text:'你好！我好！你大我小。你是我的好朋友。', chars:['你','我','好','大','小'], level:4, pinyin:{'是':'shì','的':'de','朋':'péng','友':'yǒu','和':'hé'} },
-  { title:{en:'Dad and Mom',zh:'爸爸妈妈'}, text:'爸爸大，妈妈大，我小。爸爸的手大，我的手小。妈妈好，爸爸好。', chars:['爸','妈','我','大','小','手','好'], level:4, pinyin:{'的':'de'} },
-  { title:{en:'At Home',zh:'在家里'}, text:'家在山下。家里有爸妈和我。家上有天，家下有地。我们的家好大。', chars:['家','山','下','爸','妈','我','上','天','地','好','大'], level:4, pinyin:{'在':'zài','里':'lǐ','有':'yǒu','和':'hé','们':'men','的':'de'} },
-  { title:{en:'He and I',zh:'他和我'}, text:'他是人，我也是人。他大我小。他好，我也好。你好他好大家好。', chars:['他','我','人','大','小','好','你','家'], level:4, pinyin:{'是':'shì','也':'yě','和':'hé'} },
-  { title:{en:'My Good Family',zh:'好家人'}, text:'爸爸好，妈妈好，我好，你好，他也好。一家人，大大小小，上上下下，好好好！', chars:['爸','妈','我','你','他','好','一','家','人','大','小','上','下'], level:4, pinyin:{'也':'yě'} },
-  { title:{en:'The Fish',zh:'小鱼'}, text:'水里有小鱼。大鱼在下，小鱼在上。一二三，三个小鱼在水里。', chars:['水','小','鱼','大','上','下','一','二','三'], level:5, pinyin:{'里':'lǐ','有':'yǒu','在':'zài','个':'gè'} },
-  { title:{en:'The Bird',zh:'小鸟'}, text:'天上有小鸟。鸟在山上飞。大鸟小鸟，一二三四五。鸟好好看。', chars:['天','上','小','鸟','山','大','一','二','三','好'], level:5, pinyin:{'有':'yǒu','在':'zài','飞':'fēi','四':'sì','五':'wǔ','看':'kàn'} },
-  { title:{en:'Cat and Dog',zh:'猫和狗'}, text:'我家有猫有狗。猫小狗大。猫在上，狗在下。猫好，狗也好。', chars:['我','家','猫','狗','小','大','上','下','好'], level:5, pinyin:{'有':'yǒu','在':'zài','也':'yě','和':'hé'} },
-  { title:{en:'Farm Animals',zh:'农场动物'}, text:'山下有牛有羊有马。大牛小牛，大羊小羊。马在田上跑。', chars:['山','下','牛','羊','马','大','小','田','上'], level:5, pinyin:{'有':'yǒu','在':'zài','跑':'pǎo'} },
-  { title:{en:'The Bug',zh:'小虫'}, text:'地上有小虫。花上有小虫。虫在花上走，虫在地下爬。大虫小虫。', chars:['地','上','小','虫','花','下','大'], level:5, pinyin:{'有':'yǒu','在':'zài','走':'zǒu','爬':'pá'} },
-  { title:{en:'Nature',zh:'大自然'}, text:'天上有日月鸟，地上有山水田。水里有鱼，山上有花木。大自然好美！', chars:['天','上','日','月','鸟','地','山','水','田','鱼','花','木','大','好'], level:5, pinyin:{'有':'yǒu','里':'lǐ','自':'zì','然':'rán','美':'měi'} },
-  { title:{en:'My World',zh:'我的世界'}, text:'我的家在山下。家里有爸妈猫狗。天上有日月鸟。地上有花木田。山上有水石。好大的世界！', chars:['我','家','山','下','爸','妈','猫','狗','天','上','日','月','鸟','地','花','木','田','水','石','好','大'], level:5, pinyin:{'的':'de','在':'zài','里':'lǐ','有':'yǒu','世':'shì','界':'jiè'} },
-];
+function renderChineseChars() {
+  const groups = Object.keys(CHAR_DB);
+  let tabsHtml = `<button class="filter-btn ${charGroup==='all'?'active':''}" onclick="charGroup='all';charPage=0;renderChineseChars();">${t('allCat')} (${ALL_CHARS_FLAT.length})</button>`;
+  for (const gk of groups) {
+    const g = CHAR_DB[gk];
+    tabsHtml += `<button class="filter-btn ${charGroup===gk?'active':''}" onclick="charGroup='${gk}';charPage=0;renderChineseChars();">${g.icon} ${g[currentLang]||g.en} (${g.items.length})</button>`;
+  }
+  document.getElementById('charCategoryTabs').innerHTML = tabsHtml;
 
-function renderStories() {
-  const learned = data.learning.learnedChinese;
+  let chars = charGroup === 'all' ? ALL_CHARS_FLAT : ALL_CHARS_FLAT.filter(c => c.g === charGroup);
+  const total = chars.length;
+  const totalPages = Math.ceil(total / CHARS_PER_PAGE);
+  if (charPage >= totalPages) charPage = Math.max(0, totalPages - 1);
+  const pageChars = chars.slice(charPage * CHARS_PER_PAGE, (charPage + 1) * CHARS_PER_PAGE);
+
+  const phase = data.phases[data.learning.currentPhase];
+  const phaseChars = phase ? phase.chinese : [];
   let html = '';
-  STORIES.forEach((story, i) => {
-    const knownCount = story.chars.filter(c => learned.includes(c)).length;
-    const total = story.chars.length;
-    const pct = total > 0 ? Math.round((knownCount / total) * 100) : 0;
-    const unlocked = pct >= 60;
-    const levelStars = '⭐'.repeat(story.level);
-    html += `<div class="story-card ${unlocked ? '' : 'locked'}" onclick="${unlocked ? `showStory(${i})` : ''}">
-      <div class="story-title">${story.title[currentLang] || story.title.en} <span style="font-size:11px;">${levelStars}</span></div>
-      <div class="story-level">${knownCount}/${total} ${t('charsKnown')} ${!unlocked ? '· ' + t('locked') : ''}</div>
-      <div class="story-progress"><div class="fill" style="width:${pct}%"></div></div>
+  pageChars.forEach(ch => {
+    const learned = data.learning.learnedChinese.includes(ch.c);
+    const isCurrent = phaseChars.includes(ch.c);
+    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
+    html += `<div class="char-cell ${cls}" onclick="showCharDetail('${ch.c}')" title="${ch.p} ${ch.e}">
+      <div class="char-svg" style="font-size:18px;line-height:1;">${ch.m}</div>
+      <div class="char-text">${ch.c}</div>
     </div>`;
   });
-  document.getElementById('storiesContainer').innerHTML = html;
+  document.getElementById('chineseGrid').innerHTML = html;
+
+  let pagHtml = '';
+  if (totalPages > 1) {
+    pagHtml += `<button class="btn btn-outline btn-small" ${charPage===0?'disabled':''} onclick="charPage--;renderChineseChars();">◀</button>`;
+    pagHtml += `<span style="font-size:12px;padding:4px 8px;">${charPage+1}/${totalPages}</span>`;
+    pagHtml += `<button class="btn btn-outline btn-small" ${charPage>=totalPages-1?'disabled':''} onclick="charPage++;renderChineseChars();">▶</button>`;
+  }
+  document.getElementById('charPagination').innerHTML = pagHtml;
+
+  const learnedCount = ALL_CHARS_FLAT.filter(c => data.learning.learnedChinese.includes(c.c)).length;
+  document.getElementById('charCountInfo').textContent = `${learnedCount}/${ALL_CHARS_FLAT.length} ${t('charsKnown')}`;
 }
 
-function showStory(idx) {
-  const story = STORIES[idx];
-  if (!story) return;
-  const learned = data.learning.learnedChinese;
-  const allPinyin = { ...CHAR_PINYIN, ...story.pinyin };
-  let textHtml = '';
-  for (const char of story.text) {
-    if (/[\s，。！？、；：""''（）]/.test(char)) {
-      textHtml += char;
-    } else if (learned.includes(char)) {
-      textHtml += `<span class="known">${char}</span>`;
-    } else {
-      const py = allPinyin[char] || '';
-      if (py) {
-        textHtml += `<ruby class="unknown">${char}<rt>${py}</rt></ruby>`;
-      } else {
-        textHtml += `<span class="unknown">${char}</span>`;
-      }
-    }
-  }
-  openModal(`
-    <h3>${story.title[currentLang] || story.title.en}</h3>
-    <div class="story-modal-text">${textHtml}</div>
-    <div style="font-size:12px;color:var(--text-light);margin-top:8px;">
-      <span class="known" style="font-size:14px;">绿</span> = ${t('markLearned')} &nbsp;
-      <span class="unknown" style="font-size:14px;">红</span> = pinyin
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancelBtn')}</button>
-    </div>
-  `);
+// ==================== TIPS DATA ====================
+const LEARNING_TIPS = [
+  { en: '<strong>Keep sessions short</strong> — 10-15 min per activity. A 3yo\'s attention span is about 6-15 minutes.', zh: '<strong>保持简短</strong> — 每个活动10-15分钟。3岁孩子的注意力约6-15分钟。' },
+  { en: '<strong>Play-based learning</strong> — use songs, games, flashcards with pictures, and physical movement.', zh: '<strong>游戏化学习</strong> — 用歌曲、游戏、图片卡和肢体运动来学习。' },
+  { en: '<strong>Repetition is key</strong> — review previously learned items at the start of each session.', zh: '<strong>重复是关键</strong> — 每次学习开始时复习之前学过的内容。' },
+  { en: '<strong>Multi-sensory approach</strong> — trace letters in sand, form characters with playdough, count real objects.', zh: '<strong>多感官方法</strong> — 在沙子上描字、用橡皮泥捏汉字、数真实物品。' },
+  { en: '<strong>Follow the child\'s interest</strong> — if they engage more with numbers today, extend that activity.', zh: '<strong>跟随孩子兴趣</strong> — 如果今天对数字更感兴趣，就延长该活动。' },
+  { en: '<strong>Celebrate small wins</strong> — stickers, high-fives, and praise reinforce positive learning attitudes.', zh: '<strong>庆祝小进步</strong> — 贴纸、击掌和表扬能强化积极的学习态度。' },
+];
+
+const BEDTIME_TIPS = [
+  { en: '<strong>Consistent wind-down:</strong> Start the same routine 45 min before target bedtime — dim lights, quiet activities.', zh: '<strong>固定放松流程：</strong>在目标就寝前45分钟开始——调暗灯光、安静活动。' },
+  { en: '<strong>No screens</strong> for at least 1 hour before bed. Blue light delays melatonin by 30+ minutes.', zh: '<strong>睡前至少1小时不看屏幕。</strong>蓝光会延迟褪黑素分泌30分钟以上。' },
+  { en: '<strong>Physical activity during the day</strong> — playground and swimming help tremendously.', zh: '<strong>白天保持运动</strong> — 游乐场和游泳非常有帮助。' },
+  { en: '<strong>Cool, dark room</strong> — set AC to 24-25°C. Use blackout curtains if possible.', zh: '<strong>凉爽暗室</strong> — 空调24-25°C，尽量用遮光窗帘。' },
+  { en: '<strong>Gradual shift:</strong> Move bedtime 15 min earlier every 3-4 days.', zh: '<strong>逐步调整：</strong>每3-4天提前15分钟就寝。' },
+  { en: '<strong>Books before bed:</strong> Reading 2-3 short books signals "sleep is coming."', zh: '<strong>睡前读书：</strong>读2-3本短故事暗示"该睡了"。' },
+  { en: '<strong>Avoid sugar after dinner.</strong> Water or warm milk are better.', zh: '<strong>晚餐后避免糖分。</strong>水或温牛奶更好。' },
+  { en: '<strong>Comfort object:</strong> A favorite stuffed animal or blanket provides security.', zh: '<strong>安抚物：</strong>最喜欢的毛绒玩具或毯子能提供安全感。' },
+  { en: '<strong>White noise or soft music:</strong> Helps block out household sounds.', zh: '<strong>白噪音或轻音乐：</strong>帮助隔绝家庭噪音。' },
+  { en: '<strong>Sticker chart:</strong> Reward good bedtime behavior. 5 stickers = a small prize!', zh: '<strong>贴纸奖励表：</strong>奖励好的睡前表现。5个贴纸 = 一个小奖品！' },
+];
+
+function renderTips() {
+  let ltHtml = '';
+  LEARNING_TIPS.forEach((tip, i) => {
+    ltHtml += `<div class="tip-item"><div class="tip-num">${i+1}</div><div class="tip-text">${tip[currentLang]}</div></div>`;
+  });
+  const ltEl = document.getElementById('learningTipsContent');
+  if (ltEl) ltEl.innerHTML = ltHtml;
+
+  let btHtml = '';
+  BEDTIME_TIPS.forEach((tip, i) => {
+    btHtml += `<div class="tip-item"><div class="tip-num">${i+1}</div><div class="tip-text">${tip[currentLang]}</div></div>`;
+  });
+  const btEl = document.getElementById('bedtimeTipsContent');
+  if (btEl) btEl.innerHTML = btHtml;
 }
+
+// ==================== STORIES (3 variants per phase) ====================
+// Child already knows: 一二三四五山水火上下石木哭笑大小了子月日田
+const STORIES = [
+  // Phase 1: 一二三大小上下 (all known — confidence builders)
+  { title:{en:'Counting Fun',zh:'数一数'}, text:'一二三四五，五四三二一。大的上，小的下。笑了笑了，一二三！', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'Big Mountain',zh:'大山小石'}, text:'大山上有大石，小山下有小石。山上有木，山下有水。一二三四五，上上下下。', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'Cry and Laugh',zh:'哭和笑'}, text:'小子哭了，大子笑了。一上一下，大子小子。三四五，笑了笑了，不哭了！', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+
+  // Phase 2: 人口手日月水火 (日月水火 known, 人口手 new)
+  { title:{en:'Big Hands',zh:'人的手'}, text:'一个大人，二个小人。大人的手大，小人的手小。人口也大小不同。日上山了，月下山了。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+  { title:{en:'Sun and Moon',zh:'日和月'}, text:'日在上，月在下。日是火，月是水。大人用手拿水，小人用口喝水。日月山水，一二三四五。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+  { title:{en:'Hilltop Person',zh:'山上的人'}, text:'山上有人，水上有月。人的手上有石子。日出了，火红的天。小子笑了，大人也笑了。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+
+  // Phase 3: 山木石田天地花 (山木石田 known, 天地花 new)
+  { title:{en:'Sky and Earth',zh:'天上地下'}, text:'天大大的，地也大大的。天上有日月，地上有山水。花在田里，木在山上，石在水下。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{} },
+  { title:{en:'Field Flowers',zh:'田里的花'}, text:'田里有花，山上有木。日照田里的花，水流山下的田。大花小花，一二三四五朵花。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{'照':'zhào','流':'liú','朵':'duǒ'} },
+  { title:{en:'Look Around',zh:'看天看地'}, text:'上看天，下看地。天上日月，地上山水。田里有花有木。石子大大小小。天地之间，花笑了。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{'之':'zhī'} },
+
+  // Phase 4: 爸妈我你他好家 (all new — family words)
+  { title:{en:'My Home',zh:'我的家'}, text:'我有一个家。家里有爸爸，有妈妈。爸爸好大，我好小。妈妈笑了，我也笑了。家在大山下。', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{} },
+  { title:{en:'Hello Hello',zh:'你好我好'}, text:'你好！我好！爸爸妈妈好！你笑我也笑。他哭了我不哭。你大我小。我们一起上山去！', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{'起':'qǐ'} },
+  { title:{en:'Good Parents',zh:'好爸爸好妈妈'}, text:'爸爸的手大，妈妈的手小。我的手更小了！他是我爸爸，她是我妈妈。家好，我好，你也好！', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{'更':'gèng'} },
+
+  // Phase 5: 鱼鸟马牛羊猫狗虫 (all new — animals)
+  { title:{en:'Cat and Dog',zh:'小猫小狗'}, text:'我家有猫有狗。猫小了，狗大了。猫笑了，狗哭了。猫在上面，狗在下面。猫和狗是好朋友。', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{} },
+  { title:{en:'The Farm',zh:'山下农场'}, text:'山下有牛有羊有马。大牛吃草，小羊喝水。马在田上跑。鸟在天上飞。鱼在水里。虫在地上爬。', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{'农':'nóng','场':'chǎng'} },
+  { title:{en:'I Love Nature',zh:'我爱大自然'}, text:'天上有鸟，水里有鱼。山上有马有羊，田里有牛有虫。猫和狗在家里。大大小小，笑了笑了！', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{} },
+];
 
 // ==================== RECIPES ====================
 const RECIPES = [
@@ -1383,6 +1478,58 @@ const RECIPES = [
   { name:{en:'Pumpkin Congee',zh:'南瓜粥'}, cat:'soup', diff:1, time:30, emoji:'🎃', ing:['南瓜 200g/200g pumpkin','大米 半杯/½ cup rice','水/water'], steps:['南瓜去皮切块/Peel & dice pumpkin','大米泡水/Soak rice','一起煮至浓稠/Cook together until thick','南瓜煮化即可/Pumpkin should melt into congee'], tags:['sweet','vitamin-a'] },
 ];
 
+function renderStories() {
+  const learned = data.learning.learnedChinese;
+  let html = '';
+  STORIES.forEach((story, i) => {
+    const knownCount = story.chars.filter(c => learned.includes(c)).length;
+    const total = story.chars.length;
+    const pct = total > 0 ? Math.round((knownCount / total) * 100) : 0;
+    const unlocked = pct >= 60;
+    const levelStars = '⭐'.repeat(story.level);
+    html += `<div class="story-card ${unlocked ? '' : 'locked'}" onclick="${unlocked ? `showStory(${i})` : ''}">
+      <div class="story-title">${story.title[currentLang] || story.title.en} <span style="font-size:11px;">${levelStars}</span></div>
+      <div class="story-level">${knownCount}/${total} ${t('charsKnown')} ${!unlocked ? '· ' + t('locked') : ''}</div>
+      <div class="story-progress"><div class="fill" style="width:${pct}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('storiesContainer').innerHTML = html;
+}
+
+function showStory(idx) {
+  const story = STORIES[idx];
+  if (!story) return;
+  const learned = data.learning.learnedChinese;
+  let textHtml = '';
+  for (const char of story.text) {
+    if (/[\s，。！？、；：""''（）]/.test(char)) {
+      textHtml += char;
+    } else if (learned.includes(char)) {
+      textHtml += `<span class="known">${char}</span>`;
+    } else {
+      const lu = CHAR_LOOKUP[char];
+      const py = lu ? lu.p : (story.pinyin[char] || '');
+      if (py) {
+        textHtml += `<ruby class="unknown">${char}<rt>${py}</rt></ruby>`;
+      } else {
+        textHtml += `<span class="unknown">${char}</span>`;
+      }
+    }
+  }
+  openModal(`
+    <h3>${story.title[currentLang] || story.title.en}</h3>
+    <div class="story-modal-text">${textHtml}</div>
+    <div style="font-size:12px;color:var(--text-light);margin-top:8px;">
+      <span class="known" style="font-size:14px;">绿</span> = ${t('markLearned')} &nbsp;
+      <span class="unknown" style="font-size:14px;">红</span> = pinyin
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancelBtn')}</button>
+    </div>
+  `);
+}
+
+// ==================== RECIPES ====================
 let recipeFilter = 'all';
 
 function renderRecipes() {
@@ -1446,7 +1593,9 @@ function showRecipeDetail(idx) {
 
 function getRecipeForMeal(mealName) {
   if (!mealName) return null;
-  const lower = mealName.toLowerCase();
+  // mealName could be a raw bilingual string like "咖喱鸡饭/Curry chicken with rice"
+  const lower = (typeof mealName === 'string' ? mealName : '').toLowerCase();
+  if (!lower) return null;
   return RECIPES.find(r => {
     const en = (r.name.en || '').toLowerCase();
     const zh = r.name.zh || '';
@@ -1511,6 +1660,12 @@ const DEFAULT_DATA = {
       "苹果片/Apple slices", "香蕉/Banana", "酸奶/Yogurt", "芝士饼干/Cheese crackers",
       "葡萄/Grapes", "蒸玉米/Steamed corn", "葡萄干/Raisins", "米饼/Rice crackers",
       "西瓜/Watermelon", "蓝莓/Blueberries", "果酱面包/Bread with jam", "豆浆/Soy milk"
+    ],
+    sides: [
+      "炒西兰花/Stir-fried broccoli", "蒜蓉菠菜/Garlic spinach", "番茄蛋花汤/Tomato egg soup",
+      "拍黄瓜/Smashed cucumber", "蒸南瓜/Steamed pumpkin", "凉拌胡萝卜/Carrot salad",
+      "紫菜汤/Seaweed soup", "土豆泥/Mashed potato", "蒸蛋/Steamed egg custard",
+      "玉米排骨汤/Corn rib soup", "炒豆角/Stir-fried green beans", "白灼虾/Boiled shrimp"
     ],
   },
 
@@ -1663,6 +1818,7 @@ function loadData() {
       }
       if (!data.phases) data.phases = JSON.parse(JSON.stringify(DEFAULT_DATA.phases));
       if (!data.venues) data.venues = JSON.parse(JSON.stringify(DEFAULT_DATA.venues));
+      if (data.foods && !data.foods.sides) data.foods.sides = JSON.parse(JSON.stringify(DEFAULT_DATA.foods.sides));
     } else {
       data = JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
@@ -1791,21 +1947,28 @@ function renderToday() {
   const menu = data.weeklyMenu[weekKey];
   if (menu && menu[dayKey]) {
     const m = menu[dayKey];
-    const bfRecipe = getRecipeForMeal(m.breakfast);
-    const dnRecipe = getRecipeForMeal(m.dinner);
-    const bfBtn = bfRecipe ? `<div style="margin-top:4px;"><button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(bfRecipe)})">${t('viewRecipe')}</button></div>` : '';
-    const dnBtn = dnRecipe ? `<div style="margin-top:4px;"><button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(dnRecipe)})">${t('viewRecipe')}</button></div>` : '';
+    const bfMain = getMealParts(m.breakfast).main;
+    const bfSide = getMealParts(m.breakfast).side;
+    const dnMain = getMealParts(m.dinner).main;
+    const dnSide = getMealParts(m.dinner).side;
+    const bfRecipe = getRecipeForMeal(bfMain);
+    const dnRecipe = getRecipeForMeal(dnMain);
+    const bfBtn = bfRecipe ? `<button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(bfRecipe)})">${t('viewRecipe')}</button> ` : '';
+    const dnBtn = dnRecipe ? `<button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(dnRecipe)})">${t('viewRecipe')}</button> ` : '';
+    const bfSearch = bfMain ? `<button class="btn btn-small" style="background:var(--accent);color:white;" onclick="searchOnlineRecipe('${bfMain.replace(/'/g,"\\'")}')">🔍 ${t('searchOnline')}</button>` : '';
+    const dnSearch = dnMain ? `<button class="btn btn-small" style="background:var(--accent);color:white;" onclick="searchOnlineRecipe('${dnMain.replace(/'/g,"\\'")}')">🔍 ${t('searchOnline')}</button>` : '';
+    const dnSideSearch = dnSide ? `<button class="btn btn-small" style="background:var(--accent);color:white;margin-top:4px;" onclick="searchOnlineRecipe('${dnSide.replace(/'/g,"\\'")}')">🔍 ${fd(dnSide)}</button>` : '';
     document.getElementById('todayMeals').innerHTML = `
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:120px;padding:8px;background:#FFF8E1;border-radius:8px;">
           <div style="font-size:11px;font-weight:600;color:#F57F17;">${t('breakfast')}</div>
-          <div style="font-size:13px;margin-top:2px;">${fd(m.breakfast) || '—'}</div>
-          ${bfBtn}
+          <div style="font-size:13px;margin-top:2px;">${getMealDisplay(m.breakfast) || '—'}</div>
+          <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">${bfBtn}${bfSearch}</div>
         </div>
         <div style="flex:1;min-width:120px;padding:8px;background:#E8F5E8;border-radius:8px;">
           <div style="font-size:11px;font-weight:600;color:#2E7D32;">${t('dinner')}</div>
-          <div style="font-size:13px;margin-top:2px;">${fd(m.dinner) || '—'}</div>
-          ${dnBtn}
+          <div style="font-size:13px;margin-top:2px;">${getMealDisplay(m.dinner) || '—'}</div>
+          <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">${dnBtn}${dnSearch}${dnSideSearch}</div>
         </div>
       </div>`;
   } else {
@@ -1820,7 +1983,7 @@ function getTodayMeal(type) {
   const weekKey = getWeekKey(selectedDate);
   const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
   const menu = data.weeklyMenu[weekKey];
-  if (menu && menu[dayKey] && menu[dayKey][type]) return fd(menu[dayKey][type]);
+  if (menu && menu[dayKey] && menu[dayKey][type]) return getMealDisplay(menu[dayKey][type]);
   return t('notPlanned');
 }
 
@@ -1867,14 +2030,16 @@ function renderMeals() {
   // Breakfast row
   html += `<div class="cell row-header">${t('bfast')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
-    const meal = menu[d]?.breakfast || '';
-    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${meal ? fd(meal) : '+'}</div>`;
+    const mealObj = menu[d]?.breakfast;
+    const { main } = getMealParts(mealObj);
+    html += `<div class="cell ${main ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${main ? fd(main) : '+'}</div>`;
   });
   // Dinner row
   html += `<div class="cell row-header">${t('dinner')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
-    const meal = menu[d]?.dinner || '';
-    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${meal ? fd(meal) : '+'}</div>`;
+    const mealObj = menu[d]?.dinner;
+    const { main } = getMealParts(mealObj);
+    html += `<div class="cell ${main ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${main ? fd(main) : '+'}</div>`;
   });
   html += '</div>';
   document.getElementById('weekMenuGrid').innerHTML = html;
@@ -1883,6 +2048,7 @@ function renderMeals() {
   renderFoodList('breakfast', 'breakfastList');
   renderFoodList('dinner', 'dinnerList');
   renderFoodList('snack', 'snackList');
+  renderFoodList('sides', 'sidesList');
 
   // Meal history
   renderMealHistory();
@@ -1901,8 +2067,8 @@ function renderFoodList(type, containerId) {
 }
 
 function addFood(type) {
-  const inputId = type === 'breakfast' ? 'addBreakfast' : (type === 'dinner' ? 'addDinner' : 'addSnack');
-  const input = document.getElementById(inputId);
+  const inputMap = { breakfast: 'addBreakfast', dinner: 'addDinner', snack: 'addSnack', sides: 'addSides' };
+  const input = document.getElementById(inputMap[type]);
   const val = input.value.trim();
   if (!val) return;
   if (!data.foods[type]) data.foods[type] = [];
@@ -1924,10 +2090,12 @@ function generateWeeklyMenu() {
   const days = ['mon','tue','wed','thu','fri','sat','sun'];
   const bList = [...data.foods.breakfast];
   const dList = [...data.foods.dinner];
+  const sList = [...(data.foods.sides || [])];
 
   // Shuffle to avoid same order every time
   shuffle(bList);
   shuffle(dList);
+  shuffle(sList);
 
   // Check recent meals from history to avoid repetition
   const recentBreakfast = data.mealHistory.filter(m => m.type === 'breakfast').slice(-7).map(m => m.meal);
@@ -1946,7 +2114,10 @@ function generateWeeklyMenu() {
     const dIdx = dList.indexOf(dn);
     if (dIdx > -1) { dList.splice(dIdx, 1); dList.push(dn); }
 
-    menu[day] = { breakfast: bf, dinner: dn };
+    menu[day] = {
+      breakfast: { main: bf, side: '' },
+      dinner: { main: dn, side: sList.length > 0 ? sList[i % sList.length] : '' }
+    };
   });
 
   data.weeklyMenu[weekKey] = menu;
@@ -1963,38 +2134,59 @@ function shuffle(arr) {
 }
 
 function editMeal(weekKey, day, type) {
-  const foods = data.foods[type] || [];
-  const current = data.weeklyMenu[weekKey]?.[day]?.[type] || '';
+  const mainFoods = data.foods[type] || [];
+  const sideFoods = data.foods.sides || [];
+  const currentObj = data.weeklyMenu[weekKey]?.[day]?.[type];
+  const { main: curMain, side: curSide } = getMealParts(currentObj);
 
-  let optionsHtml = foods.map(f =>
-    `<div class="venue-card ${f === current ? 'selected' : ''}" onclick="selectMeal('${weekKey}','${day}','${type}','${f.replace(/'/g,"\\'")}')">
-      <div class="venue-name">${fd(f)}</div>
+  const esc = s => (s || '').replace(/'/g, "\\'");
+
+  let mainOptionsHtml = mainFoods.map(f =>
+    `<div class="venue-card ${f === curMain ? 'selected' : ''}" style="padding:6px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <div class="venue-name" style="font-size:13px;flex:1;cursor:pointer;" onclick="document.getElementById('editMealMain').value='${esc(f)}'">${fd(f)}</div>
+      <span style="cursor:pointer;font-size:16px;" onclick="event.stopPropagation();searchOnlineRecipe('${esc(f)}')">🔍</span>
     </div>`
   ).join('');
 
+  let sideOptionsHtml = sideFoods.map(f =>
+    `<div class="venue-card ${f === curSide ? 'selected' : ''}" style="padding:6px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <div class="venue-name" style="font-size:13px;flex:1;cursor:pointer;" onclick="document.getElementById('editMealSide').value='${esc(f)}'">${fd(f)}</div>
+      <span style="cursor:pointer;font-size:16px;" onclick="event.stopPropagation();searchOnlineRecipe('${esc(f)}')">🔍</span>
+    </div>`
+  ).join('');
+
+  const dayLabel = day.charAt(0).toUpperCase() + day.slice(1);
   openModal(`
-    <h3>${t('pickMealTitle').replace('{type}',type).replace('{day}',day.charAt(0).toUpperCase()+day.slice(1))}</h3>
-    ${optionsHtml}
-    <div style="margin-top:12px;">
-      <label>${t('orTypeCustom')}</label>
-      <div class="add-input-row">
-        <input id="customMealInput" placeholder="${t('customMealPH')}" value="${current}">
-        <button class="btn btn-primary btn-small" onclick="selectMealCustom('${weekKey}','${day}','${type}')">${t('setBtn')}</button>
-      </div>
+    <h3>${t('pickMealTitle').replace('{type}',type).replace('{day}',dayLabel)}</h3>
+    <label style="font-size:14px;font-weight:700;margin-top:8px;">${t('mainDishLabel')}</label>
+    <div style="max-height:150px;overflow-y:auto;margin:6px 0;">${mainOptionsHtml}</div>
+    <div class="add-input-row">
+      <input id="editMealMain" placeholder="${t('customMealPH')}" value="${esc(curMain)}">
     </div>
-    <div class="modal-actions">
+    <label style="font-size:14px;font-weight:700;margin-top:12px;">${t('sideDishLabel')}</label>
+    <div style="max-height:150px;overflow-y:auto;margin:6px 0;">${sideOptionsHtml}</div>
+    <div class="add-input-row">
+      <input id="editMealSide" placeholder="${t('addSidePlaceholder')}" value="${esc(curSide)}">
+    </div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-small" style="background:var(--accent);color:white;" onclick="var v=document.getElementById('editMealMain').value.trim();if(v)searchOnlineRecipe(v);">🔍 ${t('searchOnline')}</button>
       <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="saveMealEdit('${weekKey}','${day}','${type}')">${t('saveBtn')}</button>
     </div>
   `);
 }
 
-function selectMeal(weekKey, day, type, meal) {
+function saveMealEdit(weekKey, day, type) {
+  const main = document.getElementById('editMealMain').value.trim();
+  const side = document.getElementById('editMealSide').value.trim();
+  if (!main && !side) { closeModal(); return; }
   if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
   if (!data.weeklyMenu[weekKey][day]) data.weeklyMenu[weekKey][day] = {};
-  data.weeklyMenu[weekKey][day][type] = meal;
+  data.weeklyMenu[weekKey][day][type] = { main, side };
 
   // Add to history
-  data.mealHistory.push({ type, meal, date: selectedDate.toISOString().split('T')[0] });
+  const display = getMealDisplay({ main, side });
+  data.mealHistory.push({ type, meal: display, date: selectedDate.toISOString().split('T')[0] });
   if (data.mealHistory.length > 100) data.mealHistory = data.mealHistory.slice(-50);
 
   saveData();
@@ -2003,9 +2195,20 @@ function selectMeal(weekKey, day, type, meal) {
   renderToday();
 }
 
-function selectMealCustom(weekKey, day, type) {
-  const val = document.getElementById('customMealInput').value.trim();
-  if (val) selectMeal(weekKey, day, type, val);
+function selectMeal(weekKey, day, type, meal) {
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  if (!data.weeklyMenu[weekKey][day]) data.weeklyMenu[weekKey][day] = {};
+  const curSide = getMealParts(data.weeklyMenu[weekKey][day][type]).side;
+  data.weeklyMenu[weekKey][day][type] = { main: meal, side: curSide };
+
+  // Add to history
+  data.mealHistory.push({ type, meal: fd(meal), date: selectedDate.toISOString().split('T')[0] });
+  if (data.mealHistory.length > 100) data.mealHistory = data.mealHistory.slice(-50);
+
+  saveData();
+  closeModal();
+  renderMeals();
+  renderToday();
 }
 
 function renderMealHistory() {
@@ -2058,21 +2261,8 @@ function renderLearn() {
   });
   document.getElementById('letterGrid').innerHTML = letterHtml;
 
-  // Chinese grid
-  const allChinese = [];
-  data.phases.forEach(p => p.chinese.forEach(c => { if (!allChinese.includes(c)) allChinese.push(c); }));
-  let chineseHtml = '';
-  allChinese.forEach(c => {
-    const learned = data.learning.learnedChinese.includes(c);
-    const isCurrent = phase && phase.chinese.includes(c);
-    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
-    const svgEl = renderCharSVG(c, 24);
-    chineseHtml += `<div class="char-cell ${cls}" onclick="showCharDetail('${c}')">
-      ${svgEl ? `<div class="char-svg">${svgEl}</div>` : ''}
-      <div class="char-text">${c}</div>
-    </div>`;
-  });
-  document.getElementById('chineseGrid').innerHTML = chineseHtml;
+  // Chinese grid (paginated 500-char database)
+  renderChineseChars();
 
   // Stories
   renderStories();
@@ -2471,6 +2661,255 @@ function addScheduleItem() {
   renderAll();
 }
 
+// ==================== CLOUD SYNC (share-by-code) ====================
+// Uses jsonblob.com — free, no auth, CORS-enabled JSON storage.
+// Each child gets a unique 6-char code. The code maps to a jsonblob ID stored in localStorage.
+const SYNC_API = 'https://jsonblob.com/api/jsonBlob';
+
+function getChildProfiles() {
+  try { return JSON.parse(localStorage.getItem('childProfiles') || '[]'); } catch(e) { return []; }
+}
+function saveChildProfiles(profiles) {
+  localStorage.setItem('childProfiles', JSON.stringify(profiles));
+}
+function getActiveChildCode() {
+  return localStorage.getItem('activeChildCode') || '';
+}
+function setActiveChildCode(code) {
+  localStorage.setItem('activeChildCode', code);
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function renderSyncUI() {
+  const profiles = getChildProfiles();
+  const activeCode = getActiveChildCode();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+
+  let html = '';
+  if (activeProfile) {
+    const lastSync = activeProfile.lastSynced ? new Date(activeProfile.lastSynced).toLocaleString() : '—';
+    html += `
+      <div style="background:var(--green-light);border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:700;color:#2E7D32;">🧒 ${activeProfile.name}</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:4px;color:var(--primary);margin:6px 0;font-family:monospace;">${activeProfile.code}</div>
+        <div style="font-size:11px;color:var(--text-light);">${t('shareCodeHint')}</div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:4px;">${t('lastSynced')}: ${lastSync}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-small" onclick="cloudSync()" id="syncNowBtn">⬆️ ${t('syncNow')}</button>
+        <button class="btn btn-green btn-small" onclick="cloudPull()">⬇️ Pull</button>
+        <button class="btn btn-outline btn-small" onclick="copyChildCode('${activeProfile.code}')">📋 ${t('childCode')}</button>
+      </div>
+      <div id="syncStatus" style="font-size:11px;color:var(--text-light);margin-top:6px;"></div>
+    `;
+    // Show other profiles for switching
+    if (profiles.length > 1) {
+      html += `<div style="margin-top:12px;font-size:13px;font-weight:600;">${t('switchChild')}</div>`;
+      profiles.filter(p => p.code !== activeCode).forEach(p => {
+        html += `<div class="venue-card" style="margin-top:4px;padding:8px;" onclick="switchToChild('${p.code}')">
+          <div style="font-size:13px;">🧒 ${p.name} <span style="color:var(--text-light);font-family:monospace;">${p.code}</span></div>
+        </div>`;
+      });
+    }
+    html += `<div style="margin-top:12px;">
+      <button class="btn btn-outline btn-small" onclick="showAddChildUI()">${t('createChild')}</button>
+      <button class="btn btn-outline btn-small" onclick="showJoinChildUI()">${t('joinChild')}</button>
+    </div>`;
+  } else {
+    html += `<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;">${t('noChildYet')}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="showAddChildUI()">${t('createChild')}</button>
+        <button class="btn btn-outline" onclick="showJoinChildUI()">${t('joinChild')}</button>
+      </div>`;
+    if (profiles.length > 0) {
+      html += `<div style="margin-top:12px;font-size:13px;font-weight:600;">${t('switchChild')}</div>`;
+      profiles.forEach(p => {
+        html += `<div class="venue-card" style="margin-top:4px;padding:8px;" onclick="switchToChild('${p.code}')">
+          <div style="font-size:13px;">🧒 ${p.name} <span style="color:var(--text-light);font-family:monospace;">${p.code}</span></div>
+        </div>`;
+      });
+    }
+  }
+  document.getElementById('syncUI').innerHTML = html;
+}
+
+function showAddChildUI() {
+  openModal(`
+    <h3>${t('createChild')}</h3>
+    <label>${t('childName')}</label>
+    <input id="newChildName" placeholder="${currentLang==='zh'?'例如：小明':'e.g., Mingming'}">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="createChild()">${t('saveBtn')}</button>
+    </div>
+  `);
+}
+
+function showJoinChildUI() {
+  openModal(`
+    <h3>${t('joinChild')}</h3>
+    <label>${t('enterCode')}</label>
+    <input id="joinCode" placeholder="ABC123" style="font-family:monospace;font-size:20px;letter-spacing:4px;text-align:center;text-transform:uppercase;" maxlength="6">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="joinChild()">${t('saveBtn')}</button>
+    </div>
+  `);
+}
+
+async function createChild() {
+  const name = document.getElementById('newChildName').value.trim();
+  if (!name) return;
+  const code = generateCode();
+  // Create cloud blob with current data
+  try {
+    const resp = await fetch(SYNC_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, name, data, ts: Date.now() })
+    });
+    if (!resp.ok) throw new Error('Create failed');
+    const blobUrl = resp.headers.get('Location') || resp.url;
+    const blobId = blobUrl.split('/').pop();
+    // Save profile
+    const profiles = getChildProfiles();
+    profiles.push({ code, name, blobId, lastSynced: Date.now() });
+    saveChildProfiles(profiles);
+    setActiveChildCode(code);
+    localStorage.setItem('toddlerPlanner_' + code, JSON.stringify(data));
+    closeModal();
+    renderSyncUI();
+    alert(`${currentLang==='zh'?'已创建！代码':'Created! Code'}: ${code}`);
+  } catch(e) {
+    alert(t('syncFail') + ': ' + e.message);
+  }
+}
+
+async function joinChild() {
+  const code = (document.getElementById('joinCode').value || '').trim().toUpperCase();
+  if (code.length !== 6) { alert(currentLang==='zh'?'请输入6位代码':'Please enter 6-digit code'); return; }
+  // Search for this code in existing profiles
+  const profiles = getChildProfiles();
+  const existing = profiles.find(p => p.code === code);
+  if (existing) {
+    // Already have it locally — just switch
+    switchToChild(code);
+    closeModal();
+    return;
+  }
+  // Try to find it in cloud — we need to know the blobId
+  // Since we don't have a search API, the code IS the lookup key.
+  // We store a mapping blob: code -> blobId at a known location.
+  // Simpler approach: use the code itself as a jsonblob by creating a "registry" blob.
+  // Actually simplest: encode the code in a predictable blobId pattern.
+  // For robustness, let's use the export/import approach: user shares code + blobId together.
+  // Better UX: store a registry at a known paste endpoint.
+
+  // Pragmatic approach: prompt user to also paste the blob ID that the creator can share
+  const blobId = prompt(currentLang==='zh'?'请输入同步ID（由创建者提供）:':'Enter sync ID (from creator):');
+  if (!blobId) return;
+
+  try {
+    const resp = await fetch(SYNC_API + '/' + blobId);
+    if (!resp.ok) throw new Error('Not found');
+    const cloudData = await resp.json();
+    if (cloudData.code !== code) throw new Error('Code mismatch');
+    // Load the data
+    data = cloudData.data;
+    saveData();
+    profiles.push({ code, name: cloudData.name, blobId, lastSynced: Date.now() });
+    saveChildProfiles(profiles);
+    setActiveChildCode(code);
+    closeModal();
+    renderAll();
+    renderSyncUI();
+    alert(`${currentLang==='zh'?'已加入':'Joined'}: ${cloudData.name}`);
+  } catch(e) {
+    alert(t('syncFail') + ': ' + e.message);
+  }
+}
+
+async function cloudSync() {
+  const code = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  if (!profile) return;
+  const statusEl = document.getElementById('syncStatus');
+  if (statusEl) statusEl.textContent = t('syncing');
+  try {
+    await fetch(SYNC_API + '/' + profile.blobId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, name: profile.name, data, ts: Date.now() })
+    });
+    profile.lastSynced = Date.now();
+    saveChildProfiles(profiles);
+    if (statusEl) statusEl.textContent = t('syncOk') + ' ' + new Date().toLocaleTimeString();
+    renderSyncUI();
+  } catch(e) {
+    if (statusEl) statusEl.textContent = t('syncFail');
+  }
+}
+
+async function cloudPull() {
+  const code = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  if (!profile) return;
+  const statusEl = document.getElementById('syncStatus');
+  if (statusEl) statusEl.textContent = t('syncing');
+  try {
+    const resp = await fetch(SYNC_API + '/' + profile.blobId);
+    if (!resp.ok) throw new Error('Pull failed');
+    const cloudData = await resp.json();
+    data = cloudData.data;
+    saveData();
+    profile.lastSynced = Date.now();
+    saveChildProfiles(profiles);
+    if (statusEl) statusEl.textContent = t('syncOk');
+    renderAll();
+    renderSyncUI();
+  } catch(e) {
+    if (statusEl) statusEl.textContent = t('syncFail');
+  }
+}
+
+function switchToChild(code) {
+  const activeCode = getActiveChildCode();
+  // Save current data for current child
+  if (activeCode) {
+    localStorage.setItem('toddlerPlanner_' + activeCode, JSON.stringify(data));
+  }
+  // Load data for new child
+  setActiveChildCode(code);
+  const saved = localStorage.getItem('toddlerPlanner_' + code);
+  if (saved) {
+    try { data = JSON.parse(saved); } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+  } else {
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+  saveData();
+  renderAll();
+  renderSyncUI();
+}
+
+function copyChildCode(code) {
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  const shareText = `${profile ? profile.name : ''}\n${currentLang==='zh'?'代码':'Code'}: ${code}\n${currentLang==='zh'?'同步ID':'Sync ID'}: ${profile ? profile.blobId : ''}\n${currentLang==='zh'?'打开此链接使用':'Open this link to use'}: ${location.href}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareText).then(() => alert(currentLang==='zh'?'已复制！发送给家人。':'Copied! Send to family.'));
+  } else {
+    prompt(currentLang==='zh'?'复制以下信息:':'Copy this:', shareText);
+  }
+}
+
 // ==================== EXPORT/IMPORT ====================
 function exportData() {
   const json = JSON.stringify(data, null, 2);
@@ -2507,6 +2946,8 @@ function renderAll() {
   renderLearn();
   renderWeekend();
   renderSettings();
+  renderTips();
+  renderSyncUI();
 }
 
 // ==================== INIT ====================
