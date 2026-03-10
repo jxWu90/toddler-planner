@@ -1103,6 +1103,14 @@ function toggleLang() {
   renderAll();
 }
 
+// Display bilingual food string ("中文/English") in the current language
+function fd(biStr) {
+  if (!biStr) return biStr;
+  const slash = biStr.indexOf('/');
+  if (slash === -1) return biStr; // user-typed, no slash
+  return currentLang === 'zh' ? biStr.substring(0, slash) : biStr.substring(slash + 1);
+}
+
 function updateI18nLabels() {
   const el = (id) => document.getElementById(id);
   el('appTitle').textContent = t('appTitle');
@@ -1487,22 +1495,22 @@ const DEFAULT_DATA = {
 
   foods: {
     breakfast: [
-      "Oatmeal with fruits", "Scrambled eggs & toast", "Pancakes",
-      "Congee with pork floss", "Noodle soup", "French toast",
-      "Rice with egg", "Steamed buns (baozi)", "Cereal with milk",
-      "Banana pancakes", "Dim sum (siew mai)", "Peanut butter sandwich"
+      "燕麦粥配水果/Oatmeal with fruits", "炒蛋吐司/Scrambled eggs & toast", "松饼/Pancakes",
+      "肉松粥/Congee with pork floss", "汤面/Noodle soup", "法式吐司/French toast",
+      "蛋炒饭/Rice with egg", "包子/Steamed buns (baozi)", "牛奶麦片/Cereal with milk",
+      "香蕉煎饼/Banana pancakes", "烧卖/Dim sum (siew mai)", "花生酱三明治/Peanut butter sandwich"
     ],
     dinner: [
-      "Rice + steamed chicken", "Pasta with meatballs", "Grilled fish + veggies",
-      "Dumplings (jiaozi)", "Fried rice with egg", "Tofu & vegetable stir-fry",
-      "Curry chicken with rice", "Noodles with minced pork", "Sweet potato + salmon",
-      "Congee with fish", "Chicken rice (Hainanese)", "Porridge with century egg",
-      "Steamed egg with rice", "Macaroni soup", "Rice + braised pork belly"
+      "米饭+蒸鸡/Rice + steamed chicken", "肉丸意面/Pasta with meatballs", "烤鱼配蔬菜/Grilled fish + veggies",
+      "水饺/Dumplings (jiaozi)", "蛋炒饭/Fried rice with egg", "豆腐炒蔬菜/Tofu & vegetable stir-fry",
+      "咖喱鸡饭/Curry chicken with rice", "肉末面条/Noodles with minced pork", "红薯三文鱼/Sweet potato + salmon",
+      "鱼粥/Congee with fish", "海南鸡饭/Chicken rice (Hainanese)", "皮蛋粥/Porridge with century egg",
+      "蒸蛋配饭/Steamed egg with rice", "通心粉汤/Macaroni soup", "红烧肉配饭/Rice + braised pork belly"
     ],
     snack: [
-      "Apple slices", "Banana", "Yogurt", "Cheese crackers",
-      "Grapes", "Steamed corn", "Raisins", "Rice crackers",
-      "Watermelon", "Blueberries", "Bread with jam", "Soy milk"
+      "苹果片/Apple slices", "香蕉/Banana", "酸奶/Yogurt", "芝士饼干/Cheese crackers",
+      "葡萄/Grapes", "蒸玉米/Steamed corn", "葡萄干/Raisins", "米饼/Rice crackers",
+      "西瓜/Watermelon", "蓝莓/Blueberries", "果酱面包/Bread with jam", "豆浆/Soy milk"
     ],
   },
 
@@ -1791,12 +1799,12 @@ function renderToday() {
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:120px;padding:8px;background:#FFF8E1;border-radius:8px;">
           <div style="font-size:11px;font-weight:600;color:#F57F17;">${t('breakfast')}</div>
-          <div style="font-size:13px;margin-top:2px;">${m.breakfast || '—'}</div>
+          <div style="font-size:13px;margin-top:2px;">${fd(m.breakfast) || '—'}</div>
           ${bfBtn}
         </div>
         <div style="flex:1;min-width:120px;padding:8px;background:#E8F5E8;border-radius:8px;">
           <div style="font-size:11px;font-weight:600;color:#2E7D32;">${t('dinner')}</div>
-          <div style="font-size:13px;margin-top:2px;">${m.dinner || '—'}</div>
+          <div style="font-size:13px;margin-top:2px;">${fd(m.dinner) || '—'}</div>
           ${dnBtn}
         </div>
       </div>`;
@@ -1812,7 +1820,7 @@ function getTodayMeal(type) {
   const weekKey = getWeekKey(selectedDate);
   const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
   const menu = data.weeklyMenu[weekKey];
-  if (menu && menu[dayKey] && menu[dayKey][type]) return menu[dayKey][type];
+  if (menu && menu[dayKey] && menu[dayKey][type]) return fd(menu[dayKey][type]);
   return t('notPlanned');
 }
 
@@ -1860,13 +1868,13 @@ function renderMeals() {
   html += `<div class="cell row-header">${t('bfast')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
     const meal = menu[d]?.breakfast || '';
-    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${meal || '+'}</div>`;
+    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${meal ? fd(meal) : '+'}</div>`;
   });
   // Dinner row
   html += `<div class="cell row-header">${t('dinner')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
     const meal = menu[d]?.dinner || '';
-    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${meal || '+'}</div>`;
+    html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${meal ? fd(meal) : '+'}</div>`;
   });
   html += '</div>';
   document.getElementById('weekMenuGrid').innerHTML = html;
@@ -1887,7 +1895,7 @@ function renderFoodList(type, containerId) {
   const list = data.foods[type] || [];
   let html = '';
   list.forEach((food, idx) => {
-    html += `<span class="food-tag">${food}<span class="remove" onclick="removeFood('${type}',${idx})">×</span></span>`;
+    html += `<span class="food-tag">${fd(food)}<span class="remove" onclick="removeFood('${type}',${idx})">×</span></span>`;
   });
   document.getElementById(containerId).innerHTML = html;
 }
@@ -1960,7 +1968,7 @@ function editMeal(weekKey, day, type) {
 
   let optionsHtml = foods.map(f =>
     `<div class="venue-card ${f === current ? 'selected' : ''}" onclick="selectMeal('${weekKey}','${day}','${type}','${f.replace(/'/g,"\\'")}')">
-      <div class="venue-name">${f}</div>
+      <div class="venue-name">${fd(f)}</div>
     </div>`
   ).join('');
 
@@ -2006,7 +2014,7 @@ function renderMealHistory() {
   let html = '<div style="font-size:12px;">';
   recent.forEach(m => {
     html += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0;">
-      <span>${m.meal}</span>
+      <span>${fd(m.meal)}</span>
       <span style="color:var(--text-light);">${m.type} · ${m.date}</span>
     </div>`;
   });
