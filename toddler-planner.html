@@ -1,0 +1,3141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Little Explorer Planner</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4A90D9">
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-light: #E8F1FB;
+  --accent: #FF8C42;
+  --green: #5CB85C;
+  --green-light: #E8F5E8;
+  --red: #E74C3C;
+  --yellow: #F5A623;
+  --yellow-light: #FFF8E1;
+  --purple: #9B59B6;
+  --purple-light: #F3E5F5;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #2C3E50;
+  --text-light: #7F8C8D;
+  --border: #E0E6ED;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-tap-highlight-color: transparent;
+}
+.header {
+  background: linear-gradient(135deg, var(--primary), #357ABD);
+  color: white;
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 { font-size: 20px; font-weight: 700; }
+.header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+.header .date-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.header .date-nav button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+.header .date-nav .current-date {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.tab-bar button {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 8px 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-light);
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.tab-bar button.active { color: var(--primary); }
+.tab-bar button .icon { font-size: 22px; line-height: 1; }
+.tab-content { display: none; padding: 16px; }
+.tab-content.active { display: block; }
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-light); color: #2E7D32; }
+.badge-yellow { background: var(--yellow-light); color: #F57F17; }
+.badge-purple { background: var(--purple-light); color: #7B1FA2; }
+/* Timeline */
+.timeline { position: relative; }
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 8px;
+  padding: 8px;
+}
+.timeline-item:hover { background: #f8f9fa; }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item.current { background: var(--primary-light); border-radius: 8px; }
+.timeline-item.past { opacity: 0.5; }
+.time-col {
+  min-width: 52px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding-top: 2px;
+}
+.activity-col { flex: 1; }
+.activity-name { font-size: 14px; font-weight: 500; }
+.activity-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.activity-icon { font-size: 20px; }
+/* Meal Planner */
+.week-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 11px;
+}
+.week-grid .cell {
+  background: white;
+  padding: 6px 4px;
+  text-align: center;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.week-grid .cell:hover { background: #f0f4ff; }
+.week-grid .header-cell {
+  background: var(--primary-light);
+  font-weight: 700;
+  color: var(--primary);
+  cursor: default;
+}
+.week-grid .row-header {
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--text-light);
+}
+.week-grid .cell.filled { color: var(--text); }
+.week-grid .cell.empty { color: #ccc; font-style: italic; }
+/* Food list */
+.food-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.food-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0f4ff;
+  border: 1px solid #d0daf0;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: default;
+}
+.food-tag .remove {
+  cursor: pointer;
+  color: var(--red);
+  font-weight: bold;
+  margin-left: 2px;
+}
+.add-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.add-input-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.add-input-row input:focus { border-color: var(--primary); }
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-accent { background: var(--accent); color: white; }
+.btn-green { background: var(--green); color: white; }
+.btn-outline {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn-small { padding: 5px 10px; font-size: 11px; }
+.btn-block { width: 100%; }
+/* Learning */
+.learn-card {
+  border-left: 4px solid var(--purple);
+  padding: 12px;
+  background: var(--purple-light);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+}
+.learn-card .learn-title { font-weight: 700; font-size: 14px; color: #6A1B9A; }
+.learn-card .learn-desc { font-size: 12px; color: #7B1FA2; margin-top: 4px; }
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), #CE93D8);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.char-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.char-cell.learned { background: var(--green-light); border-color: var(--green); color: var(--green); }
+.char-cell.current { background: var(--yellow-light); border-color: var(--yellow); }
+/* Weekend */
+.venue-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.venue-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.venue-card.selected { border-color: var(--green); background: var(--green-light); }
+.venue-icon { font-size: 28px; }
+.venue-info { flex: 1; }
+.venue-name { font-weight: 600; font-size: 14px; }
+.venue-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.venue-last { font-size: 10px; color: var(--accent); margin-top: 2px; }
+/* Tips */
+.tip-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tip-item:last-child { border-bottom: none; }
+.tip-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.tip-text { font-size: 13px; line-height: 1.5; }
+.tip-text strong { color: var(--primary); }
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } }
+.modal h3 { font-size: 17px; margin-bottom: 12px; }
+.modal label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+.modal input, .modal select, .modal textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.modal input:focus, .modal select:focus, .modal textarea:focus {
+  border-color: var(--primary);
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.modal-actions .btn { flex: 1; }
+/* Section title */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 16px 0 8px;
+}
+.section-title:first-child { margin-top: 0; }
+/* Toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.toggle-row:last-child { border-bottom: none; }
+/* Sleep tracker */
+.sleep-goal {
+  text-align: center;
+  padding: 16px;
+}
+.sleep-goal .time-display {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.sleep-goal .target { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+/* Export/Import */
+.share-box {
+  background: #f8f9fa;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+/* Timer */
+.timer-display {
+  text-align: center;
+  padding: 16px;
+}
+.timer-display .timer-time {
+  font-size: 48px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--purple);
+}
+.timer-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+/* Responsive */
+@media (min-width: 600px) {
+  .tab-content { max-width: 560px; margin: 0 auto; }
+}
+
+/* ==================== i18n Toggle ==================== */
+.lang-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+}
+.lang-toggle:active { background: rgba(255,255,255,0.4); }
+
+/* ==================== SVG Char Illustrations ==================== */
+.char-grid {
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)) !important;
+}
+.char-cell {
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px;
+}
+.char-cell .char-svg { line-height: 0; }
+.char-cell .char-text { font-size: 16px; line-height: 1.2; }
+.char-detail-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  align-items: center;
+  justify-content: center;
+}
+.char-detail-overlay.show { display: flex; }
+.char-detail-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 280px;
+  text-align: center;
+  animation: slideUp 0.25s ease;
+}
+.char-detail-box .big-char { font-size: 48px; font-weight: 800; margin: 8px 0; }
+.char-detail-box .char-hint { font-size: 14px; color: var(--text-light); margin: 4px 0 12px; }
+
+/* ==================== Stories ==================== */
+.story-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.story-card:hover { border-color: var(--purple); background: var(--purple-light); }
+.story-card.locked { opacity: 0.5; pointer-events: none; }
+.story-card .story-title { font-weight: 600; font-size: 14px; }
+.story-card .story-level { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.story-card .story-progress {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.story-card .story-progress .fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 2px;
+}
+.story-modal-text {
+  font-size: 22px;
+  line-height: 2.2;
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+.story-modal-text .known { color: var(--green); font-weight: 700; }
+.story-modal-text .unknown { color: var(--red); }
+.story-modal-text ruby { font-size: 22px; }
+.story-modal-text rt { font-size: 10px; color: var(--red); font-weight: 400; letter-spacing: 0; }
+
+/* ==================== Recipes ==================== */
+.recipe-search {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.recipe-search input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.recipe-search input:focus { border-color: var(--primary); }
+.recipe-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.recipe-filters .filter-btn {
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.recipe-filters .filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.recipe-list { max-height: 400px; overflow-y: auto; }
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.recipe-item:hover { background: #f8f9fa; }
+.recipe-item:last-child { border-bottom: none; }
+.recipe-item .recipe-emoji { font-size: 24px; }
+.recipe-item .recipe-info { flex: 1; }
+.recipe-item .recipe-name { font-size: 13px; font-weight: 600; }
+.recipe-item .recipe-meta { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.recipe-detail-section { margin: 12px 0; }
+.recipe-detail-section h4 { font-size: 14px; margin-bottom: 6px; color: var(--primary); }
+.recipe-detail-section ol, .recipe-detail-section ul {
+  margin-left: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+</style>
+</head>
+<body>
+
+<div class="header" style="position:relative;">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLang()">中文</button>
+  <h1 id="appTitle">Little Explorer Planner</h1>
+  <div class="subtitle" id="appSubtitle">Daily Schedule & Learning Tracker</div>
+  <div class="date-nav">
+    <button onclick="changeDate(-1)">&#9664;</button>
+    <span class="current-date" id="currentDate"></span>
+    <button onclick="changeDate(1)">&#9654;</button>
+    <button onclick="goToday()" style="width:auto;padding:0 10px;border-radius:14px;font-size:12px;" id="todayBtn">Today</button>
+  </div>
+</div>
+
+<!-- ===================== TAB: TODAY ===================== -->
+<div class="tab-content active" id="tab-today">
+  <div class="card">
+    <div class="card-title">
+      <span id="dailyScheduleTitle">Daily Schedule</span>
+      <span class="badge badge-green" id="dayType">Weekday</span>
+    </div>
+    <div class="timeline" id="todayTimeline"></div>
+  </div>
+
+  <div class="card" id="todayMealsCard">
+    <div class="card-title" id="todayMealsTitle">Today's Meals</div>
+    <div id="todayMeals"></div>
+  </div>
+
+  <div class="card" id="todayLearnCard">
+    <div class="card-title" id="todayLearnTitle">Today's Learning (7:30-8:15 PM)</div>
+    <div id="todayLearn"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: MEALS ===================== -->
+<div class="tab-content" id="tab-meals">
+  <div class="card">
+    <div class="card-title">
+      <span id="weeklyMealPlanTitle">Weekly Meal Plan</span>
+      <button class="btn btn-accent btn-small" onclick="generateWeeklyMenu()" id="autoGenBtn">Auto-Generate</button>
+    </div>
+    <div id="weekMenuGrid"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="mealGridHint">Tap any cell to change. Auto-generate rotates meals to avoid repetition.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="breakfastOptionsTitle">Breakfast Options</div>
+    <div class="food-list" id="breakfastList"></div>
+    <div class="add-input-row">
+      <input id="addBreakfast" placeholder="Add breakfast item..." onkeydown="if(event.key==='Enter')addFood('breakfast')">
+      <button class="btn btn-primary btn-small" onclick="addFood('breakfast')" id="addBreakfastBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="dinnerOptionsTitle">Dinner Options</div>
+    <div class="food-list" id="dinnerList"></div>
+    <div class="add-input-row">
+      <input id="addDinner" placeholder="Add dinner item..." onkeydown="if(event.key==='Enter')addFood('dinner')">
+      <button class="btn btn-primary btn-small" onclick="addFood('dinner')" id="addDinnerBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="snackOptionsTitle">Snack Options</div>
+    <div class="food-list" id="snackList"></div>
+    <div class="add-input-row">
+      <input id="addSnack" placeholder="Add snack item..." onkeydown="if(event.key==='Enter')addFood('snack')">
+      <button class="btn btn-primary btn-small" onclick="addFood('snack')" id="addSnackBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="sideOptionsTitle">Side Dish Options</div>
+    <div class="food-list" id="sidesList"></div>
+    <div class="add-input-row">
+      <input id="addSides" placeholder="Add side dish..." onkeydown="if(event.key==='Enter')addFood('sides')">
+      <button class="btn btn-primary btn-small" onclick="addFood('sides')" id="addSidesBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="mealHistoryTitle">Meal History</div>
+    <div id="mealHistory" style="font-size:12px;color:var(--text-light);">Recent meals served will appear here to help avoid repetition.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="recipesCardTitle">Recipe Collection</div>
+    <div class="recipe-search">
+      <input id="recipeSearchInput" placeholder="Search recipes..." oninput="renderRecipes()">
+    </div>
+    <div class="recipe-filters" id="recipeFilters"></div>
+    <div class="recipe-list" id="recipeList"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: LEARN ===================== -->
+<div class="tab-content" id="tab-learn">
+  <div class="card">
+    <div class="card-title">
+      <span id="learningTimerTitle">Learning Session Timer</span>
+      <span class="badge badge-purple" id="timerBadge">30-45 min</span>
+    </div>
+    <div class="timer-display">
+      <div class="timer-time" id="timerDisplay">00:00</div>
+      <div style="font-size:12px;color:var(--text-light);margin-top:4px;" id="timerLabel">Ready to start</div>
+    </div>
+    <div class="timer-controls">
+      <button class="btn btn-primary" onclick="toggleTimer()" id="timerBtn">Start</button>
+      <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span id="currentPhaseTitle">Current Phase</span>
+      <select id="phaseSelect" onchange="changePhase(this.value)" style="margin-left:auto;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;"></select>
+    </div>
+    <div id="phaseInfo"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="todayActivitiesTitle">Today's Activities</div>
+    <div id="todayActivities"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="lettersTitle">Letters (A-Z)</div>
+    <div class="char-grid" id="letterGrid"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="tapToMarkHint">Tap to mark as learned. Green = learned, Yellow = this week's focus.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="chineseCharsTitle">Chinese Characters</div>
+    <div class="recipe-filters" id="charCategoryTabs" style="margin-bottom:6px;"></div>
+    <div class="char-grid" id="chineseGrid"></div>
+    <div id="charPagination" style="display:flex;justify-content:center;gap:8px;margin-top:10px;"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--text-light);" id="charCountInfo"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="storiesCardTitle">Practice Stories</div>
+    <div id="storiesContainer"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="numbersTitle">Numbers (1-30)</div>
+    <div class="char-grid" id="numberGrid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="learningTipsTitle">Learning Tips for 3-Year-Olds</div>
+    <div id="learningTipsContent" style="font-size:13px;line-height:1.6;"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: WEEKEND ===================== -->
+<div class="tab-content" id="tab-weekend">
+  <div class="card">
+    <div class="card-title">
+      <span id="sundayPlanTitle">This Sunday's Plan</span>
+      <span class="badge badge-yellow" id="sundayDate"></span>
+    </div>
+    <div id="sundayPlan">
+      <div style="font-size:13px;color:var(--text-light);" id="noSundayPlanText">No plan set yet. Pick a venue below or add a custom activity.</div>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn btn-accent btn-small" onclick="suggestSundayPlan()" id="suggestPlanBtn">Suggest a Plan</button>
+      <button class="btn btn-outline btn-small" onclick="openCustomEvent()" id="customEventBtn">+ Custom Event</button>
+    </div>
+  </div>
+
+  <div class="section-title" id="parksOutdoorTitle">Parks & Outdoor</div>
+  <div id="parksList"></div>
+
+  <div class="section-title" id="indoorVenuesTitle">Indoor Venues</div>
+  <div id="indoorList"></div>
+
+  <div class="section-title" id="customEventsTitle">Custom Events</div>
+  <div id="customEvents">
+    <div class="card" style="text-align:center;">
+      <button class="btn btn-primary" onclick="openCustomEvent()" id="addEventWeekBtn">+ Add Event for This Week</button>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="addEventHintText">Add local events, playdates, or special activities</div>
+    </div>
+  </div>
+
+  <div class="section-title" id="outingHistoryTitle">Outing History</div>
+  <div class="card">
+    <div id="outingHistory" style="font-size:12px;color:var(--text-light);">Past outings will appear here to help rotate venues.</div>
+  </div>
+</div>
+
+<!-- ===================== TAB: SETTINGS ===================== -->
+<div class="tab-content" id="tab-settings">
+  <div class="card">
+    <div class="card-title" id="sleepPlanTitle">Sleep Improvement Plan</div>
+    <div class="sleep-goal">
+      <div style="font-size:12px;color:var(--text-light);" id="currentToTargetLabel">Current → Target</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;">
+        <div>
+          <div style="font-size:28px;font-weight:800;color:var(--red);" id="currentSleepTime">11:00 PM</div>
+          <div style="font-size:11px;color:var(--text-light);" id="currentSleepLabel">Current</div>
+        </div>
+        <div style="font-size:24px;">→</div>
+        <div>
+          <div style="font-size:28px;font-weight:800;color:var(--green);">10:00 PM</div>
+          <div style="font-size:11px;color:var(--text-light);" id="targetSleepLabel">Target</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:12px;">
+        <div class="fill" id="sleepProgress" style="width:0%;background:linear-gradient(90deg,var(--green),#81C784);"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:4px;" id="sleepProgressText"></div>
+    </div>
+    <div style="margin-top:8px;">
+      <label style="font-size:13px;font-weight:600;" id="adjustBedtimeLabel">Adjust current bedtime:</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-green btn-small" onclick="adjustSleep(-15)" id="earlierBtn">-15 min (earlier)</button>
+        <button class="btn btn-outline btn-small" onclick="adjustSleep(15)" id="laterBtn">+15 min (later)</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="sleepAdjustHint">Move 15 minutes earlier every 3-4 days. Log progress as you go.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="bedtimeTipsTitle">Bedtime Routine Tips</div>
+    <div id="bedtimeTipsContent"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="editScheduleTitle">Edit Daily Schedule</div>
+    <div id="scheduleEditor"></div>
+    <button class="btn btn-primary btn-small" style="margin-top:8px;" onclick="openAddScheduleItem()" id="addActivityBtnEl">+ Add Activity</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="sharingSyncTitle">Sharing & Sync</div>
+    <div id="syncUI"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="manualExportTitle">Manual Export/Import</div>
+    <div class="share-box">
+      <button class="btn btn-primary" onclick="exportData()" id="exportBtn">Export Data (Copy)</button>
+      <div style="margin-top:8px;">
+        <button class="btn btn-outline" onclick="importData()" id="importBtn">Import Data (Paste)</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="exportHintText">
+        Export copies all data as text. Send via WhatsApp. Import on the other device.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="resetCardTitle">Reset</div>
+    <button class="btn btn-small" style="background:var(--red);color:white;" onclick="if(confirm(t('resetConfirm'))){localStorage.clear();location.reload();}" id="resetAllBtn">Reset All Data</button>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="active" onclick="switchTab('today',this)"><span class="icon">📅</span><span id="tabToday">Today</span></button>
+  <button onclick="switchTab('meals',this)"><span class="icon">🍽️</span><span id="tabMeals">Meals</span></button>
+  <button onclick="switchTab('learn',this)"><span class="icon">📚</span><span id="tabLearn">Learn</span></button>
+  <button onclick="switchTab('weekend',this)"><span class="icon">🌳</span><span id="tabWeekend">Weekend</span></button>
+  <button onclick="switchTab('settings',this)"><span class="icon">⚙️</span><span id="tabSettings">Settings</span></button>
+</div>
+
+<!-- Character Detail Overlay -->
+<div class="char-detail-overlay" id="charDetailOverlay" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="char-detail-box" id="charDetailContent"></div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ==================== i18n ====================
+let currentLang = localStorage.getItem('plannerLang') || 'zh';
+
+const LANG = {
+  appTitle: { en: 'Little Explorer Planner', zh: '小探险家计划' },
+  appSubtitle: { en: 'Daily Schedule & Learning Tracker', zh: '每日安排与学习跟踪' },
+  today: { en: 'Today', zh: '今天' },
+  meals: { en: 'Meals', zh: '餐食' },
+  learn: { en: 'Learn', zh: '学习' },
+  weekend: { en: 'Weekend', zh: '周末' },
+  settings: { en: 'Settings', zh: '设置' },
+  dailySchedule: { en: 'Daily Schedule', zh: '每日安排' },
+  weekdayLabel: { en: 'Weekday', zh: '工作日' },
+  weekendLabel: { en: 'Weekend', zh: '周末' },
+  todaysMeals: { en: "Today's Meals", zh: '今日餐食' },
+  todaysLearning: { en: "Today's Learning (7:30-8:15 PM)", zh: '今日学习 (19:30-20:15)' },
+  weeklyMealPlan: { en: 'Weekly Meal Plan', zh: '每周餐食计划' },
+  autoGenerate: { en: 'Auto-Generate', zh: '自动生成' },
+  breakfastOptions: { en: 'Breakfast Options', zh: '早餐选项' },
+  dinnerOptions: { en: 'Dinner Options', zh: '晚餐选项' },
+  snackOptions: { en: 'Snack Options', zh: '零食选项' },
+  addPlaceholder: { en: 'Add {type} item...', zh: '添加{type}...' },
+  add: { en: 'Add', zh: '添加' },
+  mealHistory: { en: 'Meal History', zh: '用餐记录' },
+  mealGridHint: { en: 'Tap any cell to change. Auto-generate rotates meals to avoid repetition.', zh: '点击单元格更改。自动生成会轮换餐食避免重复。' },
+  breakfast: { en: 'Breakfast', zh: '早餐' },
+  dinner: { en: 'Dinner', zh: '晚餐' },
+  lunch: { en: 'Lunch', zh: '午餐' },
+  snack: { en: 'Snack', zh: '零食' },
+  bfast: { en: 'Bfast', zh: '早餐' },
+  notPlanned: { en: 'Not planned', zh: '未安排' },
+  noMealPlan: { en: 'No meal plan set. Go to Meals tab to generate.', zh: '未设置餐食计划。前往餐食页生成。' },
+  learningTimer: { en: 'Learning Session Timer', zh: '学习计时器' },
+  min3045: { en: '30-45 min', zh: '30-45 分钟' },
+  readyToStart: { en: 'Ready to start', zh: '准备开始' },
+  start: { en: 'Start', zh: '开始' },
+  pauseBtn: { en: 'Pause', zh: '暂停' },
+  resumeBtn: { en: 'Resume', zh: '继续' },
+  resetBtn: { en: 'Reset', zh: '重置' },
+  pausedLabel: { en: 'Paused', zh: '已暂停' },
+  learningInProgress: { en: 'Learning in progress...', zh: '学习中...' },
+  min30reached: { en: '30 min reached — great session!', zh: '30分钟 — 很棒!' },
+  min45wrapUp: { en: '45 min — time to wrap up!', zh: '45分钟 — 该结束了!' },
+  currentPhase: { en: 'Current Phase', zh: '当前阶段' },
+  todaysActivities: { en: "Today's Activities", zh: '今日活动' },
+  lettersAZ: { en: 'Letters (A-Z)', zh: '字母 (A-Z)' },
+  chineseChars: { en: 'Chinese Characters', zh: '中文汉字' },
+  numbers130: { en: 'Numbers (1-30)', zh: '数字 (1-30)' },
+  tapToMark: { en: 'Tap to mark as learned. Green = learned, Yellow = this week\'s focus.', zh: '点击标记已学。绿 = 已学，黄 = 本周重点。' },
+  learningTips: { en: 'Learning Tips for 3-Year-Olds', zh: '3岁儿童学习建议' },
+  sessionPlan: { en: 'Session Plan (30-45 min)', zh: '学习计划 (30-45分钟)' },
+  review: { en: 'Review', zh: '复习' },
+  lettersLabel: { en: 'Letters', zh: '字母' },
+  chineseLabel: { en: 'Chinese', zh: '中文' },
+  numbersLabel: { en: 'Numbers', zh: '数字' },
+  activityLabel: { en: 'Activity', zh: '活动' },
+  sundayPlan: { en: "This Sunday's Plan", zh: '本周日计划' },
+  noSundayPlan: { en: 'No plan set yet. Pick a venue below or add a custom activity.', zh: '尚未设置计划。从下方选择或添加活动。' },
+  suggestPlan: { en: 'Suggest a Plan', zh: '推荐计划' },
+  customEvent: { en: '+ Custom Event', zh: '+ 自定义活动' },
+  parksOutdoor: { en: 'Parks & Outdoor', zh: '公园与户外' },
+  indoorVenues: { en: 'Indoor Venues', zh: '室内场馆' },
+  customEvents: { en: 'Custom Events', zh: '自定义活动' },
+  outingHistory: { en: 'Outing History', zh: '出行记录' },
+  addEventWeek: { en: '+ Add Event for This Week', zh: '+ 添加本周活动' },
+  addEventHint: { en: 'Add local events, playdates, or special activities', zh: '添加本地活动、聚会或特别活动' },
+  lastVisitedLabel: { en: 'Last visited', zh: '上次去' },
+  notVisitedYet: { en: 'Not visited yet!', zh: '还没去过!' },
+  suggestion: { en: 'Suggestion', zh: '推荐' },
+  tryAnother: { en: 'Try Another', zh: '换一个' },
+  pickFromList: { en: 'Pick from List', zh: '从列表选' },
+  changePlan: { en: 'Change Plan', zh: '更改计划' },
+  sleepPlan: { en: 'Sleep Improvement Plan', zh: '睡眠改善计划' },
+  currentSleep: { en: 'Current', zh: '当前' },
+  targetSleep: { en: 'Target', zh: '目标' },
+  currentToTarget: { en: 'Current → Target', zh: '当前 → 目标' },
+  targetReached: { en: 'Target reached!', zh: '目标达成!' },
+  toGoal: { en: 'to goal', zh: '距目标' },
+  adjustBedtime: { en: 'Adjust current bedtime:', zh: '调整就寝时间:' },
+  earlierMin: { en: '-15 min (earlier)', zh: '-15分钟（提前）' },
+  laterMin: { en: '+15 min (later)', zh: '+15分钟（推后）' },
+  sleepAdjustHint: { en: 'Move 15 min earlier every 3-4 days.', zh: '每3-4天提前15分钟。' },
+  bedtimeRoutineTips: { en: 'Bedtime Routine Tips', zh: '睡前习惯建议' },
+  editSchedule: { en: 'Edit Daily Schedule', zh: '编辑每日安排' },
+  addActivityBtn: { en: '+ Add Activity', zh: '+ 添加活动' },
+  sharingSync: { en: 'Sharing & Sync', zh: '分享与同步' },
+  exportData: { en: 'Export Data (Copy)', zh: '导出数据（复制）' },
+  importData: { en: 'Import Data (Paste)', zh: '导入数据（粘贴）' },
+  resetLabel: { en: 'Reset', zh: '重置' },
+  resetAllData: { en: 'Reset All Data', zh: '重置所有数据' },
+  resetConfirm: { en: 'Reset ALL data? This cannot be undone.', zh: '重置所有数据？不可撤销。' },
+  exportSuccess: { en: 'Data copied to clipboard!', zh: '数据已复制到剪贴板！' },
+  importPrompt: { en: 'Paste the shared data here:', zh: '在此粘贴数据:' },
+  importSuccess: { en: 'Data imported successfully!', zh: '数据导入成功!' },
+  importError: { en: 'Invalid data format.', zh: '数据格式无效。' },
+  editActivityTitle: { en: 'Edit Activity', zh: '编辑活动' },
+  timeLabel: { en: 'Time:', zh: '时间:' },
+  activityInput: { en: 'Activity:', zh: '活动:' },
+  iconLabel: { en: 'Icon (emoji):', zh: '图标:' },
+  deleteBtn: { en: 'Delete', zh: '删除' },
+  cancelBtn: { en: 'Cancel', zh: '取消' },
+  saveBtn: { en: 'Save', zh: '保存' },
+  deleteConfirm: { en: 'Delete this activity?', zh: '删除此活动？' },
+  addActivityTitle: { en: 'Add Activity', zh: '添加活动' },
+  scheduleLabel: { en: 'Schedule:', zh: '时间表:' },
+  activityNamePH: { en: 'Activity name', zh: '活动名称' },
+  pickMealTitle: { en: 'Pick {type} for {day}', zh: '选择{day}的{type}' },
+  orTypeCustom: { en: 'Or type custom:', zh: '或输入自定义:' },
+  customMealPH: { en: 'Custom meal...', zh: '自定义餐食...' },
+  setBtn: { en: 'Set', zh: '设定' },
+  planLabel: { en: 'Plan:', zh: '计划:' },
+  notesOptional: { en: 'Notes (optional):', zh: '备注（可选）:' },
+  setPlan: { en: 'Set Plan', zh: '设定计划' },
+  addCustomEventTitle: { en: 'Add Custom Event', zh: '添加自定义活动' },
+  eventNameLabel: { en: 'Event Name:', zh: '活动名称:' },
+  dateLabel: { en: 'Date:', zh: '日期:' },
+  detailsLabel: { en: 'Details:', zh: '详情:' },
+  addEventBtn: { en: 'Add Event', zh: '添加活动' },
+  weekdaySchedule: { en: 'Weekday Schedule', zh: '工作日时间表' },
+  weekendSchedule: { en: 'Weekend Schedule', zh: '周末时间表' },
+  recentMealsHint: { en: 'Recent meals will appear here.', zh: '最近的用餐记录将在此显示。' },
+  pastOutingsHint: { en: 'Past outings will appear here.', zh: '出行记录将在此显示。' },
+  bestFormat: { en: 'Best format for Huawei + iPhone:', zh: '华为+苹果最佳方式:' },
+  exportHint: { en: 'Export copies all data as text. Send via messaging. Import on the other device.', zh: '导出数据为文本。通过消息发送。在另一设备导入。' },
+  // Schedule nameKeys
+  wakeUpMorning: { en: 'Wake up & morning routine', zh: '起床和晨间活动' },
+  breakfastTime: { en: 'Breakfast', zh: '早餐' },
+  goToSchool: { en: 'Go to school', zh: '上学' },
+  pickUpSchool: { en: 'Pick up from school', zh: '放学接回' },
+  playgroundSwimming: { en: 'Playground / Swimming', zh: '游乐场 / 游泳' },
+  dinnerTime: { en: 'Dinner', zh: '晚餐' },
+  showerTime: { en: 'Shower time', zh: '洗澡时间' },
+  learningTime: { en: 'Learning time', zh: '学习时间' },
+  freePlayWindDown: { en: 'Free play / wind-down', zh: '自由玩耍 / 放松' },
+  readBooks: { en: 'Read books', zh: '读书' },
+  bedtimeRoutine: { en: 'Bedtime routine', zh: '睡前活动' },
+  sleepTime: { en: 'Sleep', zh: '睡觉' },
+  wakeUp: { en: 'Wake up', zh: '起床' },
+  familyTime: { en: 'Free play / family time', zh: '自由玩耍 / 家庭时间' },
+  sundayOuting: { en: 'Sunday Outing (if Sunday)', zh: '周日出游' },
+  lunchTime: { en: 'Lunch', zh: '午餐' },
+  napTime: { en: 'Nap / quiet time', zh: '午睡 / 安静时间' },
+  snackTime: { en: 'Snack', zh: '零食时间' },
+  lightLearning: { en: 'Learning time (light)', zh: '学习时间（轻松）' },
+  // Stories
+  storiesTitle: { en: 'Practice Stories', zh: '练习故事' },
+  readStory: { en: 'Read', zh: '阅读' },
+  charsKnown: { en: 'chars known', zh: '字已学' },
+  locked: { en: 'Learn more to unlock', zh: '学更多汉字解锁' },
+  // Recipes
+  recipesTitle: { en: 'Recipe Collection', zh: '食谱集' },
+  searchRecipesPH: { en: 'Search recipes...', zh: '搜索食谱...' },
+  allCat: { en: 'All', zh: '全部' },
+  mainDish: { en: 'Main', zh: '主食' },
+  soupCat: { en: 'Soup', zh: '汤粥' },
+  noodleCat: { en: 'Noodle', zh: '面条' },
+  snackCat: { en: 'Snack', zh: '点心' },
+  vegCat: { en: 'Veggie', zh: '蔬菜' },
+  bfastCat: { en: 'Breakfast', zh: '早餐' },
+  ingredients: { en: 'Ingredients', zh: '食材' },
+  steps: { en: 'Steps', zh: '步骤' },
+  searchOnline: { en: 'Search Online', zh: '在线搜索' },
+  viewRecipe: { en: 'View Recipe', zh: '查看食谱' },
+  mins: { en: 'min', zh: '分钟' },
+  mainDishLabel: { en: 'Main Dish', zh: '主菜' },
+  sideDishLabel: { en: 'Side Dish', zh: '配菜' },
+  sideOptions: { en: 'Side Dish Options', zh: '配菜选项' },
+  addSidePlaceholder: { en: 'Add side dish...', zh: '添加配菜...' },
+  nonePicked: { en: 'None', zh: '无' },
+  charDetail: { en: 'Character Detail', zh: '汉字详情' },
+  // Sync
+  syncTitle: { en: 'Cloud Sync', zh: '云同步' },
+  childCode: { en: 'Child Code', zh: '孩子代码' },
+  currentChild: { en: 'Current child', zh: '当前孩子' },
+  createChild: { en: 'Create New Child', zh: '新建孩子' },
+  joinChild: { en: 'Join Existing Code', zh: '加入已有代码' },
+  childName: { en: 'Child\'s Name', zh: '孩子姓名' },
+  enterCode: { en: 'Enter 6-digit code', zh: '输入6位代码' },
+  syncNow: { en: 'Sync Now', zh: '立即同步' },
+  lastSynced: { en: 'Last synced', zh: '上次同步' },
+  syncing: { en: 'Syncing...', zh: '同步中...' },
+  syncOk: { en: 'Synced!', zh: '已同步!' },
+  syncFail: { en: 'Sync failed', zh: '同步失败' },
+  switchChild: { en: 'Switch Child', zh: '切换孩子' },
+  shareCodeHint: { en: 'Share this code with family members so they see the same schedule.', zh: '把代码分享给家人，大家看到同一个时间表。' },
+  noChildYet: { en: 'Create a child profile or join an existing code to enable cloud sync.', zh: '创建孩子档案或加入已有代码来启用云同步。' },
+  manualExport: { en: 'Manual Export/Import', zh: '手动导出/导入' },
+  meaning: { en: 'Meaning', zh: '含义' },
+  markLearned: { en: 'Mark Learned', zh: '标记已学' },
+  markUnlearned: { en: 'Mark Unlearned', zh: '标记未学' },
+};
+
+function t(key) {
+  const entry = LANG[key];
+  if (!entry) return key;
+  return entry[currentLang] || entry.en || key;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  localStorage.setItem('plannerLang', currentLang);
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  renderAll();
+}
+
+// Display bilingual food string ("中文/English") in the current language
+function fd(biStr) {
+  if (!biStr) return biStr;
+  const slash = biStr.indexOf('/');
+  if (slash === -1) return biStr; // user-typed, no slash
+  return currentLang === 'zh' ? biStr.substring(0, slash) : biStr.substring(slash + 1);
+}
+
+// Meal data helpers — each meal slot is { main: string, side: string }
+// Old data may store a plain string; these helpers handle both.
+function getMealParts(meal) {
+  if (!meal) return { main: '', side: '' };
+  if (typeof meal === 'string') return { main: meal, side: '' };
+  return { main: meal.main || '', side: meal.side || '' };
+}
+function getMealDisplay(meal) {
+  const { main, side } = getMealParts(meal);
+  const parts = [];
+  if (main) parts.push(fd(main));
+  if (side) parts.push(fd(side));
+  return parts.join(' + ') || '';
+}
+
+// Extract Chinese name from bilingual "中文/English" string and open recipe search
+function searchOnlineRecipe(biStr) {
+  if (!biStr) return;
+  // Get Chinese portion (before the slash), or full string if no slash
+  const slash = biStr.indexOf('/');
+  const zh = slash > -1 ? biStr.substring(0, slash) : biStr;
+  const keyword = encodeURIComponent(zh + ' 做法');
+  window.open('https://www.xiachufang.com/search/?keyword=' + keyword, '_blank');
+}
+
+function updateI18nLabels() {
+  const el = (id) => document.getElementById(id);
+  el('appTitle').textContent = t('appTitle');
+  // Show child name in subtitle if active
+  const activeCode = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+  el('appSubtitle').textContent = activeProfile ? `🧒 ${activeProfile.name}` : t('appSubtitle');
+  el('todayBtn').textContent = t('today');
+  el('langToggle').textContent = currentLang === 'en' ? '中文' : 'EN';
+  // Tab bar
+  el('tabToday').textContent = t('today');
+  el('tabMeals').textContent = t('meals');
+  el('tabLearn').textContent = t('learn');
+  el('tabWeekend').textContent = t('weekend');
+  el('tabSettings').textContent = t('settings');
+  // Today tab
+  el('dailyScheduleTitle').textContent = t('dailySchedule');
+  el('todayMealsTitle').textContent = t('todaysMeals');
+  el('todayLearnTitle').textContent = t('todaysLearning');
+  // Meals tab
+  el('weeklyMealPlanTitle').textContent = t('weeklyMealPlan');
+  el('autoGenBtn').textContent = t('autoGenerate');
+  el('mealGridHint').textContent = t('mealGridHint');
+  el('breakfastOptionsTitle').textContent = t('breakfastOptions');
+  el('dinnerOptionsTitle').textContent = t('dinnerOptions');
+  el('snackOptionsTitle').textContent = t('snackOptions');
+  el('mealHistoryTitle').textContent = t('mealHistory');
+  el('sideOptionsTitle').textContent = t('sideOptions');
+  el('addSidesBtn').textContent = t('add');
+  el('recipesCardTitle').textContent = t('recipesTitle');
+  el('addBreakfastBtn').textContent = t('add');
+  el('addDinnerBtn').textContent = t('add');
+  el('addSnackBtn').textContent = t('add');
+  el('recipeSearchInput').placeholder = t('searchRecipesPH');
+  // Learn tab
+  el('learningTimerTitle').textContent = t('learningTimer');
+  el('timerBadge').textContent = t('min3045');
+  el('currentPhaseTitle').textContent = t('currentPhase');
+  el('todayActivitiesTitle').textContent = t('todaysActivities');
+  el('lettersTitle').textContent = t('lettersAZ');
+  el('chineseCharsTitle').textContent = t('chineseChars');
+  el('storiesCardTitle').textContent = t('storiesTitle');
+  el('numbersTitle').textContent = t('numbers130');
+  el('tapToMarkHint').textContent = t('tapToMark');
+  el('learningTipsTitle').textContent = t('learningTips');
+  // Settings tab
+  el('sleepPlanTitle').textContent = t('sleepPlan');
+  el('currentToTargetLabel').textContent = t('currentToTarget');
+  el('currentSleepLabel').textContent = t('currentSleep');
+  el('targetSleepLabel').textContent = t('targetSleep');
+  el('adjustBedtimeLabel').textContent = t('adjustBedtime');
+  el('earlierBtn').textContent = t('earlierMin');
+  el('laterBtn').textContent = t('laterMin');
+  el('sleepAdjustHint').textContent = t('sleepAdjustHint');
+  el('bedtimeTipsTitle').textContent = t('bedtimeRoutineTips');
+  el('editScheduleTitle').textContent = t('editSchedule');
+  el('addActivityBtnEl').textContent = t('addActivityBtn');
+  el('sharingSyncTitle').textContent = t('sharingSync');
+  el('resetCardTitle').textContent = t('resetLabel');
+  el('resetAllBtn').textContent = t('resetAllData');
+  el('exportBtn').textContent = t('exportData');
+  el('importBtn').textContent = t('importData');
+  el('exportHintText').textContent = t('exportHint');
+  if (el('manualExportTitle')) el('manualExportTitle').textContent = t('manualExport');
+  // Weekend tab
+  if (el('parksOutdoorTitle')) el('parksOutdoorTitle').textContent = t('parksOutdoor');
+  if (el('indoorVenuesTitle')) el('indoorVenuesTitle').textContent = t('indoorVenues');
+  if (el('customEventsTitle')) el('customEventsTitle').textContent = t('customEvents');
+  if (el('outingHistoryTitle')) el('outingHistoryTitle').textContent = t('outingHistory');
+  if (el('addEventWeekBtn')) el('addEventWeekBtn').textContent = t('addEventWeek');
+  if (el('addEventHintText')) el('addEventHintText').textContent = t('addEventHint');
+  if (el('sundayPlanTitle')) el('sundayPlanTitle').textContent = t('sundayPlan');
+  if (el('suggestPlanBtn')) el('suggestPlanBtn').textContent = t('suggestPlan');
+  if (el('customEventBtn')) el('customEventBtn').textContent = t('customEvent');
+}
+
+// ==================== CHARACTER DATABASE (500 chars) ====================
+const CHAR_DB = {
+  num:{en:'Numbers',zh:'数字',icon:'🔢',items:[
+    ['一','yī','one','☝️'],['二','èr','two','✌️'],['三','sān','three','3️⃣'],['四','sì','four','4️⃣'],['五','wǔ','five','🖐️'],
+    ['六','liù','six','6️⃣'],['七','qī','seven','7️⃣'],['八','bā','eight','8️⃣'],['九','jiǔ','nine','9️⃣'],['十','shí','ten','🔟'],
+    ['百','bǎi','hundred','💯'],['千','qiān','thousand','🏔️'],['万','wàn','ten thousand','🌟'],['零','líng','zero','0️⃣'],
+    ['两','liǎng','two/pair','✌️'],['半','bàn','half','½'],['双','shuāng','pair','👐'],['几','jǐ','how many','❓'],['第','dì','ordinal','🏅'],['数','shù','count','🔢']]},
+  fam:{en:'Family',zh:'家人',icon:'👨‍👩‍👦',items:[
+    ['爸','bà','dad','👨'],['妈','mā','mom','👩'],['爷','yé','grandpa','👴'],['奶','nǎi','grandma','👵'],['哥','gē','brother','👦'],
+    ['姐','jiě','sister','👧'],['弟','dì','younger brother','🧒'],['妹','mèi','younger sister','👧'],['叔','shū','uncle','👨'],
+    ['婆','pó','grandma','👵'],['公','gōng','grandpa','👴'],['儿','ér','child/son','👶'],['女','nǚ','girl','👧'],['孩','hái','child','🧒'],
+    ['男','nán','boy','👦'],['朋','péng','friend','🤝'],['友','yǒu','friend','🤝'],['亲','qīn','family','👪'],
+    ['我','wǒ','I/me','🙋'],['你','nǐ','you','🫵'],['他','tā','he','👤'],['她','tā','she','👤'],['们','men','plural','👥'],
+    ['这','zhè','this','👈'],['那','nà','that','👉'],['谁','shuí','who','❓'],['人','rén','person','🧑'],['家','jiā','home','🏠'],
+    ['好','hǎo','good','👍'],['夫','fū','husband','👨']]},
+  body:{en:'Body',zh:'身体',icon:'🫀',items:[
+    ['头','tóu','head','🗣️'],['发','fà','hair','💇'],['眼','yǎn','eye','👁️'],['耳','ěr','ear','👂'],['口','kǒu','mouth','👄'],
+    ['鼻','bí','nose','👃'],['脸','liǎn','face','😊'],['手','shǒu','hand','✋'],['指','zhǐ','finger','☝️'],['脚','jiǎo','foot','🦶'],
+    ['腿','tuǐ','leg','🦵'],['肚','dù','belly','🤰'],['心','xīn','heart','❤️'],['牙','yá','tooth','🦷'],['舌','shé','tongue','👅'],
+    ['身','shēn','body','🧍'],['骨','gǔ','bone','🦴'],['血','xuè','blood','🩸'],['皮','pí','skin','🤲'],['背','bèi','back','🔙'],
+    ['腰','yāo','waist','🧍'],['肩','jiān','shoulder','💪'],['眉','méi','eyebrow','🤨'],['脑','nǎo','brain','🧠'],['胃','wèi','stomach','🫁']]},
+  nat:{en:'Nature',zh:'自然',icon:'🌍',items:[
+    ['天','tiān','sky','🌤️'],['地','dì','earth','🌍'],['日','rì','sun','☀️'],['月','yuè','moon','🌙'],['星','xīng','star','⭐'],
+    ['山','shān','mountain','⛰️'],['水','shuǐ','water','💧'],['火','huǒ','fire','🔥'],['风','fēng','wind','💨'],['云','yún','cloud','☁️'],
+    ['雨','yǔ','rain','🌧️'],['雪','xuě','snow','❄️'],['石','shí','stone','🪨'],['田','tián','field','🌾'],['河','hé','river','🏞️'],
+    ['海','hǎi','sea','🌊'],['湖','hú','lake','🏞️'],['光','guāng','light','💡'],['阳','yáng','sunny','☀️'],['阴','yīn','cloudy','🌑'],
+    ['雷','léi','thunder','⚡'],['电','diàn','electricity','⚡'],['冰','bīng','ice','🧊'],['沙','shā','sand','🏖️'],['土','tǔ','soil','🟤'],
+    ['晴','qíng','clear sky','🌤️'],['雾','wù','fog','🌫️'],['霜','shuāng','frost','🥶'],['露','lù','dew','💧'],['泉','quán','spring','⛲']]},
+  ani:{en:'Animals',zh:'动物',icon:'🐾',items:[
+    ['鸡','jī','chicken','🐔'],['鸭','yā','duck','🦆'],['鱼','yú','fish','🐟'],['鸟','niǎo','bird','🐦'],['马','mǎ','horse','🐴'],
+    ['牛','niú','cow','🐄'],['羊','yáng','sheep','🐑'],['猫','māo','cat','🐱'],['狗','gǒu','dog','🐕'],['猪','zhū','pig','🐷'],
+    ['虫','chóng','bug','🐛'],['蛇','shé','snake','🐍'],['龙','lóng','dragon','🐲'],['兔','tù','rabbit','🐰'],['象','xiàng','elephant','🐘'],
+    ['猴','hóu','monkey','🐵'],['蝶','dié','butterfly','🦋'],['鼠','shǔ','mouse','🐭'],['蛙','wā','frog','🐸'],['熊','xióng','bear','🐻'],
+    ['虎','hǔ','tiger','🐯'],['狼','láng','wolf','🐺'],['蜂','fēng','bee','🐝'],['鹅','é','goose','🦢'],['龟','guī','turtle','🐢'],
+    ['鸽','gē','pigeon','🕊️'],['雀','què','sparrow','🐦'],['燕','yàn','swallow','🐦'],['鲸','jīng','whale','🐋'],['蚁','yǐ','ant','🐜']]},
+  pla:{en:'Plants',zh:'植物',icon:'🌱',items:[
+    ['花','huā','flower','🌸'],['草','cǎo','grass','🌿'],['木','mù','wood','🌳'],['树','shù','tree','🌲'],['叶','yè','leaf','🍃'],
+    ['果','guǒ','fruit','🍎'],['竹','zhú','bamboo','🎋'],['松','sōng','pine','🌲'],['梅','méi','plum','🌸'],['兰','lán','orchid','🌺'],
+    ['菊','jú','chrysanthemum','🌼'],['莲','lián','lotus','🪷'],['瓜','guā','melon','🍈'],['种','zhǒng','seed','🌱'],['根','gēn','root','🌱'],
+    ['桃','táo','peach','🍑'],['橘','jú','tangerine','🍊'],['梨','lí','pear','🍐'],['莓','méi','berry','🫐'],['藤','téng','vine','🌿']]},
+  food:{en:'Food',zh:'食物',icon:'🍚',items:[
+    ['饭','fàn','rice/meal','🍚'],['菜','cài','dish/veggie','🥬'],['肉','ròu','meat','🥩'],['蛋','dàn','egg','🥚'],['米','mǐ','rice','🌾'],
+    ['面','miàn','noodle','🍜'],['汤','tāng','soup','🍲'],['茶','chá','tea','🍵'],['糖','táng','candy','🍬'],['盐','yán','salt','🧂'],
+    ['油','yóu','oil','🫒'],['豆','dòu','bean','🫘'],['虾','xiā','shrimp','🦐'],['饼','bǐng','pancake','🥞'],['粥','zhōu','porridge','🥣'],
+    ['饺','jiǎo','dumpling','🥟'],['包','bāo','bun','🫓'],['酒','jiǔ','wine','🍷'],['醋','cù','vinegar','🫗'],['酱','jiàng','sauce','🥫'],
+    ['姜','jiāng','ginger','🫚'],['蒜','suàn','garlic','🧄'],['葱','cōng','scallion','🧅'],['奶','nǎi','milk','🥛'],['粉','fěn','powder','🍜']]},
+  col:{en:'Colors',zh:'颜色',icon:'🎨',items:[
+    ['红','hóng','red','🔴'],['黄','huáng','yellow','🟡'],['蓝','lán','blue','🔵'],['绿','lǜ','green','🟢'],['白','bái','white','⚪'],
+    ['黑','hēi','black','⚫'],['紫','zǐ','purple','🟣'],['橙','chéng','orange','🟠']]},
+  desc:{en:'Descriptors',zh:'描述',icon:'📏',items:[
+    ['大','dà','big','⬆️'],['小','xiǎo','small','⬇️'],['长','cháng','long','📏'],['短','duǎn','short','📐'],['高','gāo','tall','📈'],
+    ['低','dī','low','📉'],['轻','qīng','light','🪶'],['重','zhòng','heavy','🏋️'],['胖','pàng','fat','🐷'],['瘦','shòu','thin','🧍'],
+    ['快','kuài','fast','🏎️'],['慢','màn','slow','🐌'],['冷','lěng','cold','🥶'],['热','rè','hot','🥵'],['新','xīn','new','🆕'],
+    ['旧','jiù','old','♻️'],['多','duō','many','📊'],['少','shǎo','few','📉'],['美','měi','beautiful','🌹'],['丑','chǒu','ugly','👹'],
+    ['干','gān','dry','🏜️'],['净','jìng','clean','✨'],['甜','tián','sweet','🍯'],['苦','kǔ','bitter','😖'],['酸','suān','sour','🍋'],
+    ['辣','là','spicy','🌶️'],['香','xiāng','fragrant','🌹'],['软','ruǎn','soft','🧸'],['硬','yìng','hard','🪨'],['满','mǎn','full','🥛'],
+    ['空','kōng','empty','📭'],['亮','liàng','bright','💡'],['暗','àn','dark','🌑'],['暖','nuǎn','warm','🌡️'],['凉','liáng','cool','🌊']]},
+  dir:{en:'Directions',zh:'方位',icon:'🧭',items:[
+    ['上','shàng','up','⬆️'],['下','xià','down','⬇️'],['左','zuǒ','left','⬅️'],['右','yòu','right','➡️'],['前','qián','front','▶️'],
+    ['后','hòu','behind','◀️'],['里','lǐ','inside','📥'],['外','wài','outside','📤'],['中','zhōng','middle','⏺️'],['东','dōng','east','🧭'],
+    ['西','xī','west','🧭'],['南','nán','south','🧭'],['北','běi','north','🧭'],['远','yuǎn','far','🔭'],['近','jìn','near','🔍']]},
+  act:{en:'Actions',zh:'动作',icon:'🎬',items:[
+    ['吃','chī','eat','🍽️'],['喝','hē','drink','🥤'],['走','zǒu','walk','🚶'],['跑','pǎo','run','🏃'],['跳','tiào','jump','🤸'],
+    ['看','kàn','look','👀'],['听','tīng','listen','👂'],['说','shuō','speak','🗣️'],['读','dú','read','📖'],['写','xiě','write','✍️'],
+    ['画','huà','draw','🎨'],['飞','fēi','fly','🕊️'],['坐','zuò','sit','💺'],['站','zhàn','stand','🧍'],['开','kāi','open','🔓'],
+    ['关','guān','close','🔒'],['拿','ná','take','✊'],['放','fàng','put','📦'],['拉','lā','pull','🤏'],['推','tuī','push','🫸'],
+    ['打','dǎ','hit','🏓'],['切','qiē','cut','✂️'],['洗','xǐ','wash','🧼'],['穿','chuān','wear','👔'],['脱','tuō','take off','👕'],
+    ['睡','shuì','sleep','😴'],['醒','xǐng','wake','🌅'],['来','lái','come','🏃'],['去','qù','go','🚶'],['出','chū','exit','🚪'],
+    ['入','rù','enter','🚪'],['回','huí','return','🔄'],['送','sòng','send','🎁'],['买','mǎi','buy','🛒'],['卖','mài','sell','💰'],
+    ['做','zuò','make','🔨'],['用','yòng','use','🔧'],['找','zhǎo','find','🔍'],['给','gěi','give','🤲'],['问','wèn','ask','❓'],
+    ['答','dá','answer','✅'],['想','xiǎng','think','💭'],['学','xué','learn','📚'],['教','jiāo','teach','👨‍🏫'],['玩','wán','play','🎮'],
+    ['笑','xiào','laugh','😄'],['哭','kū','cry','😢'],['唱','chàng','sing','🎤'],['爬','pá','crawl','🐛'],['游','yóu','swim','🏊'],
+    ['吹','chuī','blow','💨'],['扔','rēng','throw','🤾'],['接','jiē','catch','🤲'],['抱','bào','hug','🤗'],['踢','tī','kick','⚽'],
+    ['拍','pāi','clap','👏'],['摸','mō','touch','🤚'],['选','xuǎn','choose','☑️'],['等','děng','wait','⏳'],['帮','bāng','help','🤝'],
+    ['挖','wā','dig','🏗️'],['喂','wèi','feed','🍼'],['叫','jiào','call','📢'],['记','jì','remember','📝'],['换','huàn','change','🔄']]},
+  obj:{en:'Things',zh:'物品',icon:'🏠',items:[
+    ['门','mén','door','🚪'],['窗','chuāng','window','🪟'],['床','chuáng','bed','🛏️'],['灯','dēng','lamp','💡'],['车','chē','car','🚗'],
+    ['船','chuán','boat','⛵'],['刀','dāo','knife','🔪'],['碗','wǎn','bowl','🥣'],['杯','bēi','cup','☕'],['瓶','píng','bottle','🍶'],
+    ['伞','sǎn','umbrella','☂️'],['钟','zhōng','clock','🕐'],['锁','suǒ','lock','🔒'],['箱','xiāng','box','📦'],['袋','dài','bag','👜'],
+    ['钱','qián','money','💰'],['球','qiú','ball','⚽'],['桌','zhuō','desk','🪑'],['椅','yǐ','chair','💺'],['柜','guì','cabinet','🗄️'],
+    ['镜','jìng','mirror','🪞'],['绳','shéng','rope','🧵'],['剪','jiǎn','scissors','✂️'],['尺','chǐ','ruler','📏'],
+    ['衣','yī','clothes','👔'],['服','fú','clothing','👕'],['裤','kù','pants','👖'],['裙','qún','skirt','👗'],['鞋','xié','shoes','👟'],['袜','wà','socks','🧦']]},
+  time:{en:'Time',zh:'时间',icon:'⏰',items:[
+    ['年','nián','year','📅'],['时','shí','hour','⏰'],['分','fēn','minute','⏱️'],['秒','miǎo','second','⏱️'],['今','jīn','today','📆'],
+    ['明','míng','tomorrow','🌅'],['昨','zuó','yesterday','📅'],['早','zǎo','morning','🌅'],['午','wǔ','noon','☀️'],['晚','wǎn','evening','🌙'],
+    ['春','chūn','spring','🌸'],['夏','xià','summer','☀️'],['秋','qiū','autumn','🍂'],['冬','dōng','winter','❄️'],['周','zhōu','week','📅']]},
+  com:{en:'Common',zh:'常用',icon:'📖',items:[
+    ['是','shì','is','✅'],['有','yǒu','have','📦'],['在','zài','at','📍'],['不','bù','not','❌'],['了','le','done','✔️'],
+    ['的','de','possessive','📝'],['和','hé','and','➕'],['也','yě','also','➕'],['还','hái','still','⏳'],['都','dōu','all','👥'],
+    ['很','hěn','very','💯'],['太','tài','too much','‼️'],['可','kě','can','✅'],['会','huì','will','🎓'],['能','néng','able','💪'],
+    ['要','yào','want','🙋'],['让','ràng','let','👐'],['对','duì','correct','✅'],['从','cóng','from','⬅️'],['到','dào','arrive','➡️'],
+    ['过','guò','pass','⏩'],['知','zhī','know','🧠'],['道','dào','way','🛤️'],['同','tóng','same','🟰'],['别','bié','don\'t','⛔'],
+    ['再','zài','again','🔄'],['已','yǐ','already','✔️'],['只','zhī','only','☝️'],['个','gè','mw','📦'],['把','bǎ','handle','🤏'],
+    ['被','bèi','by','📋'],['着','zhe','-ing','⏳'],['校','xiào','school','🏫'],['书','shū','book','📚'],['笔','bǐ','pen','🖊️'],
+    ['纸','zhǐ','paper','📄'],['字','zì','character','🔤'],['课','kè','class','📝'],['老','lǎo','old','👴'],['师','shī','teacher','👨‍🏫'],
+    ['路','lù','road','🛤️'],['街','jiē','street','🏘️'],['桥','qiáo','bridge','🌉'],['城','chéng','city','🏙️'],['村','cūn','village','🏘️'],
+    ['房','fáng','house','🏠'],['店','diàn','shop','🏪'],['园','yuán','garden','🏞️'],['世','shì','world','🌍'],['国','guó','country','🏳️'],
+    ['爱','ài','love','❤️'],['怕','pà','fear','😨'],['喜','xǐ','happy','😊'],['怒','nù','angry','😡'],['急','jí','urgent','😰'],
+    ['累','lèi','tired','😫'],['饿','è','hungry','🤤'],['忙','máng','busy','🏃'],['生','shēng','born','👶'],['活','huó','live','🌱'],
+    ['力','lì','power','💪'],['气','qì','air','💨'],['声','shēng','sound','🔊'],['名','míng','name','📛'],['岁','suì','age','🎂'],
+    ['机','jī','machine','✈️'],['每','měi','every','📅'],['比','bǐ','compare','🤔'],['最','zuì','most','🏆'],['加','jiā','add','➕'],
+    ['自','zì','self','🙋'],['见','jiàn','see','👀']]},
+};
+
+// Build flat lookup from CHAR_DB
+const CHAR_LOOKUP = {};
+const ALL_CHARS_FLAT = [];
+for (const gk of Object.keys(CHAR_DB)) {
+  for (const item of CHAR_DB[gk].items) {
+    const obj = { c: item[0], p: item[1], e: item[2], m: item[3], g: gk };
+    CHAR_LOOKUP[item[0]] = obj;
+    ALL_CHARS_FLAT.push(obj);
+  }
+}
+
+let charGroup = 'all';
+let charPage = 0;
+const CHARS_PER_PAGE = 60;
+
+function renderCharSVG(char, size) {
+  const d = CHAR_LOOKUP[char];
+  if (!d) return '';
+  return `<span style="font-size:${size}px;line-height:1;">${d.m}</span>`;
+}
+
+function showCharDetail(char) {
+  const d = CHAR_LOOKUP[char];
+  if (!d) return;
+  const isLearned = data.learning.learnedChinese.includes(char);
+  const isCustom = d.g === 'custom';
+  var deleteBtn = isCustom ? '<button class="btn btn-small" style="background:var(--red);color:white;margin-top:8px;" onclick="removeCustomChar(\'' + char + '\');document.getElementById(\'charDetailOverlay\').classList.remove(\'show\');">' + (currentLang==='zh'?'删除此字':'Delete') + '</button>' : '';
+  document.getElementById('charDetailContent').innerHTML = `
+    <div style="font-size:64px;line-height:1;">${d.m}</div>
+    <div class="big-char" style="color:var(--primary)">${char}</div>
+    <div style="font-size:18px;color:var(--text-light);margin-bottom:4px;">${d.p}</div>
+    <div class="char-hint">${t('meaning')}: ${d.e}</div>
+    <div style="margin:8px 0;">${isLearned ? `<span class="badge badge-green">${t('markLearned')}</span>` : ''}</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn ${isLearned ? 'btn-outline' : 'btn-green'} btn-block" onclick="toggleLearnedFromDetail('${char}')">${isLearned ? t('markUnlearned') : t('markLearned')}</button>
+      <button class="btn btn-outline btn-block" onclick="document.getElementById('charDetailOverlay').classList.remove('show')">${t('cancelBtn')}</button>
+    </div>
+    ${deleteBtn}
+  `;
+  document.getElementById('charDetailOverlay').classList.add('show');
+}
+
+function toggleLearnedFromDetail(char) {
+  toggleLearned('chinese', char);
+  showCharDetail(char);
+}
+
+function renderChineseChars() {
+  // Load custom chars from localStorage
+  const customChars = getCustomChars();
+  const groups = Object.keys(CHAR_DB);
+  let allCount = ALL_CHARS_FLAT.length + customChars.length;
+  let tabsHtml = '<button class="filter-btn ' + (charGroup==='all'?'active':'') + '" onclick="charGroup=\'all\';charPage=0;renderChineseChars();">' + t('allCat') + ' (' + allCount + ')</button>';
+  for (const gk of groups) {
+    const g = CHAR_DB[gk];
+    tabsHtml += '<button class="filter-btn ' + (charGroup===gk?'active':'') + '" onclick="charGroup=\'' + gk + '\';charPage=0;renderChineseChars();">' + g.icon + ' ' + (g[currentLang]||g.en) + ' (' + g.items.length + ')</button>';
+  }
+  if (customChars.length > 0) {
+    tabsHtml += '<button class="filter-btn ' + (charGroup==='custom'?'active':'') + '" onclick="charGroup=\'custom\';charPage=0;renderChineseChars();">\u2B50 ' + (currentLang==='zh'?'自定义':'Custom') + ' (' + customChars.length + ')</button>';
+  }
+  tabsHtml += '<button class="filter-btn" onclick="showAddCharUI()" style="background:var(--accent);color:white;border-color:var(--accent);">+ ' + (currentLang==='zh'?'添加':'Add') + '</button>';
+  document.getElementById('charCategoryTabs').innerHTML = tabsHtml;
+
+  // Build char list including custom
+  let allWithCustom = [...ALL_CHARS_FLAT, ...customChars.map(function(c) { return {c:c[0],p:c[1],e:c[2],m:c[3],g:'custom'}; })];
+  let chars = charGroup === 'all' ? allWithCustom :
+              charGroup === 'custom' ? allWithCustom.filter(c => c.g === 'custom') :
+              allWithCustom.filter(c => c.g === charGroup);
+  const total = chars.length;
+  const totalPages = Math.ceil(total / CHARS_PER_PAGE);
+  if (charPage >= totalPages) charPage = Math.max(0, totalPages - 1);
+  const pageChars = chars.slice(charPage * CHARS_PER_PAGE, (charPage + 1) * CHARS_PER_PAGE);
+
+  const phase = data.phases[data.learning.currentPhase];
+  const phaseChars = phase ? phase.chinese : [];
+  let html = '';
+  pageChars.forEach(ch => {
+    const learned = data.learning.learnedChinese.includes(ch.c);
+    const isCurrent = phaseChars.includes(ch.c);
+    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
+    html += `<div class="char-cell ${cls}" onclick="showCharDetail('${ch.c}')" title="${ch.p} ${ch.e}">
+      <div class="char-svg" style="font-size:18px;line-height:1;">${ch.m}</div>
+      <div class="char-text">${ch.c}</div>
+    </div>`;
+  });
+  document.getElementById('chineseGrid').innerHTML = html;
+
+  let pagHtml = '';
+  if (totalPages > 1) {
+    pagHtml += `<button class="btn btn-outline btn-small" ${charPage===0?'disabled':''} onclick="charPage--;renderChineseChars();">◀</button>`;
+    pagHtml += `<span style="font-size:12px;padding:4px 8px;">${charPage+1}/${totalPages}</span>`;
+    pagHtml += `<button class="btn btn-outline btn-small" ${charPage>=totalPages-1?'disabled':''} onclick="charPage++;renderChineseChars();">▶</button>`;
+  }
+  document.getElementById('charPagination').innerHTML = pagHtml;
+
+  const customCharsAll = getCustomChars();
+  const allCharsForCount = [...ALL_CHARS_FLAT, ...customCharsAll.map(function(c){ return {c:c[0]}; })];
+  const learnedCount = allCharsForCount.filter(c => data.learning.learnedChinese.includes(c.c)).length;
+  document.getElementById('charCountInfo').textContent = learnedCount + '/' + allCharsForCount.length + ' ' + t('charsKnown');
+}
+
+// ==================== CUSTOM CHARACTERS ====================
+function getCustomChars() {
+  try { return JSON.parse(localStorage.getItem('customChars') || '[]'); } catch(e) { return []; }
+}
+function saveCustomChars(chars) {
+  localStorage.setItem('customChars', JSON.stringify(chars));
+}
+
+function showAddCharUI() {
+  var ph1 = currentLang==='zh'?'输入汉字':'Enter character';
+  var ph2 = currentLang==='zh'?'拼音 (如 mā)':'Pinyin (e.g. mā)';
+  var ph3 = currentLang==='zh'?'英文含义':'English meaning';
+  var ph4 = currentLang==='zh'?'表情符号 (如 🐱)':'Emoji (e.g. 🐱)';
+  openModal('<h3>' + (currentLang==='zh'?'添加汉字':'Add Character') + '</h3>' +
+    '<label>' + (currentLang==='zh'?'汉字':'Character') + '</label>' +
+    '<input id="addCharChar" placeholder="' + ph1 + '" maxlength="1" style="font-size:24px;text-align:center;">' +
+    '<label>' + (currentLang==='zh'?'拼音':'Pinyin') + '</label>' +
+    '<input id="addCharPinyin" placeholder="' + ph2 + '">' +
+    '<label>' + (currentLang==='zh'?'含义':'Meaning') + '</label>' +
+    '<input id="addCharMeaning" placeholder="' + ph3 + '">' +
+    '<label>' + (currentLang==='zh'?'表情':'Emoji') + '</label>' +
+    '<input id="addCharEmoji" placeholder="' + ph4 + '">' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="addCustomChar()">' + t('saveBtn') + '</button></div>');
+}
+
+function addCustomChar() {
+  var ch = (document.getElementById('addCharChar').value || '').trim();
+  var py = (document.getElementById('addCharPinyin').value || '').trim();
+  var meaning = (document.getElementById('addCharMeaning').value || '').trim();
+  var emoji = (document.getElementById('addCharEmoji').value || '').trim() || '📝';
+  if (!ch) return;
+  // Check if already exists in DB
+  if (CHAR_LOOKUP[ch]) {
+    alert(currentLang==='zh'?'此字已在字库中':'Character already in database');
+    return;
+  }
+  var customs = getCustomChars();
+  if (customs.find(function(c){ return c[0] === ch; })) {
+    alert(currentLang==='zh'?'此字已添加过':'Character already added');
+    return;
+  }
+  customs.push([ch, py, meaning, emoji]);
+  saveCustomChars(customs);
+  // Also add to CHAR_LOOKUP for stories/detail to work
+  CHAR_LOOKUP[ch] = { c: ch, p: py, e: meaning, m: emoji, g: 'custom' };
+  closeModal();
+  charGroup = 'custom';
+  charPage = 0;
+  renderChineseChars();
+}
+
+function removeCustomChar(ch) {
+  var customs = getCustomChars();
+  customs = customs.filter(function(c){ return c[0] !== ch; });
+  saveCustomChars(customs);
+  delete CHAR_LOOKUP[ch];
+  renderChineseChars();
+}
+
+// ==================== TIPS DATA ====================
+const LEARNING_TIPS = [
+  { en: '<strong>Keep sessions short</strong> — 10-15 min per activity. A 3yo\'s attention span is about 6-15 minutes.', zh: '<strong>保持简短</strong> — 每个活动10-15分钟。3岁孩子的注意力约6-15分钟。' },
+  { en: '<strong>Play-based learning</strong> — use songs, games, flashcards with pictures, and physical movement.', zh: '<strong>游戏化学习</strong> — 用歌曲、游戏、图片卡和肢体运动来学习。' },
+  { en: '<strong>Repetition is key</strong> — review previously learned items at the start of each session.', zh: '<strong>重复是关键</strong> — 每次学习开始时复习之前学过的内容。' },
+  { en: '<strong>Multi-sensory approach</strong> — trace letters in sand, form characters with playdough, count real objects.', zh: '<strong>多感官方法</strong> — 在沙子上描字、用橡皮泥捏汉字、数真实物品。' },
+  { en: '<strong>Follow the child\'s interest</strong> — if they engage more with numbers today, extend that activity.', zh: '<strong>跟随孩子兴趣</strong> — 如果今天对数字更感兴趣，就延长该活动。' },
+  { en: '<strong>Celebrate small wins</strong> — stickers, high-fives, and praise reinforce positive learning attitudes.', zh: '<strong>庆祝小进步</strong> — 贴纸、击掌和表扬能强化积极的学习态度。' },
+];
+
+const BEDTIME_TIPS = [
+  { en: '<strong>Consistent wind-down:</strong> Start the same routine 45 min before target bedtime — dim lights, quiet activities.', zh: '<strong>固定放松流程：</strong>在目标就寝前45分钟开始——调暗灯光、安静活动。' },
+  { en: '<strong>No screens</strong> for at least 1 hour before bed. Blue light delays melatonin by 30+ minutes.', zh: '<strong>睡前至少1小时不看屏幕。</strong>蓝光会延迟褪黑素分泌30分钟以上。' },
+  { en: '<strong>Physical activity during the day</strong> — playground and swimming help tremendously.', zh: '<strong>白天保持运动</strong> — 游乐场和游泳非常有帮助。' },
+  { en: '<strong>Cool, dark room</strong> — set AC to 24-25°C. Use blackout curtains if possible.', zh: '<strong>凉爽暗室</strong> — 空调24-25°C，尽量用遮光窗帘。' },
+  { en: '<strong>Gradual shift:</strong> Move bedtime 15 min earlier every 3-4 days.', zh: '<strong>逐步调整：</strong>每3-4天提前15分钟就寝。' },
+  { en: '<strong>Books before bed:</strong> Reading 2-3 short books signals "sleep is coming."', zh: '<strong>睡前读书：</strong>读2-3本短故事暗示"该睡了"。' },
+  { en: '<strong>Avoid sugar after dinner.</strong> Water or warm milk are better.', zh: '<strong>晚餐后避免糖分。</strong>水或温牛奶更好。' },
+  { en: '<strong>Comfort object:</strong> A favorite stuffed animal or blanket provides security.', zh: '<strong>安抚物：</strong>最喜欢的毛绒玩具或毯子能提供安全感。' },
+  { en: '<strong>White noise or soft music:</strong> Helps block out household sounds.', zh: '<strong>白噪音或轻音乐：</strong>帮助隔绝家庭噪音。' },
+  { en: '<strong>Sticker chart:</strong> Reward good bedtime behavior. 5 stickers = a small prize!', zh: '<strong>贴纸奖励表：</strong>奖励好的睡前表现。5个贴纸 = 一个小奖品！' },
+];
+
+function renderTips() {
+  let ltHtml = '';
+  LEARNING_TIPS.forEach((tip, i) => {
+    ltHtml += `<div class="tip-item"><div class="tip-num">${i+1}</div><div class="tip-text">${tip[currentLang]}</div></div>`;
+  });
+  const ltEl = document.getElementById('learningTipsContent');
+  if (ltEl) ltEl.innerHTML = ltHtml;
+
+  let btHtml = '';
+  BEDTIME_TIPS.forEach((tip, i) => {
+    btHtml += `<div class="tip-item"><div class="tip-num">${i+1}</div><div class="tip-text">${tip[currentLang]}</div></div>`;
+  });
+  const btEl = document.getElementById('bedtimeTipsContent');
+  if (btEl) btEl.innerHTML = btHtml;
+}
+
+// ==================== STORIES (3 variants per phase) ====================
+// Child already knows: 一二三四五山水火上下石木哭笑大小了子月日田
+
+// ==================== STORY GENERATOR ====================
+const KNOWN_CHARS_BASE = '一二三四五山水火上下石木哭笑大小了子月日田'.split('');
+
+function getCharLearningOrder() {
+  const order = [...KNOWN_CHARS_BASE];
+  if (typeof DEFAULT_DATA !== 'undefined') {
+    DEFAULT_DATA.phases.forEach(p => p.chinese.forEach(c => { if (!order.includes(c)) order.push(c); }));
+  }
+  ALL_CHARS_FLAT.forEach(ch => { if (!order.includes(ch.c)) order.push(ch.c); });
+  return order;
+}
+
+function getCharBatches() {
+  const order = getCharLearningOrder();
+  const toLearn = order.filter(c => !KNOWN_CHARS_BASE.includes(c));
+  const batches = [];
+  for (let i = 0; i < toLearn.length; i += 3) batches.push(toLearn.slice(i, i + 3));
+  return batches;
+}
+
+const STORY_TPLS = [
+  function(a,b,c){ return a+'在上面，'+b+'在下面。看了'+c+'，'+c+'好大！笑了笑了。'; },
+  function(a,b,c){ return '一个'+a+'，二个'+b+'，三个'+c+'。大'+a+'小'+b+'，上上下下。'; },
+  function(a,b,c){ return '山上有'+a+'。水里有'+b+'。田里有'+c+'。大大小小，一二三四五。'; },
+  function(a,b,c){ return '我有'+a+'。你有'+b+'。他也有'+c+'。大的小的，好好好！'; },
+  function(a,b,c){ return '日出了，'+a+'来了。月上了，'+b+'走了。天上地下，'+c+'大大小小。'; },
+  function(a,b,c){ return '大人'+a+'了，小人也'+a+'了。'+b+'了又'+c+'了，笑了又笑了！'; },
+  function(a,b,c){ return a+'大，'+b+'小。'+a+'在上，'+b+'在下。'+c+'在中，大大小小。'; },
+  function(a,b,c){ return '上山了！山上有'+a+'有'+b+'。下山了！山下有'+c+'有水。日月天地！'; },
+  function(a,b,c){ return a+'和'+b+'和'+c+'在一起。大的笑了，小的也笑了。一二三，上上下下！'; },
+];
+
+function generateBatchStories(batchIdx) {
+  const batches = getCharBatches();
+  if (batchIdx < 0 || batchIdx >= batches.length) return [];
+  const nc = batches[batchIdx];
+  const a = nc[0], b = nc[1]||a, c = nc[2]||a;
+  const stories = [];
+  const base = (batchIdx * 3) % STORY_TPLS.length;
+  for (let s = 0; s < 3; s++) {
+    const tpl = STORY_TPLS[(base + s) % STORY_TPLS.length];
+    stories.push({
+      title: { en: 'Batch ' + (batchIdx+1) + ' #' + (s+1), zh: '第' + (batchIdx+1) + '组 · ' + (s+1) },
+      text: tpl(a, b, c),
+      chars: [...nc],
+      level: Math.min(5, Math.floor(batchIdx / 33) + 1),
+      pinyin: {}, batch: batchIdx
+    });
+  }
+  return stories;
+}
+
+let storyBatchPage = 0;
+const BATCH_PAGE_SIZE = 5;
+
+// ==================== FEATURED STORIES (handwritten) ====================
+const STORIES = [
+  // Phase 1: 一二三大小上下 (all known — confidence builders)
+  { title:{en:'Counting Fun',zh:'数一数'}, text:'一二三四五，五四三二一。大的上，小的下。笑了笑了，一二三！', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'Big Mountain',zh:'大山小石'}, text:'大山上有大石，小山下有小石。山上有木，山下有水。一二三四五，上上下下。', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'Cry and Laugh',zh:'哭和笑'}, text:'小子哭了，大子笑了。一上一下，大子小子。三四五，笑了笑了，不哭了！', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+
+  // Phase 2: 人口手日月水火 (日月水火 known, 人口手 new)
+  { title:{en:'Big Hands',zh:'人的手'}, text:'一个大人，二个小人。大人的手大，小人的手小。人口也大小不同。日上山了，月下山了。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+  { title:{en:'Sun and Moon',zh:'日和月'}, text:'日在上，月在下。日是火，月是水。大人用手拿水，小人用口喝水。日月山水，一二三四五。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+  { title:{en:'Hilltop Person',zh:'山上的人'}, text:'山上有人，水上有月。人的手上有石子。日出了，火红的天。小子笑了，大人也笑了。', chars:['人','口','手','日','月','水','火'], level:2, pinyin:{} },
+
+  // Phase 3: 山木石田天地花 (山木石田 known, 天地花 new)
+  { title:{en:'Sky and Earth',zh:'天上地下'}, text:'天大大的，地也大大的。天上有日月，地上有山水。花在田里，木在山上，石在水下。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{} },
+  { title:{en:'Field Flowers',zh:'田里的花'}, text:'田里有花，山上有木。日照田里的花，水流山下的田。大花小花，一二三四五朵花。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{'照':'zhào','流':'liú','朵':'duǒ'} },
+  { title:{en:'Look Around',zh:'看天看地'}, text:'上看天，下看地。天上日月，地上山水。田里有花有木。石子大大小小。天地之间，花笑了。', chars:['山','木','石','田','天','地','花'], level:3, pinyin:{'之':'zhī'} },
+
+  // Phase 4: 爸妈我你他好家 (all new — family words)
+  { title:{en:'My Home',zh:'我的家'}, text:'我有一个家。家里有爸爸，有妈妈。爸爸好大，我好小。妈妈笑了，我也笑了。家在大山下。', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{} },
+  { title:{en:'Hello Hello',zh:'你好我好'}, text:'你好！我好！爸爸妈妈好！你笑我也笑。他哭了我不哭。你大我小。我们一起上山去！', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{'起':'qǐ'} },
+  { title:{en:'Good Parents',zh:'好爸爸好妈妈'}, text:'爸爸的手大，妈妈的手小。我的手更小了！他是我爸爸，她是我妈妈。家好，我好，你也好！', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{'更':'gèng'} },
+
+  // Phase 5: 鱼鸟马牛羊猫狗虫 (all new — animals)
+  { title:{en:'Cat and Dog',zh:'小猫小狗'}, text:'我家有猫有狗。猫小了，狗大了。猫笑了，狗哭了。猫在上面，狗在下面。猫和狗是好朋友。', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{} },
+  { title:{en:'The Farm',zh:'山下农场'}, text:'山下有牛有羊有马。大牛吃草，小羊喝水。马在田上跑。鸟在天上飞。鱼在水里。虫在地上爬。', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{'农':'nóng','场':'chǎng'} },
+  { title:{en:'I Love Nature',zh:'我爱大自然'}, text:'天上有鸟，水里有鱼。山上有马有羊，田里有牛有虫。猫和狗在家里。大大小小，笑了笑了！', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{} },
+];
+
+// ==================== RECIPES ====================
+const RECIPES = [
+  { name:{en:'Tomato Egg Stir-Fry',zh:'番茄炒蛋'}, cat:'main', diff:1, time:15, emoji:'🍳', ing:['番茄 2个/2 tomatoes','鸡蛋 3个/3 eggs','盐/salt','油/oil','糖 少许/pinch of sugar'], steps:['打蛋搅拌/Beat eggs','热油炒蛋盛出/Scramble eggs, set aside','炒番茄加糖/Stir-fry tomatoes with sugar','加入蛋翻炒/Add eggs back, stir'], tags:['quick','protein'] },
+  { name:{en:'Steamed Egg Custard',zh:'蒸蛋'}, cat:'main', diff:1, time:15, emoji:'🥚', ing:['鸡蛋 2个/2 eggs','温水 150ml/150ml warm water','盐/salt','酱油 少许/soy sauce','香油/sesame oil'], steps:['打蛋加温水搅拌/Beat eggs with warm water','过滤蛋液/Strain mixture','盖保鲜膜蒸10分钟/Cover, steam 10 min','淋酱油香油/Drizzle soy sauce & sesame oil'], tags:['easy','soft'] },
+  { name:{en:'Egg Fried Rice',zh:'蛋炒饭'}, cat:'main', diff:1, time:10, emoji:'🍚', ing:['隔夜饭 1碗/1 bowl leftover rice','鸡蛋 2个/2 eggs','葱/scallion','盐/salt','油/oil'], steps:['热油炒蛋碎/Scramble eggs in oil','加冷饭大火翻炒/Add rice, stir-fry high heat','加盐调味/Season with salt','撒葱花/Top with scallion'], tags:['quick','staple'] },
+  { name:{en:'Pork & Veggie Dumplings',zh:'猪肉蔬菜水饺'}, cat:'main', diff:3, time:60, emoji:'🥟', ing:['饺子皮/dumpling wrappers','猪肉末 200g/200g ground pork','白菜/napa cabbage','姜/ginger','酱油/soy sauce','香油/sesame oil'], steps:['白菜切碎挤水/Chop cabbage, squeeze dry','肉末加调料搅拌/Mix pork with seasonings','包饺子/Wrap dumplings','水开下锅煮8分钟/Boil 8 min after water boils'], tags:['family','freezable'] },
+  { name:{en:'Sweet Potato Congee',zh:'红薯粥'}, cat:'soup', diff:1, time:30, emoji:'🍠', ing:['大米 半杯/½ cup rice','红薯 1个/1 sweet potato','水 5杯/5 cups water'], steps:['大米洗净泡20分钟/Wash rice, soak 20 min','红薯去皮切块/Peel & dice sweet potato','大火煮开转小火/Bring to boil, simmer','煮至粘稠/Cook until thick'], tags:['sweet','warm'] },
+  { name:{en:'Tomato Egg Drop Soup',zh:'番茄蛋花汤'}, cat:'soup', diff:1, time:15, emoji:'🍅', ing:['番茄 1个/1 tomato','鸡蛋 1个/1 egg','盐/salt','香油/sesame oil','葱/scallion'], steps:['番茄切块煮开/Dice tomato, boil','打蛋液淋入/Drizzle beaten egg','加盐调味/Season','撒葱花香油/Add scallion & sesame oil'], tags:['quick','light'] },
+  { name:{en:'Fish Congee',zh:'鱼粥'}, cat:'soup', diff:2, time:40, emoji:'🐟', ing:['大米 半杯/½ cup rice','鱼片 100g/100g fish fillet','姜丝/ginger','盐/salt','葱/scallion','胡椒粉/white pepper'], steps:['煮白粥至浓稠/Cook plain congee until thick','加姜丝/Add ginger','放入鱼片煮熟/Add fish, cook through','加盐胡椒葱花/Season & garnish'], tags:['nutritious','protein'] },
+  { name:{en:'Corn & Rib Soup',zh:'玉米排骨汤'}, cat:'soup', diff:2, time:60, emoji:'🌽', ing:['排骨 300g/300g ribs','玉米 1根/1 corn cob','胡萝卜 1个/1 carrot','盐/salt','姜/ginger'], steps:['排骨焯水/Blanch ribs','放入锅加水姜/Add water & ginger','大火煮开转小火1小时/Boil then simmer 1 hr','加玉米胡萝卜煮20分钟/Add corn & carrot 20 min','加盐/Salt to taste'], tags:['nutritious','slow'] },
+  { name:{en:'Noodle Soup',zh:'汤面'}, cat:'noodle', diff:1, time:15, emoji:'🍜', ing:['面条/noodles','鸡蛋 1个/1 egg','青菜/greens','盐/salt','酱油/soy sauce'], steps:['水开下面条/Boil noodles','另锅煮蛋和青菜/Cook egg & greens','面条盛入汤碗/Place noodles in bowl','加汤和配菜/Add broth & toppings'], tags:['quick','comforting'] },
+  { name:{en:'Fried Noodles',zh:'炒面'}, cat:'noodle', diff:1, time:15, emoji:'🍝', ing:['面条/noodles','鸡蛋/egg','青菜/greens','酱油/soy sauce','油/oil'], steps:['面条煮熟沥干/Boil noodles, drain','热油炒蛋和菜/Stir-fry egg & veggies','加入面条和酱油/Add noodles & soy sauce','大火翻炒均匀/Toss on high heat'], tags:['quick','kids-love'] },
+  { name:{en:'Dan Dan Noodles (Mild)',zh:'担担面（儿童版）'}, cat:'noodle', diff:2, time:20, emoji:'🍜', ing:['面条/noodles','猪肉末 100g/100g ground pork','芝麻酱 2勺/2 tbsp sesame paste','酱油/soy sauce','醋 少许/splash of vinegar','花生碎/crushed peanuts'], steps:['炒肉末至熟/Brown pork','调芝麻酱汁/Mix sesame paste sauce','煮面沥干/Boil noodles, drain','拌酱和肉末/Toss with sauce & pork'], tags:['savory','protein'] },
+  { name:{en:'Banana Pancakes',zh:'香蕉煎饼'}, cat:'breakfast', diff:1, time:15, emoji:'🥞', ing:['香蕉 1根/1 banana','鸡蛋 1个/1 egg','面粉 3勺/3 tbsp flour','牛奶 少许/splash of milk'], steps:['香蕉压成泥/Mash banana','加蛋面粉牛奶搅拌/Mix with egg, flour, milk','小火煎至两面金黄/Pan-fry until golden','可配蜂蜜/Serve with honey'], tags:['sweet','no-sugar-added'] },
+  { name:{en:'Egg & Veggie Muffins',zh:'蔬菜蛋杯'}, cat:'breakfast', diff:1, time:25, emoji:'🧁', ing:['鸡蛋 4个/4 eggs','胡萝卜碎/diced carrot','玉米粒/corn kernels','盐/salt','芝士碎/shredded cheese'], steps:['打蛋加蔬菜搅拌/Mix eggs with veggies','倒入马芬模具/Pour into muffin tin','撒芝士/Top with cheese','180°C烤20分钟/Bake 180°C for 20 min'], tags:['meal-prep','protein'] },
+  { name:{en:'Chinese Crepes',zh:'鸡蛋饼'}, cat:'breakfast', diff:1, time:10, emoji:'🫓', ing:['面粉 4勺/4 tbsp flour','鸡蛋 1个/1 egg','水/water','葱花/scallion','盐/salt'], steps:['面粉加水蛋搅成糊/Mix flour, water, egg into batter','加葱花盐/Add scallion & salt','平底锅摊薄煎/Spread thin in pan, cook','卷起切段/Roll up & slice'], tags:['quick','traditional'] },
+  { name:{en:'Steamed Buns (Mantou)',zh:'馒头'}, cat:'breakfast', diff:2, time:60, emoji:'🫘', ing:['面粉 300g/300g flour','酵母 3g/3g yeast','糖 20g/20g sugar','温水 150ml/150ml warm water'], steps:['酵母温水化开/Dissolve yeast in warm water','和面揉光滑/Knead dough until smooth','发酵1小时/Rise 1 hour','分剂蒸15分钟/Shape & steam 15 min'], tags:['staple','freezable'] },
+  { name:{en:'Stir-Fried Broccoli',zh:'炒西兰花'}, cat:'veggie', diff:1, time:10, emoji:'🥦', ing:['西兰花 1个/1 broccoli','蒜 2瓣/2 garlic cloves','盐/salt','油/oil'], steps:['西兰花切小朵焯水/Cut & blanch broccoli','热油爆香蒜/Sauté garlic','加入西兰花翻炒/Add broccoli, stir-fry','加盐调味/Season with salt'], tags:['quick','healthy'] },
+  { name:{en:'Braised Tofu',zh:'红烧豆腐'}, cat:'veggie', diff:1, time:20, emoji:'🧈', ing:['豆腐 1块/1 block tofu','酱油/soy sauce','糖/sugar','葱/scallion','油/oil'], steps:['豆腐切块煎至金黄/Cube tofu, pan-fry golden','加酱油糖水/Add soy sauce, sugar, water','小火焖5分钟/Simmer 5 min','撒葱花/Garnish with scallion'], tags:['protein','vegetarian'] },
+  { name:{en:'Garlic Spinach',zh:'蒜蓉菠菜'}, cat:'veggie', diff:1, time:8, emoji:'🥬', ing:['菠菜 1把/1 bunch spinach','蒜 3瓣/3 garlic cloves','盐/salt','油/oil'], steps:['菠菜洗净焯水/Wash & blanch spinach','热油爆蒜/Sauté garlic','放入菠菜翻炒/Add spinach, quick stir','加盐/Season'], tags:['quick','iron-rich'] },
+  { name:{en:'Carrot & Egg Stir-Fry',zh:'胡萝卜炒蛋'}, cat:'veggie', diff:1, time:10, emoji:'🥕', ing:['胡萝卜 1根/1 carrot','鸡蛋 2个/2 eggs','盐/salt','油/oil'], steps:['胡萝卜切丝/Julienne carrot','热油炒蛋碎盛出/Scramble eggs, set aside','炒胡萝卜丝/Stir-fry carrot','加入蛋翻炒/Add eggs back'], tags:['quick','vitamin-a'] },
+  { name:{en:'Mashed Potato',zh:'土豆泥'}, cat:'veggie', diff:1, time:20, emoji:'🥔', ing:['土豆 2个/2 potatoes','牛奶 少许/splash of milk','黄油/butter','盐/salt'], steps:['土豆去皮切块煮熟/Peel, dice, boil potatoes','沥水压成泥/Drain & mash','加牛奶黄油搅拌/Mix in milk & butter','加盐调味/Season'], tags:['soft','toddler-friendly'] },
+  { name:{en:'Steamed Chicken',zh:'蒸鸡肉'}, cat:'main', diff:1, time:25, emoji:'🍗', ing:['鸡腿肉 200g/200g chicken thigh','姜/ginger','葱/scallion','盐/salt','酱油/soy sauce'], steps:['鸡肉切块加姜葱腌15分钟/Marinate chicken with ginger & scallion','放入盘中/Place in dish','大火蒸15分钟/Steam 15 min on high','淋酱油/Drizzle soy sauce'], tags:['simple','protein'] },
+  { name:{en:'Curry Chicken Rice',zh:'咖喱鸡饭'}, cat:'main', diff:2, time:35, emoji:'🍛', ing:['鸡腿肉 200g/200g chicken','土豆 1个/1 potato','胡萝卜 1个/1 carrot','咖喱块 2块/2 curry cubes','米饭/rice'], steps:['鸡肉土豆胡萝卜切块/Dice chicken & veggies','炒鸡肉变色/Brown chicken','加水煮软蔬菜/Add water, cook veggies','加咖喱块搅拌/Add curry cubes, stir','配米饭/Serve with rice'], tags:['one-pot','kids-love'] },
+  { name:{en:'Hainanese Chicken Rice',zh:'海南鸡饭'}, cat:'main', diff:2, time:45, emoji:'🍚', ing:['鸡腿 2个/2 chicken legs','大米/rice','姜/ginger','蒜/garlic','香油/sesame oil','酱油/soy sauce'], steps:['整鸡腿煮熟/Poach whole chicken legs','鸡汤煮饭/Cook rice in chicken broth','鸡肉切块/Slice chicken','配姜蓉酱油/Serve with ginger sauce'], tags:['classic','singaporean'] },
+  { name:{en:'Braised Pork Belly',zh:'红烧肉'}, cat:'main', diff:2, time:60, emoji:'🥩', ing:['五花肉 300g/300g pork belly','酱油/soy sauce','糖/sugar','姜/ginger','八角/star anise'], steps:['五花肉切块焯水/Cube & blanch pork','炒糖色/Caramelize sugar','加肉翻炒/Add pork, coat','加酱油水焖45分钟/Add soy sauce, water, braise 45 min'], tags:['classic','rich'] },
+  { name:{en:'Steamed Fish',zh:'清蒸鱼'}, cat:'main', diff:2, time:20, emoji:'🐟', ing:['鱼 1条/1 whole fish','姜丝/ginger','葱丝/scallion','酱油/soy sauce','油/oil'], steps:['鱼洗净放盘/Clean fish, place on plate','铺姜丝/Top with ginger','大火蒸10分钟/Steam 10 min','淋热油酱油葱丝/Pour hot oil, soy sauce, scallion'], tags:['healthy','protein'] },
+  { name:{en:'Pork Meatballs',zh:'猪肉丸子'}, cat:'main', diff:2, time:30, emoji:'🧆', ing:['猪肉末 300g/300g ground pork','葱姜末/minced scallion & ginger','酱油/soy sauce','淀粉/starch','盐/salt'], steps:['肉末加调料搅拌/Mix pork with seasonings','搓成小丸子/Roll into small balls','水开下锅煮/Drop into boiling water','煮至浮起即熟/Cook until they float'], tags:['freezable','protein'] },
+  { name:{en:'Fried Rice Cake',zh:'炒年糕'}, cat:'main', diff:2, time:15, emoji:'🍙', ing:['年糕/rice cakes','白菜/napa cabbage','酱油/soy sauce','糖/sugar','油/oil'], steps:['年糕切片泡软/Slice rice cakes, soak','炒白菜/Stir-fry cabbage','加年糕和酱油糖/Add rice cakes, soy sauce, sugar','翻炒至软糯/Cook until soft & chewy'], tags:['chewy','kids-love'] },
+  { name:{en:'Wonton Soup',zh:'馄饨汤'}, cat:'soup', diff:2, time:40, emoji:'🥟', ing:['馄饨皮/wonton wrappers','猪肉末 150g/150g ground pork','虾仁 50g/50g shrimp','紫菜/seaweed','葱/scallion'], steps:['肉末虾仁调馅/Mix pork & shrimp filling','包馄饨/Wrap wontons','水开下锅煮/Boil until they float','加紫菜葱花汤/Serve in broth with seaweed & scallion'], tags:['comforting','protein'] },
+  { name:{en:'Millet Congee',zh:'小米粥'}, cat:'soup', diff:1, time:30, emoji:'🥣', ing:['小米 半杯/½ cup millet','水 5杯/5 cups water','红枣 3个/3 red dates'], steps:['小米洗净/Wash millet','大火煮开/Bring to boil','转小火加红枣/Simmer, add dates','煮30分钟至浓稠/Cook 30 min until thick'], tags:['digestive','warm'] },
+  { name:{en:'Egg Pancake Roll',zh:'蛋饼卷'}, cat:'snack', diff:1, time:10, emoji:'🌯', ing:['鸡蛋 2个/2 eggs','面粉 2勺/2 tbsp flour','火腿/ham','生菜/lettuce'], steps:['蛋面粉搅成糊/Mix egg & flour','摊成薄饼/Make thin crepe','放火腿生菜/Add ham & lettuce','卷起切段/Roll & slice'], tags:['quick','portable'] },
+  { name:{en:'Steamed Cake',zh:'蒸蛋糕'}, cat:'snack', diff:2, time:30, emoji:'🍰', ing:['鸡蛋 3个/3 eggs','面粉 80g/80g flour','糖 40g/40g sugar','牛奶 30ml/30ml milk'], steps:['蛋白打至硬性发泡/Whip egg whites stiff','蛋黄加糖面粉牛奶/Mix yolks, sugar, flour, milk','轻拌蛋白/Fold in egg whites','蒸20分钟/Steam 20 min'], tags:['sweet','no-oven'] },
+  { name:{en:'Seaweed Rice Balls',zh:'海苔饭团'}, cat:'snack', diff:1, time:10, emoji:'🍙', ing:['米饭/rice','海苔/seaweed sheets','盐/salt','芝麻/sesame seeds'], steps:['米饭加少许盐/Mix rice with pinch of salt','手沾水捏成团/Wet hands, shape into balls','撒芝麻/Sprinkle sesame','包海苔/Wrap with seaweed'], tags:['portable','fun'] },
+  { name:{en:'Fruit Yogurt Bowl',zh:'水果酸奶碗'}, cat:'snack', diff:1, time:5, emoji:'🥣', ing:['酸奶/yogurt','香蕉/banana','蓝莓/blueberries','燕麦/granola'], steps:['酸奶倒入碗中/Pour yogurt in bowl','切水果摆上/Slice fruit, arrange','撒燕麦/Top with granola','即可食用/Serve immediately'], tags:['no-cook','healthy'] },
+  { name:{en:'Mini Siew Mai',zh:'迷你烧卖'}, cat:'snack', diff:2, time:30, emoji:'🥟', ing:['猪肉末 200g/200g ground pork','虾仁 50g/50g shrimp','烧卖皮/siew mai wrappers','酱油/soy sauce','姜末/minced ginger'], steps:['虾仁切碎加肉末/Chop shrimp, mix with pork','加酱油姜拌匀/Add soy sauce & ginger','包入烧卖皮/Wrap in siew mai skins','大火蒸10分钟/Steam 10 min'], tags:['dim-sum','freezable'] },
+  { name:{en:'Corn Fritters',zh:'玉米饼'}, cat:'snack', diff:1, time:15, emoji:'🌽', ing:['玉米粒 1杯/1 cup corn','鸡蛋 1个/1 egg','面粉 3勺/3 tbsp flour','盐/salt'], steps:['玉米加蛋面粉搅拌/Mix corn, egg, flour','加盐调味/Season with salt','小火煎至两面金黄/Pan-fry until golden','沥油即可/Drain & serve'], tags:['sweet','crispy'] },
+  { name:{en:'Macaroni Soup',zh:'通心粉汤'}, cat:'noodle', diff:1, time:20, emoji:'🍝', ing:['通心粉/macaroni','火腿/ham','青菜/greens','鸡汤/chicken broth'], steps:['煮通心粉至软/Boil macaroni','鸡汤加火腿煮/Heat broth with ham','加青菜/Add greens','加入通心粉/Add macaroni to soup'], tags:['comforting','easy'] },
+  { name:{en:'Zucchini Fritters',zh:'西葫芦饼'}, cat:'veggie', diff:1, time:15, emoji:'🥒', ing:['西葫芦 1个/1 zucchini','鸡蛋 1个/1 egg','面粉/flour','盐/salt'], steps:['西葫芦擦丝挤水/Grate zucchini, squeeze dry','加蛋面粉盐拌匀/Mix with egg, flour, salt','小火煎至金黄/Pan-fry until golden','翻面煎熟/Flip & cook through'], tags:['hidden-veggie','crispy'] },
+  { name:{en:'Pumpkin Congee',zh:'南瓜粥'}, cat:'soup', diff:1, time:30, emoji:'🎃', ing:['南瓜 200g/200g pumpkin','大米 半杯/½ cup rice','水/water'], steps:['南瓜去皮切块/Peel & dice pumpkin','大米泡水/Soak rice','一起煮至浓稠/Cook together until thick','南瓜煮化即可/Pumpkin should melt into congee'], tags:['sweet','vitamin-a'] },
+];
+
+function renderStories() {
+  const learned = data.learning.learnedChinese;
+  let html = '';
+
+  // Section 1: Featured stories (handwritten)
+  html += '<div style="font-size:13px;font-weight:700;margin-bottom:6px;">' + (currentLang==='zh'?'精选故事':'Featured Stories') + '</div>';
+  STORIES.forEach(function(story, i) {
+    var knownCount = story.chars.filter(function(c){ return learned.includes(c); }).length;
+    var total = story.chars.length;
+    var pct = total > 0 ? Math.round((knownCount / total) * 100) : 0;
+    var unlocked = pct >= 60;
+    html += '<div class="story-card ' + (unlocked ? '' : 'locked') + '" onclick="' + (unlocked ? 'showStoryObj(STORIES['+i+'])' : '') + '">';
+    html += '<div class="story-title">' + (story.title[currentLang] || story.title.en) + ' <span style="font-size:11px;">' + '\u2B50'.repeat(story.level) + '</span></div>';
+    html += '<div class="story-level">' + knownCount + '/' + total + ' ' + t('charsKnown') + (unlocked ? '' : ' \u00B7 ' + t('locked')) + '</div>';
+    html += '<div class="story-progress"><div class="fill" style="width:' + pct + '%"></div></div></div>';
+  });
+
+  // Section 2: Auto-generated batch stories
+  var batches = getCharBatches();
+  var totalBatches = batches.length;
+  var totalPages = Math.ceil(totalBatches / BATCH_PAGE_SIZE);
+  if (storyBatchPage >= totalPages) storyBatchPage = totalPages - 1;
+  if (storyBatchPage < 0) storyBatchPage = 0;
+  var startBatch = storyBatchPage * BATCH_PAGE_SIZE;
+  var endBatch = Math.min(startBatch + BATCH_PAGE_SIZE, totalBatches);
+
+  html += '<div style="font-size:13px;font-weight:700;margin:16px 0 6px;">' + (currentLang==='zh'?'分组练习 ('+totalBatches+'组，每组3字)':'Batch Practice ('+totalBatches+' batches, 3 chars each)') + '</div>';
+
+  for (var bi = startBatch; bi < endBatch; bi++) {
+    var batch = batches[bi];
+    var batchLabel = batch.join(' ');
+    var batchMeanings = batch.map(function(c){ var lu = CHAR_LOOKUP[c]; return lu ? lu.m + c : c; }).join(' ');
+    var knownCount = batch.filter(function(c){ return learned.includes(c); }).length;
+    var pct = Math.round((knownCount / batch.length) * 100);
+    var unlocked = true; // batch stories always accessible
+    html += '<div style="background:#f8f0ff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid var(--purple);">';
+    html += '<div style="font-size:13px;font-weight:700;color:#6A1B9A;">' + (currentLang==='zh'?'第':'Batch ') + (bi+1) + (currentLang==='zh'?'组：':'：') + batchMeanings + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);margin:4px 0;">' + knownCount + '/' + batch.length + ' ' + t('charsKnown') + '</div>';
+    html += '<div style="display:flex;gap:6px;margin-top:6px;">';
+    for (var si = 0; si < 3; si++) {
+      html += '<button class="btn btn-outline btn-small" style="flex:1;" onclick="showBatchStory(' + bi + ',' + si + ')">' + (currentLang==='zh'?'故事':'Story') + ' ' + (si+1) + '</button>';
+    }
+    html += '</div></div>';
+  }
+
+  // Pagination
+  if (totalPages > 1) {
+    html += '<div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">';
+    html += '<button class="btn btn-outline btn-small" ' + (storyBatchPage===0?'disabled':'') + ' onclick="storyBatchPage--;renderStories();">\u25C0</button>';
+    html += '<span style="font-size:12px;padding:4px 8px;">' + (storyBatchPage+1) + '/' + totalPages + '</span>';
+    html += '<button class="btn btn-outline btn-small" ' + (storyBatchPage>=totalPages-1?'disabled':'') + ' onclick="storyBatchPage++;renderStories();">\u25B6</button>';
+    html += '</div>';
+  }
+
+  document.getElementById('storiesContainer').innerHTML = html;
+}
+
+function showBatchStory(batchIdx, storyIdx) {
+  var stories = generateBatchStories(batchIdx);
+  if (storyIdx < stories.length) showStoryObj(stories[storyIdx]);
+}
+
+function showStoryObj(story) {
+  if (!story) return;
+  var learned = data.learning.learnedChinese;
+  var textHtml = '';
+  for (var i = 0; i < story.text.length; i++) {
+    var char = story.text[i];
+    if (/[\s，。！？、；：""''（）]/.test(char)) {
+      textHtml += char;
+    } else if (learned.includes(char) || KNOWN_CHARS_BASE.includes(char)) {
+      textHtml += '<span class="known">' + char + '</span>';
+    } else {
+      var lu = CHAR_LOOKUP[char];
+      var py = lu ? lu.p : (story.pinyin[char] || '');
+      if (py) {
+        textHtml += '<ruby class="unknown">' + char + '<rt>' + py + '</rt></ruby>';
+      } else {
+        textHtml += '<span class="unknown">' + char + '</span>';
+      }
+    }
+  }
+  var newCharsHtml = story.chars.map(function(c) {
+    var lu = CHAR_LOOKUP[c];
+    var isLearned = learned.includes(c);
+    return '<span style="display:inline-block;margin:2px 4px;padding:4px 8px;border-radius:6px;font-size:18px;' +
+      (isLearned ? 'background:var(--green-light);color:var(--green);' : 'background:var(--yellow-light);color:#F57F17;') +
+      '">' + (lu?lu.m:'') + c + (lu?' <small style="font-size:10px;">'+lu.p+'</small>':'') + '</span>';
+  }).join('');
+
+  openModal('<h3>' + (story.title[currentLang] || story.title.en) + '</h3>' +
+    '<div style="margin:8px 0;">' + (currentLang==='zh'?'本组生字：':'New chars: ') + newCharsHtml + '</div>' +
+    '<div class="story-modal-text">' + textHtml + '</div>' +
+    '<div style="font-size:12px;color:var(--text-light);margin-top:8px;">' +
+    '<span class="known" style="font-size:14px;">\u7EFF</span> = ' + t('markLearned') + ' &nbsp;' +
+    '<span class="unknown" style="font-size:14px;">\u7EA2</span> = pinyin</div>' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-outline btn-block" onclick="closeModal()">' + t('cancelBtn') + '</button></div>');
+}
+
+// ==================== RECIPES ====================
+let recipeFilter = 'all';
+
+function renderRecipes() {
+  const searchVal = (document.getElementById('recipeSearchInput')?.value || '').toLowerCase();
+  // Filters
+  const cats = ['all','main','soup','noodle','breakfast','veggie','snack'];
+  const catLabels = { all:t('allCat'), main:t('mainDish'), soup:t('soupCat'), noodle:t('noodleCat'), breakfast:t('bfastCat'), veggie:t('vegCat'), snack:t('snackCat') };
+  let filterHtml = cats.map(c => `<button class="filter-btn ${recipeFilter===c?'active':''}" onclick="recipeFilter='${c}';renderRecipes()">${catLabels[c]}</button>`).join('');
+  document.getElementById('recipeFilters').innerHTML = filterHtml;
+  // Filter recipes
+  let filtered = RECIPES.filter(r => {
+    if (recipeFilter !== 'all' && r.cat !== recipeFilter) return false;
+    if (searchVal) {
+      const n = (r.name[currentLang] || r.name.en).toLowerCase();
+      const nOther = (r.name[currentLang === 'en' ? 'zh' : 'en'] || '').toLowerCase();
+      if (!n.includes(searchVal) && !nOther.includes(searchVal)) return false;
+    }
+    return true;
+  });
+  let html = '';
+  filtered.forEach((r, i) => {
+    const realIdx = RECIPES.indexOf(r);
+    const stars = '⭐'.repeat(r.diff);
+    html += `<div class="recipe-item" onclick="showRecipeDetail(${realIdx})">
+      <div class="recipe-emoji">${r.emoji}</div>
+      <div class="recipe-info">
+        <div class="recipe-name">${r.name[currentLang] || r.name.en}</div>
+        <div class="recipe-meta">${stars} · ${r.time}${t('mins')} · ${catLabels[r.cat] || r.cat}</div>
+      </div>
+    </div>`;
+  });
+  if (!html) html = `<div style="text-align:center;color:var(--text-light);padding:16px;font-size:13px;">No recipes found</div>`;
+  document.getElementById('recipeList').innerHTML = html;
+}
+
+function showRecipeDetail(idx) {
+  const r = RECIPES[idx];
+  if (!r) return;
+  const isZh = currentLang === 'zh';
+  const getName = (biStr) => { const parts = biStr.split('/'); return isZh ? (parts[0] || biStr) : (parts[1] || parts[0] || biStr); };
+  let ingHtml = r.ing.map(i => `<li>${getName(i)}</li>`).join('');
+  let stepsHtml = r.steps.map((s, i) => `<li>${getName(s)}</li>`).join('');
+  const searchName = encodeURIComponent(r.name.zh);
+  openModal(`
+    <h3>${r.emoji} ${r.name[currentLang] || r.name.en}</h3>
+    <div style="font-size:12px;color:var(--text-light);">${'⭐'.repeat(r.diff)} · ${r.time}${t('mins')}</div>
+    <div class="recipe-detail-section">
+      <h4>${t('ingredients')}</h4>
+      <ul>${ingHtml}</ul>
+    </div>
+    <div class="recipe-detail-section">
+      <h4>${t('steps')}</h4>
+      <ol>${stepsHtml}</ol>
+    </div>
+    <div class="modal-actions">
+      <a href="https://www.xiachufang.com/search/?keyword=${searchName}" target="_blank" class="btn btn-accent btn-block" style="text-decoration:none;">${t('searchOnline')}</a>
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancelBtn')}</button>
+    </div>
+  `);
+}
+
+function getRecipeForMeal(mealName) {
+  if (!mealName) return null;
+  // mealName could be a raw bilingual string like "咖喱鸡饭/Curry chicken with rice"
+  const lower = (typeof mealName === 'string' ? mealName : '').toLowerCase();
+  if (!lower) return null;
+  return RECIPES.find(r => {
+    const en = (r.name.en || '').toLowerCase();
+    const zh = r.name.zh || '';
+    return lower.includes(en) || lower.includes(zh) || en.includes(lower) || zh.includes(lower);
+  });
+}
+
+// ==================== DATA MODEL ====================
+const DEFAULT_DATA = {
+  currentSleepMinutes: 23 * 60, // 11:00 PM in minutes from midnight
+  targetSleepMinutes: 22 * 60, // 10:00 PM
+
+  schedule: {
+    weekday: [
+      { time: "07:30", activity: "Wake up & morning routine", icon: "☀️", nameKey: "wakeUpMorning" },
+      { time: "08:00", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:00", activity: "Go to school", icon: "🏫", nameKey: "goToSchool" },
+      { time: "16:30", activity: "Pick up from school", icon: "🎒", nameKey: "pickUpSchool" },
+      { time: "17:00", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Learning time", icon: "📚", type: "learning", nameKey: "learningTime" },
+      { time: "20:15", activity: "Free play / wind-down", icon: "🧸", nameKey: "freePlayWindDown" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
+    ],
+    weekend: [
+      { time: "08:00", activity: "Wake up", icon: "☀️", nameKey: "wakeUp" },
+      { time: "08:30", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:30", activity: "Free play / family time", icon: "🏠", nameKey: "familyTime" },
+      { time: "10:00", activity: "Sunday Outing (if Sunday)", icon: "🌳", nameKey: "sundayOuting" },
+      { time: "12:30", activity: "Lunch", icon: "🍱", nameKey: "lunchTime" },
+      { time: "13:00", activity: "Nap / quiet time", icon: "😴", nameKey: "napTime" },
+      { time: "15:00", activity: "Snack", icon: "🍎", nameKey: "snackTime" },
+      { time: "15:30", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "17:30", activity: "Learning time (light)", icon: "📚", type: "learning", nameKey: "lightLearning" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Free play / family time", icon: "🧸", nameKey: "familyTime" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
+    ],
+  },
+
+  foods: {
+    breakfast: [
+      "燕麦粥配水果/Oatmeal with fruits", "炒蛋吐司/Scrambled eggs & toast", "松饼/Pancakes",
+      "肉松粥/Congee with pork floss", "汤面/Noodle soup", "法式吐司/French toast",
+      "蛋炒饭/Rice with egg", "包子/Steamed buns (baozi)", "牛奶麦片/Cereal with milk",
+      "香蕉煎饼/Banana pancakes", "烧卖/Dim sum (siew mai)", "花生酱三明治/Peanut butter sandwich"
+    ],
+    dinner: [
+      "米饭+蒸鸡/Rice + steamed chicken", "肉丸意面/Pasta with meatballs", "烤鱼配蔬菜/Grilled fish + veggies",
+      "水饺/Dumplings (jiaozi)", "蛋炒饭/Fried rice with egg", "豆腐炒蔬菜/Tofu & vegetable stir-fry",
+      "咖喱鸡饭/Curry chicken with rice", "肉末面条/Noodles with minced pork", "红薯三文鱼/Sweet potato + salmon",
+      "鱼粥/Congee with fish", "海南鸡饭/Chicken rice (Hainanese)", "皮蛋粥/Porridge with century egg",
+      "蒸蛋配饭/Steamed egg with rice", "通心粉汤/Macaroni soup", "红烧肉配饭/Rice + braised pork belly"
+    ],
+    snack: [
+      "苹果片/Apple slices", "香蕉/Banana", "酸奶/Yogurt", "芝士饼干/Cheese crackers",
+      "葡萄/Grapes", "蒸玉米/Steamed corn", "葡萄干/Raisins", "米饼/Rice crackers",
+      "西瓜/Watermelon", "蓝莓/Blueberries", "果酱面包/Bread with jam", "豆浆/Soy milk"
+    ],
+    sides: [
+      "炒西兰花/Stir-fried broccoli", "蒜蓉菠菜/Garlic spinach", "番茄蛋花汤/Tomato egg soup",
+      "拍黄瓜/Smashed cucumber", "蒸南瓜/Steamed pumpkin", "凉拌胡萝卜/Carrot salad",
+      "紫菜汤/Seaweed soup", "土豆泥/Mashed potato", "蒸蛋/Steamed egg custard",
+      "玉米排骨汤/Corn rib soup", "炒豆角/Stir-fried green beans", "白灼虾/Boiled shrimp"
+    ],
+  },
+
+  weeklyMenu: {},
+  mealHistory: [],
+
+  learning: {
+    currentPhase: 0,
+    learnedLetters: [],
+    learnedChinese: [],
+    learnedNumbers: [],
+  },
+
+  phases: [
+    {
+      name: "Phase 1: Foundation",
+      duration: "Weeks 1-4",
+      desc: "Build familiarity with letters, characters, and numbers through play",
+      letters: ["A","B","C","D","E"],
+      chinese: ["一","二","三","大","小","上","下"],
+      numbers: [1,2,3,4,5],
+      activities: [
+        "Sing the ABC song together (focus on A-E)",
+        "Flashcards with pictures (A=Apple, B=Ball...)",
+        "Trace letters in sand, flour, or with finger paint",
+        "Count toys, fingers, snacks together (1-5)",
+        "Chinese stroke practice with water brush on mat",
+        "Shape sorting — circles, squares, triangles",
+        "Color scavenger hunt around the house",
+      ],
+    },
+    {
+      name: "Phase 2: Building",
+      duration: "Weeks 5-8",
+      desc: "Expand recognition and introduce simple concepts",
+      letters: ["F","G","H","I","J"],
+      chinese: ["人","口","手","日","月","水","火"],
+      numbers: [6,7,8,9,10],
+      activities: [
+        "Letter matching game (uppercase pairs)",
+        "Phonics — what sound does each letter make?",
+        "Chinese: practice 一 to 三, introduce new characters",
+        "Count everything! Steps, blocks, apples (6-10)",
+        "Simple pattern recognition (red-blue-red-blue)",
+        "Draw shapes and color them in",
+        "Play 'I spy' with letter sounds",
+      ],
+    },
+    {
+      name: "Phase 3: Expanding",
+      duration: "Weeks 9-12",
+      desc: "Connect letters to sounds and words, more characters",
+      letters: ["K","L","M","N","O"],
+      chinese: ["山","木","石","田","天","地","花"],
+      numbers: [11,12,13,14,15],
+      activities: [
+        "Letter-sound matching (K = kk-kk-kite)",
+        "Simple 2-3 letter word building (C-A-T)",
+        "Chinese character stories (山 looks like a mountain!)",
+        "Count and compare — which group has more?",
+        "Trace numbers 1-15 with crayon",
+        "Build letters with playdough",
+        "Nature walk — find things starting with target letters",
+      ],
+    },
+    {
+      name: "Phase 4: Growing",
+      duration: "Weeks 13-16",
+      desc: "Strengthen skills, introduce writing readiness",
+      letters: ["P","Q","R","S","T"],
+      chinese: ["爸","妈","我","你","他","好","家"],
+      numbers: [16,17,18,19,20],
+      activities: [
+        "Write first letter of name independently",
+        "Sight words — recognize own name, 'the', 'is'",
+        "Chinese: learn family words (爸 bà, 妈 mā)",
+        "Simple addition with objects (2 blocks + 1 block = ?)",
+        "Letter hunt in storybooks",
+        "Tracing worksheets (gentle, no pressure)",
+        "Chinese character coloring pages",
+      ],
+    },
+    {
+      name: "Phase 5: Mastery",
+      duration: "Weeks 17-24",
+      desc: "Complete alphabet, reading readiness, writing basics",
+      letters: ["U","V","W","X","Y","Z"],
+      chinese: ["鱼","鸟","马","牛","羊","猫","狗","虫"],
+      numbers: [21,22,23,24,25,26,27,28,29,30],
+      activities: [
+        "Complete alphabet song with confidence",
+        "Recognize all 26 letters in random order",
+        "Read simple 3-letter words independently",
+        "Chinese: read simple sentences (我是大人)",
+        "Count objects up to 30",
+        "Write own name",
+        "Simple subtraction concepts",
+        "Create own mini storybook with drawings",
+      ],
+    },
+  ],
+
+  venues: {
+    parks: [
+      { name: "Singapore Botanic Gardens", desc: "Jacob Ballas Children's Garden — nature play", icon: "🌿", lastVisited: null },
+      { name: "Gardens by the Bay", desc: "Children's Garden with water play", icon: "🌺", lastVisited: null },
+      { name: "East Coast Park", desc: "Cycling, playground, beach", icon: "🏖️", lastVisited: null },
+      { name: "West Coast Park", desc: "Adventure playground, sandpit", icon: "🏕️", lastVisited: null },
+      { name: "Bishan-Ang Mo Kio Park", desc: "River playground, wide open spaces", icon: "🌊", lastVisited: null },
+      { name: "Jurong Lake Gardens", desc: "Forest Ramble, Clusia Cove water play", icon: "🌳", lastVisited: null },
+      { name: "Pasir Ris Park", desc: "Mangrove boardwalk, large playground", icon: "🌴", lastVisited: null },
+      { name: "HortPark", desc: "Nature playgarden, garden trail", icon: "🦋", lastVisited: null },
+      { name: "Admiralty Park", desc: "Longest slide playground in Singapore", icon: "🛝", lastVisited: null },
+      { name: "Coney Island", desc: "Nature walk, beach, bike-friendly", icon: "🚲", lastVisited: null },
+    ],
+    indoor: [
+      { name: "Singapore Zoo", desc: "Rainforest Kidzworld, animal encounters", icon: "🦁", lastVisited: null },
+      { name: "Bird Paradise", desc: "New attraction, interactive bird shows", icon: "🦜", lastVisited: null },
+      { name: "River Wonders", desc: "Amazon flooded forest, boat ride", icon: "🐠", lastVisited: null },
+      { name: "S.E.A. Aquarium", desc: "Marine life, touch pool for kids", icon: "🐙", lastVisited: null },
+      { name: "Science Centre", desc: "KidsSTOP, interactive exhibits", icon: "🔬", lastVisited: null },
+      { name: "ArtScience Museum", desc: "Future World — digital interactive art", icon: "🎨", lastVisited: null },
+      { name: "KidZania", desc: "Role-play city for kids", icon: "👷", lastVisited: null },
+      { name: "National Museum", desc: "Children's gallery, immersive exhibits", icon: "🏛️", lastVisited: null },
+      { name: "Kiztopia / Amazonia", desc: "Indoor playground", icon: "🎪", lastVisited: null },
+      { name: "LEGO Discovery Centre", desc: "Build & play, LEGO rides", icon: "🧱", lastVisited: null },
+    ],
+  },
+
+  sundayPlan: {},
+  customEvents: [],
+  outingHistory: [],
+};
+
+// ==================== STATE MANAGEMENT ====================
+let data;
+let selectedDate = new Date();
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('toddlerPlanner');
+    if (saved) {
+      data = JSON.parse(saved);
+      // Merge any missing defaults
+      for (const key of Object.keys(DEFAULT_DATA)) {
+        if (!(key in data)) data[key] = JSON.parse(JSON.stringify(DEFAULT_DATA[key]));
+      }
+      if (!data.phases) data.phases = JSON.parse(JSON.stringify(DEFAULT_DATA.phases));
+      if (!data.venues) data.venues = JSON.parse(JSON.stringify(DEFAULT_DATA.venues));
+      if (data.foods && !data.foods.sides) data.foods.sides = JSON.parse(JSON.stringify(DEFAULT_DATA.foods.sides));
+    } else {
+      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+  } catch(e) {
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
+
+function saveData() {
+  try { localStorage.setItem('toddlerPlanner', JSON.stringify(data)); } catch(e) {}
+}
+
+// ==================== UTILITIES ====================
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_ZH = ['日','一','二','三','四','五','六'];
+const DAYS_FULL_ZH = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+function getWeekKey(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.setDate(diff));
+  return monday.toISOString().split('T')[0];
+}
+
+function formatDate(date) {
+  if (currentLang === 'zh') {
+    return `${DAYS_FULL_ZH[date.getDay()]}，${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`;
+  }
+  return `${DAYS_FULL[date.getDay()]}, ${date.toLocaleDateString('en-SG', { day:'numeric', month:'short', year:'numeric' })}`;
+}
+
+function isWeekend(date) {
+  return date.getDay() === 0 || date.getDay() === 6;
+}
+
+function timeToMinutes(t) {
+  const [h,m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minutesToTime(m) {
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+}
+
+function getNow() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+function getDayOfWeek(date) { return date.getDay(); }
+
+// ==================== NAVIGATION ====================
+function changeDate(delta) {
+  selectedDate.setDate(selectedDate.getDate() + delta);
+  renderAll();
+}
+
+function goToday() {
+  selectedDate = new Date();
+  renderAll();
+}
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ==================== MODAL ====================
+function openModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('show');
+}
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ==================== RENDER: TODAY ====================
+function renderToday() {
+  document.getElementById('currentDate').textContent = formatDate(selectedDate);
+  const weekend = isWeekend(selectedDate);
+  document.getElementById('dayType').textContent = weekend ? t('weekendLabel') : t('weekdayLabel');
+  document.getElementById('dayType').className = 'badge ' + (weekend ? 'badge-yellow' : 'badge-green');
+
+  const schedule = weekend ? data.schedule.weekend : data.schedule.weekday;
+  const nowMin = getNow();
+  const isToday = selectedDate.toDateString() === new Date().toDateString();
+
+  let html = '';
+  schedule.forEach((item, idx) => {
+    const itemMin = timeToMinutes(item.time);
+    const nextMin = idx < schedule.length - 1 ? timeToMinutes(schedule[idx + 1].time) : 24 * 60;
+    const isCurrent = isToday && nowMin >= itemMin && nowMin < nextMin;
+    const isPast = isToday && nowMin >= nextMin;
+    const cls = isCurrent ? 'current' : (isPast ? 'past' : '');
+
+    const activityName = item.nameKey ? t(item.nameKey) : item.activity;
+    html += `<div class="timeline-item ${cls}" onclick="editScheduleItem('${weekend ? 'weekend' : 'weekday'}', ${idx})">
+      <div class="time-col">${item.time}</div>
+      <div class="activity-icon">${item.icon || '📌'}</div>
+      <div class="activity-col">
+        <div class="activity-name">${activityName}</div>
+        ${item.mealType ? `<div class="activity-detail">${getTodayMeal(item.mealType)}</div>` : ''}
+        ${item.type === 'learning' ? `<div class="activity-detail">${getTodayLearningSummary()}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('todayTimeline').innerHTML = html;
+
+  // Today's meals
+  const weekKey = getWeekKey(selectedDate);
+  const dayIdx = getDayOfWeek(selectedDate);
+  const dayKey = DAYS[dayIdx].toLowerCase();
+  const menu = data.weeklyMenu[weekKey];
+  if (menu && menu[dayKey]) {
+    const m = menu[dayKey];
+    const bfMain = getMealParts(m.breakfast).main;
+    const bfSide = getMealParts(m.breakfast).side;
+    const dnMain = getMealParts(m.dinner).main;
+    const dnSide = getMealParts(m.dinner).side;
+    const bfRecipe = getRecipeForMeal(bfMain);
+    const dnRecipe = getRecipeForMeal(dnMain);
+    const bfBtn = bfRecipe ? `<button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(bfRecipe)})">${t('viewRecipe')}</button> ` : '';
+    const dnBtn = dnRecipe ? `<button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(dnRecipe)})">${t('viewRecipe')}</button> ` : '';
+    const bfSearch = bfMain ? `<button class="btn btn-small" style="background:var(--accent);color:white;" onclick="searchOnlineRecipe('${bfMain.replace(/'/g,"\\'")}')">🔍 ${t('searchOnline')}</button>` : '';
+    const dnSearch = dnMain ? `<button class="btn btn-small" style="background:var(--accent);color:white;" onclick="searchOnlineRecipe('${dnMain.replace(/'/g,"\\'")}')">🔍 ${t('searchOnline')}</button>` : '';
+    const dnSideSearch = dnSide ? `<button class="btn btn-small" style="background:var(--accent);color:white;margin-top:4px;" onclick="searchOnlineRecipe('${dnSide.replace(/'/g,"\\'")}')">🔍 ${fd(dnSide)}</button>` : '';
+    document.getElementById('todayMeals').innerHTML = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:120px;padding:8px;background:#FFF8E1;border-radius:8px;">
+          <div style="font-size:11px;font-weight:600;color:#F57F17;">${t('breakfast')}</div>
+          <div style="font-size:13px;margin-top:2px;">${getMealDisplay(m.breakfast) || '—'}</div>
+          <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">${bfBtn}${bfSearch}</div>
+        </div>
+        <div style="flex:1;min-width:120px;padding:8px;background:#E8F5E8;border-radius:8px;">
+          <div style="font-size:11px;font-weight:600;color:#2E7D32;">${t('dinner')}</div>
+          <div style="font-size:13px;margin-top:2px;">${getMealDisplay(m.dinner) || '—'}</div>
+          <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">${dnBtn}${dnSearch}${dnSideSearch}</div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('todayMeals').innerHTML = `<div style="font-size:13px;color:var(--text-light);">${t('noMealPlan')}</div>`;
+  }
+
+  // Today's learning
+  renderTodayLearnWidget();
+}
+
+function getTodayMeal(type) {
+  const weekKey = getWeekKey(selectedDate);
+  const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
+  const menu = data.weeklyMenu[weekKey];
+  if (menu && menu[dayKey] && menu[dayKey][type]) return getMealDisplay(menu[dayKey][type]);
+  return t('notPlanned');
+}
+
+function getTodayLearningSummary() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return '';
+  const dayIdx = getDayOfWeek(selectedDate);
+  const activities = phase.activities;
+  const todayActs = [activities[dayIdx % activities.length]];
+  return todayActs[0] || 'Review & practice';
+}
+
+function renderTodayLearnWidget() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return;
+  const dayIdx = getDayOfWeek(selectedDate);
+  const acts = phase.activities;
+
+  let html = `<div class="learn-card">
+    <div class="learn-title">${phase.name}</div>
+    <div class="learn-desc" style="margin-top:6px;">
+      <strong>10 min:</strong> ${t('lettersLabel')} — ${phase.letters.join(', ')}<br>
+      <strong>10 min:</strong> ${t('chineseLabel')} — ${phase.chinese.join(' ')}<br>
+      <strong>10 min:</strong> ${t('numbersLabel')} — ${phase.numbers.join(', ')}<br>
+      <strong>${t('activityLabel')}:</strong> ${acts[dayIdx % acts.length]}
+    </div>
+  </div>`;
+  document.getElementById('todayLearn').innerHTML = html;
+}
+
+// ==================== RENDER: MEALS ====================
+function renderMeals() {
+  const weekKey = getWeekKey(selectedDate);
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  const menu = data.weeklyMenu[weekKey];
+
+  let html = '<div class="week-grid">';
+  // Header row
+  html += '<div class="cell header-cell"></div>';
+  const dayLabels = currentLang === 'zh' ? ['一','二','三','四','五','六','日'] : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  dayLabels.forEach(d => {
+    html += `<div class="cell header-cell">${d}</div>`;
+  });
+  // Breakfast row
+  html += `<div class="cell row-header">${t('bfast')}</div>`;
+  ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
+    const mealObj = menu[d]?.breakfast;
+    const { main } = getMealParts(mealObj);
+    html += `<div class="cell ${main ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${main ? fd(main) : '+'}</div>`;
+  });
+  // Dinner row
+  html += `<div class="cell row-header">${t('dinner')}</div>`;
+  ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
+    const mealObj = menu[d]?.dinner;
+    const { main } = getMealParts(mealObj);
+    html += `<div class="cell ${main ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${main ? fd(main) : '+'}</div>`;
+  });
+  html += '</div>';
+  document.getElementById('weekMenuGrid').innerHTML = html;
+
+  // Food lists
+  renderFoodList('breakfast', 'breakfastList');
+  renderFoodList('dinner', 'dinnerList');
+  renderFoodList('snack', 'snackList');
+  renderFoodList('sides', 'sidesList');
+
+  // Meal history
+  renderMealHistory();
+
+  // Recipes
+  renderRecipes();
+}
+
+function renderFoodList(type, containerId) {
+  const list = data.foods[type] || [];
+  let html = '';
+  list.forEach((food, idx) => {
+    html += `<span class="food-tag">${fd(food)}<span class="remove" onclick="removeFood('${type}',${idx})">×</span></span>`;
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function addFood(type) {
+  const inputMap = { breakfast: 'addBreakfast', dinner: 'addDinner', snack: 'addSnack', sides: 'addSides' };
+  const input = document.getElementById(inputMap[type]);
+  const val = input.value.trim();
+  if (!val) return;
+  if (!data.foods[type]) data.foods[type] = [];
+  data.foods[type].push(val);
+  input.value = '';
+  saveData();
+  renderMeals();
+}
+
+function removeFood(type, idx) {
+  data.foods[type].splice(idx, 1);
+  saveData();
+  renderMeals();
+}
+
+function generateWeeklyMenu() {
+  const weekKey = getWeekKey(selectedDate);
+  const menu = {};
+  const days = ['mon','tue','wed','thu','fri','sat','sun'];
+  const bList = [...data.foods.breakfast];
+  const dList = [...data.foods.dinner];
+  const sList = [...(data.foods.sides || [])];
+
+  // Shuffle to avoid same order every time
+  shuffle(bList);
+  shuffle(dList);
+  shuffle(sList);
+
+  // Check recent meals from history to avoid repetition
+  const recentBreakfast = data.mealHistory.filter(m => m.type === 'breakfast').slice(-7).map(m => m.meal);
+  const recentDinner = data.mealHistory.filter(m => m.type === 'dinner').slice(-7).map(m => m.meal);
+
+  days.forEach((day, i) => {
+    // Pick breakfast - prefer items not recently served
+    let bf = bList.find(f => !recentBreakfast.includes(f)) || bList[i % bList.length];
+    recentBreakfast.push(bf);
+    // Pick dinner
+    let dn = dList.find(f => !recentDinner.includes(f)) || dList[i % dList.length];
+    recentDinner.push(dn);
+    // Rotate arrays to ensure variety
+    const bIdx = bList.indexOf(bf);
+    if (bIdx > -1) { bList.splice(bIdx, 1); bList.push(bf); }
+    const dIdx = dList.indexOf(dn);
+    if (dIdx > -1) { dList.splice(dIdx, 1); dList.push(dn); }
+
+    menu[day] = {
+      breakfast: { main: bf, side: '' },
+      dinner: { main: dn, side: sList.length > 0 ? sList[i % sList.length] : '' }
+    };
+  });
+
+  data.weeklyMenu[weekKey] = menu;
+  saveData();
+  renderMeals();
+  renderToday();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function editMeal(weekKey, day, type) {
+  const mainFoods = data.foods[type] || [];
+  const sideFoods = data.foods.sides || [];
+  const currentObj = data.weeklyMenu[weekKey]?.[day]?.[type];
+  const { main: curMain, side: curSide } = getMealParts(currentObj);
+
+  const esc = s => (s || '').replace(/'/g, "\\'");
+
+  let mainOptionsHtml = mainFoods.map(f =>
+    `<div class="venue-card ${f === curMain ? 'selected' : ''}" style="padding:6px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <div class="venue-name" style="font-size:13px;flex:1;cursor:pointer;" onclick="document.getElementById('editMealMain').value='${esc(f)}'">${fd(f)}</div>
+      <span style="cursor:pointer;font-size:16px;" onclick="event.stopPropagation();searchOnlineRecipe('${esc(f)}')">🔍</span>
+    </div>`
+  ).join('');
+
+  let sideOptionsHtml = sideFoods.map(f =>
+    `<div class="venue-card ${f === curSide ? 'selected' : ''}" style="padding:6px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <div class="venue-name" style="font-size:13px;flex:1;cursor:pointer;" onclick="document.getElementById('editMealSide').value='${esc(f)}'">${fd(f)}</div>
+      <span style="cursor:pointer;font-size:16px;" onclick="event.stopPropagation();searchOnlineRecipe('${esc(f)}')">🔍</span>
+    </div>`
+  ).join('');
+
+  const dayLabel = day.charAt(0).toUpperCase() + day.slice(1);
+  openModal(`
+    <h3>${t('pickMealTitle').replace('{type}',type).replace('{day}',dayLabel)}</h3>
+    <label style="font-size:14px;font-weight:700;margin-top:8px;">${t('mainDishLabel')}</label>
+    <div style="max-height:150px;overflow-y:auto;margin:6px 0;">${mainOptionsHtml}</div>
+    <div class="add-input-row">
+      <input id="editMealMain" placeholder="${t('customMealPH')}" value="${esc(curMain)}">
+    </div>
+    <label style="font-size:14px;font-weight:700;margin-top:12px;">${t('sideDishLabel')}</label>
+    <div style="max-height:150px;overflow-y:auto;margin:6px 0;">${sideOptionsHtml}</div>
+    <div class="add-input-row">
+      <input id="editMealSide" placeholder="${t('addSidePlaceholder')}" value="${esc(curSide)}">
+    </div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-small" style="background:var(--accent);color:white;" onclick="var v=document.getElementById('editMealMain').value.trim();if(v)searchOnlineRecipe(v);">🔍 ${t('searchOnline')}</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="saveMealEdit('${weekKey}','${day}','${type}')">${t('saveBtn')}</button>
+    </div>
+  `);
+}
+
+function saveMealEdit(weekKey, day, type) {
+  const main = document.getElementById('editMealMain').value.trim();
+  const side = document.getElementById('editMealSide').value.trim();
+  if (!main && !side) { closeModal(); return; }
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  if (!data.weeklyMenu[weekKey][day]) data.weeklyMenu[weekKey][day] = {};
+  data.weeklyMenu[weekKey][day][type] = { main, side };
+
+  // Add to history
+  const display = getMealDisplay({ main, side });
+  data.mealHistory.push({ type, meal: display, date: selectedDate.toISOString().split('T')[0] });
+  if (data.mealHistory.length > 100) data.mealHistory = data.mealHistory.slice(-50);
+
+  saveData();
+  closeModal();
+  renderMeals();
+  renderToday();
+}
+
+function selectMeal(weekKey, day, type, meal) {
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  if (!data.weeklyMenu[weekKey][day]) data.weeklyMenu[weekKey][day] = {};
+  const curSide = getMealParts(data.weeklyMenu[weekKey][day][type]).side;
+  data.weeklyMenu[weekKey][day][type] = { main: meal, side: curSide };
+
+  // Add to history
+  data.mealHistory.push({ type, meal: fd(meal), date: selectedDate.toISOString().split('T')[0] });
+  if (data.mealHistory.length > 100) data.mealHistory = data.mealHistory.slice(-50);
+
+  saveData();
+  closeModal();
+  renderMeals();
+  renderToday();
+}
+
+function renderMealHistory() {
+  const recent = data.mealHistory.slice(-14).reverse();
+  if (recent.length === 0) return;
+  let html = '<div style="font-size:12px;">';
+  recent.forEach(m => {
+    html += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0;">
+      <span>${fd(m.meal)}</span>
+      <span style="color:var(--text-light);">${m.type} · ${m.date}</span>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('mealHistory').innerHTML = html;
+}
+
+// ==================== RENDER: LEARN ====================
+function renderLearn() {
+  const phase = data.phases[data.learning.currentPhase];
+
+  // Phase selector
+  const sel = document.getElementById('phaseSelect');
+  sel.innerHTML = data.phases.map((p, i) =>
+    `<option value="${i}" ${i === data.learning.currentPhase ? 'selected' : ''}>${p.name}</option>`
+  ).join('');
+
+  // Phase info
+  if (phase) {
+    document.getElementById('phaseInfo').innerHTML = `
+      <div style="font-size:13px;margin-bottom:6px;"><strong>${phase.duration}</strong> — ${phase.desc}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="badge badge-green">${t('lettersLabel')}: ${phase.letters.join(' ')}</div>
+        <div class="badge badge-purple">${t('chineseLabel')}: ${phase.chinese.join(' ')}</div>
+        <div class="badge badge-yellow">${t('numbersLabel')}: ${phase.numbers.join(' ')}</div>
+      </div>
+    `;
+  }
+
+  // Today's activities
+  renderTodayActivities();
+
+  // Letter grid
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  let letterHtml = '';
+  letters.forEach(l => {
+    const learned = data.learning.learnedLetters.includes(l);
+    const isCurrent = phase && phase.letters.includes(l);
+    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
+    letterHtml += `<div class="char-cell ${cls}" onclick="toggleLearned('letter','${l}')">${l}</div>`;
+  });
+  document.getElementById('letterGrid').innerHTML = letterHtml;
+
+  // Chinese grid (paginated 500-char database)
+  renderChineseChars();
+
+  // Stories
+  renderStories();
+
+  // Number grid
+  let numberHtml = '';
+  for (let n = 1; n <= 30; n++) {
+    const learned = data.learning.learnedNumbers.includes(n);
+    const isCurrent = phase && phase.numbers.includes(n);
+    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
+    numberHtml += `<div class="char-cell ${cls}" onclick="toggleLearned('number',${n})">${n}</div>`;
+  }
+  document.getElementById('numberGrid').innerHTML = numberHtml;
+}
+
+function renderTodayActivities() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return;
+
+  const dayIdx = getDayOfWeek(selectedDate);
+  const acts = phase.activities;
+
+  let html = `
+    <div class="learn-card" style="border-left-color:#4A90D9;background:#E8F1FB;">
+      <div class="learn-title" style="color:#1565C0;">${t('sessionPlan')}</div>
+      <div class="learn-desc" style="color:#1976D2;">
+        <div style="margin:4px 0;">1. <strong>${t('review')}</strong> (5 min)</div>
+        <div style="margin:4px 0;">2. <strong>${t('lettersLabel')}</strong> (10 min) — ${t('focus')}: ${phase.letters.join(', ')}</div>
+        <div style="margin:4px 0;">3. <strong>${t('chineseLabel')}</strong> (10 min) — ${t('focus')}: ${phase.chinese.join(' ')}</div>
+        <div style="margin:4px 0;">4. <strong>${t('numbersLabel')}</strong> (10 min) — ${t('focus')}: ${phase.numbers.join(', ')}</div>
+        <div style="margin:4px 0;">5. <strong>${t('activityLabel')}</strong> (5-10 min) — ${acts[dayIdx % acts.length]}</div>
+      </div>
+    </div>`;
+  document.getElementById('todayActivities').innerHTML = html;
+}
+
+function changePhase(val) {
+  data.learning.currentPhase = parseInt(val);
+  saveData();
+  renderLearn();
+}
+
+function toggleLearned(type, val) {
+  const key = type === 'letter' ? 'learnedLetters' :
+              type === 'chinese' ? 'learnedChinese' : 'learnedNumbers';
+  const arr = data.learning[key];
+  const idx = arr.indexOf(val);
+  if (idx > -1) arr.splice(idx, 1);
+  else arr.push(val);
+  saveData();
+  renderLearn();
+}
+
+// Timer
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerBtn').textContent = t('resumeBtn');
+    document.getElementById('timerLabel').textContent = t('pausedLabel');
+  } else {
+    timerRunning = true;
+    document.getElementById('timerBtn').textContent = t('pauseBtn');
+    document.getElementById('timerLabel').textContent = t('learningInProgress');
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = Math.floor(timerSeconds / 60);
+      const s = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent =
+        `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if (timerSeconds === 30 * 60) {
+        document.getElementById('timerLabel').textContent = t('min30reached');
+        document.getElementById('timerDisplay').style.color = 'var(--green)';
+      }
+      if (timerSeconds === 45 * 60) {
+        document.getElementById('timerLabel').textContent = t('min45wrapUp');
+        document.getElementById('timerDisplay').style.color = 'var(--accent)';
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('timerDisplay').style.color = 'var(--purple)';
+  document.getElementById('timerBtn').textContent = t('start');
+  document.getElementById('timerLabel').textContent = t('readyToStart');
+}
+
+// ==================== RENDER: WEEKEND ====================
+function renderWeekend() {
+  // Calculate next Sunday
+  const today = new Date(selectedDate);
+  const dayOfWeek = today.getDay();
+  const nextSunday = new Date(today);
+  nextSunday.setDate(today.getDate() + (7 - dayOfWeek) % 7);
+  if (dayOfWeek !== 0) nextSunday.setDate(today.getDate() + (7 - dayOfWeek));
+  document.getElementById('sundayDate').textContent = nextSunday.toLocaleDateString('en-SG', { day:'numeric', month:'short' });
+
+  // Sunday plan
+  const sundayKey = nextSunday.toISOString().split('T')[0];
+  if (data.sundayPlan[sundayKey]) {
+    const plan = data.sundayPlan[sundayKey];
+    document.getElementById('sundayPlan').innerHTML = `
+      <div class="venue-card selected">
+        <div class="venue-icon">${plan.icon || '🌳'}</div>
+        <div class="venue-info">
+          <div class="venue-name">${plan.name}</div>
+          <div class="venue-desc">${plan.desc || ''}</div>
+          ${plan.notes ? `<div style="font-size:12px;margin-top:4px;color:var(--text);">${plan.notes}</div>` : ''}
+        </div>
+      </div>
+      <button class="btn btn-outline btn-small" onclick="clearSundayPlan('${sundayKey}')">${t('changePlan')}</button>
+    `;
+  }
+
+  // Parks list
+  let parksHtml = '';
+  data.venues.parks.forEach((v, i) => {
+    parksHtml += `<div class="venue-card" onclick="setSundayPlan('parks',${i},'${sundayKey}')">
+      <div class="venue-icon">${v.icon}</div>
+      <div class="venue-info">
+        <div class="venue-name">${v.name}</div>
+        <div class="venue-desc">${v.desc}</div>
+        ${v.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${v.lastVisited}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('parksList').innerHTML = parksHtml;
+
+  // Indoor list
+  let indoorHtml = '';
+  data.venues.indoor.forEach((v, i) => {
+    indoorHtml += `<div class="venue-card" onclick="setSundayPlan('indoor',${i},'${sundayKey}')">
+      <div class="venue-icon">${v.icon}</div>
+      <div class="venue-info">
+        <div class="venue-name">${v.name}</div>
+        <div class="venue-desc">${v.desc}</div>
+        ${v.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${v.lastVisited}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('indoorList').innerHTML = indoorHtml;
+
+  // Custom events
+  renderCustomEvents();
+
+  // Outing history
+  renderOutingHistory();
+}
+
+function setSundayPlan(type, idx, sundayKey) {
+  const venue = data.venues[type][idx];
+  openModal(`
+    <h3>${t('planLabel')} ${venue.name}</h3>
+    <p style="font-size:13px;color:var(--text-light);">${venue.desc}</p>
+    <label>${t('notesOptional')}</label>
+    <textarea id="venueNotes" rows="3" placeholder="..."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="confirmSundayPlan('${type}',${idx},'${sundayKey}')">${t('setPlan')}</button>
+    </div>
+  `);
+}
+
+function confirmSundayPlan(type, idx, sundayKey) {
+  const venue = data.venues[type][idx];
+  const notes = document.getElementById('venueNotes').value.trim();
+  data.sundayPlan[sundayKey] = {
+    name: venue.name,
+    desc: venue.desc,
+    icon: venue.icon,
+    notes: notes,
+    type: type,
+  };
+  venue.lastVisited = sundayKey;
+  data.outingHistory.push({ name: venue.name, date: sundayKey, notes });
+  saveData();
+  closeModal();
+  renderWeekend();
+}
+
+function clearSundayPlan(key) {
+  delete data.sundayPlan[key];
+  saveData();
+  renderWeekend();
+}
+
+function suggestSundayPlan() {
+  // Find least-recently-visited venues
+  const allVenues = [...data.venues.parks, ...data.venues.indoor];
+  const unvisited = allVenues.filter(v => !v.lastVisited);
+  const pick = unvisited.length > 0
+    ? unvisited[Math.floor(Math.random() * unvisited.length)]
+    : allVenues.sort((a, b) => (a.lastVisited || '').localeCompare(b.lastVisited || ''))[0];
+
+  if (pick) {
+    openModal(`
+      <h3>Suggestion</h3>
+      <div class="venue-card selected">
+        <div class="venue-icon">${pick.icon}</div>
+        <div class="venue-info">
+          <div class="venue-name">${pick.name}</div>
+          <div class="venue-desc">${pick.desc}</div>
+          ${pick.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${pick.lastVisited}</div>` : `<div class="venue-last">${t('notVisitedYet')}</div>`}
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal();suggestSundayPlan();">${t('tryAnother')}</button>
+        <button class="btn btn-primary" onclick="closeModal()">${t('pickFromList')}</button>
+      </div>
+    `);
+  }
+}
+
+function openCustomEvent() {
+  openModal(`
+    <h3>${t('addCustomEventTitle')}</h3>
+    <label>${t('eventNameLabel')}</label>
+    <input id="eventName" placeholder="${currentLang==='zh'?'例如：圣淘沙儿童节':'e.g., Kids Festival at Sentosa'}">
+    <label>${t('dateLabel')}</label>
+    <input id="eventDate" type="date">
+    <label>${t('detailsLabel')}</label>
+    <textarea id="eventDetails" rows="3" placeholder="..."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="addCustomEvent()">${t('addEventBtn')}</button>
+    </div>
+  `);
+}
+
+function addCustomEvent() {
+  const name = document.getElementById('eventName').value.trim();
+  const date = document.getElementById('eventDate').value;
+  const details = document.getElementById('eventDetails').value.trim();
+  if (!name) return;
+  data.customEvents.push({ name, date, details });
+  saveData();
+  closeModal();
+  renderWeekend();
+}
+
+function renderCustomEvents() {
+  if (data.customEvents.length === 0) return;
+  let html = '';
+  data.customEvents.forEach((e, i) => {
+    html += `<div class="venue-card">
+      <div class="venue-icon">🎉</div>
+      <div class="venue-info">
+        <div class="venue-name">${e.name}</div>
+        <div class="venue-desc">${e.date ? `Date: ${e.date}` : ''} ${e.details || ''}</div>
+      </div>
+      <button class="btn btn-small" style="background:var(--red);color:white;flex-shrink:0;" onclick="data.customEvents.splice(${i},1);saveData();renderWeekend();">×</button>
+    </div>`;
+  });
+  document.getElementById('customEvents').innerHTML = html;
+}
+
+function renderOutingHistory() {
+  const history = data.outingHistory.slice(-10).reverse();
+  if (history.length === 0) return;
+  let html = '';
+  history.forEach(h => {
+    html += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">
+      <span>${h.name}</span>
+      <span style="color:var(--text-light);">${h.date}</span>
+    </div>`;
+  });
+  document.getElementById('outingHistory').innerHTML = html;
+}
+
+// ==================== RENDER: SETTINGS ====================
+function renderSettings() {
+  // Sleep progress
+  const current = data.currentSleepMinutes;
+  const target = data.targetSleepMinutes;
+  const original = 23 * 60; // 11 PM
+  const progress = Math.min(100, Math.max(0, ((original - current) / (original - target)) * 100));
+  document.getElementById('currentSleepTime').textContent = minutesToTime(current);
+  document.getElementById('sleepProgress').style.width = progress + '%';
+  document.getElementById('sleepProgressText').textContent =
+    progress >= 100 ? t('targetReached') : `${Math.round(progress)}% ${t('toGoal')}`;
+
+  // Schedule editor
+  renderScheduleEditor();
+}
+
+function adjustSleep(delta) {
+  data.currentSleepMinutes += delta;
+  if (data.currentSleepMinutes < data.targetSleepMinutes) data.currentSleepMinutes = data.targetSleepMinutes;
+  if (data.currentSleepMinutes > 24 * 60) data.currentSleepMinutes = 24 * 60;
+  saveData();
+  renderSettings();
+}
+
+function renderScheduleEditor() {
+  let html = `<div style="font-size:13px;font-weight:600;margin-bottom:8px;">${t('weekdaySchedule')}</div>`;
+  data.schedule.weekday.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
+    html += `<div class="toggle-row" onclick="editScheduleItem('weekday',${idx})">
+      <div>
+        <span style="font-weight:600;color:var(--primary);min-width:50px;display:inline-block;">${item.time}</span>
+        <span>${item.icon || ''} ${actName}</span>
+      </div>
+      <span style="color:var(--text-light);font-size:16px;">✏️</span>
+    </div>`;
+  });
+
+  html += `<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">${t('weekendSchedule')}</div>`;
+  data.schedule.weekend.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
+    html += `<div class="toggle-row" onclick="editScheduleItem('weekend',${idx})">
+      <div>
+        <span style="font-weight:600;color:var(--primary);min-width:50px;display:inline-block;">${item.time}</span>
+        <span>${item.icon || ''} ${actName}</span>
+      </div>
+      <span style="color:var(--text-light);font-size:16px;">✏️</span>
+    </div>`;
+  });
+
+  document.getElementById('scheduleEditor').innerHTML = html;
+}
+
+function editScheduleItem(type, idx) {
+  const item = data.schedule[type][idx];
+  openModal(`
+    <h3>${t('editActivityTitle')}</h3>
+    <label>${t('timeLabel')}</label>
+    <input id="editTime" type="time" value="${item.time}">
+    <label>${t('activityInput')}</label>
+    <input id="editActivity" value="${item.activity}">
+    <label>${t('iconLabel')}</label>
+    <input id="editIcon" value="${item.icon || ''}" placeholder="e.g., 🏊">
+    <div class="modal-actions">
+      <button class="btn" style="background:var(--red);color:white;" onclick="deleteScheduleItem('${type}',${idx})">${t('deleteBtn')}</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="saveScheduleItem('${type}',${idx})">${t('saveBtn')}</button>
+    </div>
+  `);
+}
+
+function saveScheduleItem(type, idx) {
+  data.schedule[type][idx].time = document.getElementById('editTime').value;
+  data.schedule[type][idx].activity = document.getElementById('editActivity').value;
+  data.schedule[type][idx].icon = document.getElementById('editIcon').value;
+  // Sort by time
+  data.schedule[type].sort((a, b) => a.time.localeCompare(b.time));
+  saveData();
+  closeModal();
+  renderAll();
+}
+
+function deleteScheduleItem(type, idx) {
+  if (confirm(t('deleteConfirm'))) {
+    data.schedule[type].splice(idx, 1);
+    saveData();
+    closeModal();
+    renderAll();
+  }
+}
+
+function openAddScheduleItem() {
+  openModal(`
+    <h3>${t('addActivityTitle')}</h3>
+    <label>${t('scheduleLabel')}</label>
+    <select id="addSchedType">
+      <option value="weekday">${t('weekdayLabel')}</option>
+      <option value="weekend">${t('weekendLabel')}</option>
+    </select>
+    <label>${t('timeLabel')}</label>
+    <input id="addSchedTime" type="time" value="12:00">
+    <label>${t('activityInput')}</label>
+    <input id="addSchedActivity" placeholder="${t('activityNamePH')}">
+    <label>${t('iconLabel')}</label>
+    <input id="addSchedIcon" placeholder="e.g., 🏊">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="addScheduleItem()">${t('add')}</button>
+    </div>
+  `);
+}
+
+function addScheduleItem() {
+  const type = document.getElementById('addSchedType').value;
+  const time = document.getElementById('addSchedTime').value;
+  const activity = document.getElementById('addSchedActivity').value.trim();
+  const icon = document.getElementById('addSchedIcon').value.trim();
+  if (!activity) return;
+  data.schedule[type].push({ time, activity, icon: icon || '📌' });
+  data.schedule[type].sort((a, b) => a.time.localeCompare(b.time));
+  saveData();
+  closeModal();
+  renderAll();
+}
+
+// ==================== CHILD PROFILES & SYNC ====================
+// Multi-child support with clipboard-based sync (no server needed).
+// Each child gets a unique 6-char code. Data is stored locally per child.
+// "Push" copies data to clipboard for sharing via WeChat. "Pull" pastes received data.
+
+function getChildProfiles() {
+  try { return JSON.parse(localStorage.getItem('childProfiles') || '[]'); } catch(e) { return []; }
+}
+function saveChildProfiles(profiles) {
+  localStorage.setItem('childProfiles', JSON.stringify(profiles));
+}
+function getActiveChildCode() {
+  return localStorage.getItem('activeChildCode') || '';
+}
+function setActiveChildCode(code) {
+  localStorage.setItem('activeChildCode', code);
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function packData(childName, code) {
+  const payload = { v: 1, code, name: childName, ts: Date.now(), data };
+  const json = JSON.stringify(payload);
+  try { return btoa(unescape(encodeURIComponent(json))); } catch(e) { return json; }
+}
+function unpackData(str) {
+  try {
+    const json = decodeURIComponent(escape(atob(str.trim())));
+    return JSON.parse(json);
+  } catch(e) {
+    try { return JSON.parse(str.trim()); } catch(e2) { return null; }
+  }
+}
+
+function renderSyncUI() {
+  const profiles = getChildProfiles();
+  const activeCode = getActiveChildCode();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+
+  let html = '';
+  if (activeProfile) {
+    const lastSync = activeProfile.lastSynced ? new Date(activeProfile.lastSynced).toLocaleString() : '—';
+    html += '<div style="background:var(--green-light);border-radius:8px;padding:12px;margin-bottom:10px;">';
+    html += '<div style="font-size:14px;font-weight:700;color:#2E7D32;">\u{1F9D2} ' + activeProfile.name + '</div>';
+    html += '<div style="font-size:20px;font-weight:800;letter-spacing:4px;color:var(--primary);margin:6px 0;font-family:monospace;">' + activeProfile.code + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);">' + t('shareCodeHint') + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);margin-top:4px;">' + t('lastSynced') + ': ' + lastSync + '</div>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    html += '<button class="btn btn-primary btn-small" onclick="pushToFamily()">\u2B06\uFE0F ' + (currentLang==='zh'?'推送给家人':'Push to Family') + '</button>';
+    html += '<button class="btn btn-green btn-small" onclick="pullFromFamily()">\u2B07\uFE0F ' + (currentLang==='zh'?'从家人拉取':'Pull from Family') + '</button>';
+    html += '</div>';
+    html += '<div id="syncStatus" style="font-size:11px;color:var(--text-light);margin-top:6px;"></div>';
+
+    if (profiles.length > 1) {
+      html += '<div style="margin-top:12px;font-size:13px;font-weight:600;">' + t('switchChild') + '</div>';
+      profiles.filter(p => p.code !== activeCode).forEach(p => {
+        html += '<div class="venue-card" style="margin-top:4px;padding:8px;cursor:pointer;" onclick="switchToChild(\'' + p.code + '\')">';
+        html += '<div style="font-size:13px;">\u{1F9D2} ' + p.name + ' <span style="color:var(--text-light);font-family:monospace;">' + p.code + '</span></div></div>';
+      });
+    }
+    html += '<div style="margin-top:12px;">';
+    html += '<button class="btn btn-outline btn-small" onclick="showAddChildUI()">' + t('createChild') + '</button> ';
+    html += '<button class="btn btn-outline btn-small" onclick="showJoinChildUI()">' + t('joinChild') + '</button>';
+    html += '</div>';
+  } else {
+    html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;">' + t('noChildYet') + '</div>';
+    html += '<div style="display:flex;gap:8px;">';
+    html += '<button class="btn btn-primary" onclick="showAddChildUI()">' + t('createChild') + '</button>';
+    html += '<button class="btn btn-outline" onclick="showJoinChildUI()">' + t('joinChild') + '</button>';
+    html += '</div>';
+    if (profiles.length > 0) {
+      html += '<div style="margin-top:12px;font-size:13px;font-weight:600;">' + t('switchChild') + '</div>';
+      profiles.forEach(p => {
+        html += '<div class="venue-card" style="margin-top:4px;padding:8px;cursor:pointer;" onclick="switchToChild(\'' + p.code + '\')">';
+        html += '<div style="font-size:13px;">\u{1F9D2} ' + p.name + ' <span style="color:var(--text-light);font-family:monospace;">' + p.code + '</span></div></div>';
+      });
+    }
+  }
+  document.getElementById('syncUI').innerHTML = html;
+}
+
+function showAddChildUI() {
+  var ph = currentLang==='zh'?'例如：小明':'e.g., Mingming';
+  openModal('<h3>' + t('createChild') + '</h3>' +
+    '<label>' + t('childName') + '</label>' +
+    '<input id="newChildName" placeholder="' + ph + '">' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="createChild()">' + t('saveBtn') + '</button></div>');
+}
+
+function showJoinChildUI() {
+  var hint = currentLang==='zh'?'粘贴家人发来的同步数据：':'Paste the sync data received from family:';
+  var ph = currentLang==='zh'?'粘贴数据...':'Paste data here...';
+  openModal('<h3>' + t('joinChild') + '</h3>' +
+    '<p style="font-size:13px;color:var(--text-light);margin-bottom:8px;">' + hint + '</p>' +
+    '<textarea id="joinDataInput" rows="4" placeholder="' + ph + '" style="font-size:12px;"></textarea>' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="joinChild()">' + t('saveBtn') + '</button></div>');
+}
+
+function createChild() {
+  const name = document.getElementById('newChildName').value.trim();
+  if (!name) return;
+  const code = generateCode();
+  const profiles = getChildProfiles();
+  profiles.push({ code, name, lastSynced: Date.now() });
+  saveChildProfiles(profiles);
+  setActiveChildCode(code);
+  localStorage.setItem('toddlerPlanner_' + code, JSON.stringify(data));
+  closeModal();
+  renderAll();
+  renderSyncUI();
+  var msg = currentLang==='zh' ? '已创建！代码: ' : 'Created! Code: ';
+  alert(msg + code);
+}
+
+function joinChild() {
+  const raw = (document.getElementById('joinDataInput').value || '').trim();
+  if (!raw) return;
+  const payload = unpackData(raw);
+  if (!payload || !payload.data) {
+    alert(currentLang==='zh'?'数据格式无效，请重新粘贴。':'Invalid data. Please paste again.');
+    return;
+  }
+  const profiles = getChildProfiles();
+  const existing = profiles.find(p => p.code === payload.code);
+  if (!existing) {
+    profiles.push({ code: payload.code, name: payload.name || 'Child', lastSynced: Date.now() });
+    saveChildProfiles(profiles);
+  }
+  const curCode = getActiveChildCode();
+  if (curCode) localStorage.setItem('toddlerPlanner_' + curCode, JSON.stringify(data));
+  data = payload.data;
+  saveData();
+  setActiveChildCode(payload.code);
+  localStorage.setItem('toddlerPlanner_' + payload.code, JSON.stringify(data));
+  closeModal();
+  renderAll();
+  renderSyncUI();
+  var msg = currentLang==='zh' ? '已加入: ' : 'Joined: ';
+  alert(msg + (payload.name || payload.code));
+}
+
+function pushToFamily() {
+  const code = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  if (!profile) return;
+  const packed = packData(profile.name, code);
+  const statusEl = document.getElementById('syncStatus');
+  if (navigator.share) {
+    navigator.share({
+      title: profile.name + ' - ' + t('appTitle'),
+      text: packed
+    }).then(function() {
+      profile.lastSynced = Date.now();
+      saveChildProfiles(profiles);
+      if (statusEl) statusEl.textContent = t('syncOk');
+      renderSyncUI();
+    }).catch(function() {
+      fallbackCopy(packed, statusEl, profiles, profile);
+    });
+  } else {
+    fallbackCopy(packed, statusEl, profiles, profile);
+  }
+}
+
+function fallbackCopy(packed, statusEl, profiles, profile) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(packed).then(function() {
+      profile.lastSynced = Date.now();
+      saveChildProfiles(profiles);
+      if (statusEl) statusEl.textContent = t('syncOk');
+      renderSyncUI();
+      alert(currentLang==='zh'?'已复制！请发送给家人（微信/WhatsApp）。':'Copied! Send to family via WeChat/WhatsApp.');
+    });
+  } else {
+    prompt(currentLang==='zh'?'复制以下数据发送给家人:':'Copy this and send to family:', packed);
+  }
+}
+
+function pullFromFamily() {
+  var title = currentLang==='zh'?'从家人拉取':'Pull from Family';
+  var hint = currentLang==='zh'?'粘贴家人发来的同步数据：':'Paste sync data from family:';
+  var ph = currentLang==='zh'?'粘贴数据...':'Paste data here...';
+  var confirmText = currentLang==='zh'?'确认拉取':'Confirm Pull';
+  openModal('<h3>' + title + '</h3>' +
+    '<p style="font-size:13px;color:var(--text-light);margin-bottom:8px;">' + hint + '</p>' +
+    '<textarea id="pullDataInput" rows="4" placeholder="' + ph + '" style="font-size:12px;"></textarea>' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="doPull()">' + confirmText + '</button></div>');
+}
+
+function doPull() {
+  const raw = (document.getElementById('pullDataInput').value || '').trim();
+  if (!raw) return;
+  const payload = unpackData(raw);
+  if (!payload || !payload.data) {
+    alert(currentLang==='zh'?'数据格式无效':'Invalid data');
+    return;
+  }
+  data = payload.data;
+  saveData();
+  const code = getActiveChildCode();
+  if (code) localStorage.setItem('toddlerPlanner_' + code, JSON.stringify(data));
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  if (profile) { profile.lastSynced = Date.now(); saveChildProfiles(profiles); }
+  closeModal();
+  renderAll();
+  renderSyncUI();
+  alert(currentLang==='zh'?'已更新！':'Updated!');
+}
+
+function switchToChild(code) {
+  const activeCode = getActiveChildCode();
+  if (activeCode) localStorage.setItem('toddlerPlanner_' + activeCode, JSON.stringify(data));
+  setActiveChildCode(code);
+  const saved = localStorage.getItem('toddlerPlanner_' + code);
+  if (saved) {
+    try { data = JSON.parse(saved); } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+  } else {
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+  saveData();
+  renderAll();
+  renderSyncUI();
+}
+
+// ==================== EXPORT/IMPORT ====================
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(json).then(() => {
+      alert(t('exportSuccess'));
+    }).catch(() => {
+      prompt('Copy this data:', json);
+    });
+  } else {
+    prompt('Copy this data:', json);
+  }
+}
+
+function importData() {
+  const json = prompt(t('importPrompt'));
+  if (!json) return;
+  try {
+    const imported = JSON.parse(json);
+    data = imported;
+    saveData();
+    renderAll();
+    alert(t('importSuccess'));
+  } catch (e) {
+    alert(t('importError'));
+  }
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  updateI18nLabels();
+  renderToday();
+  renderMeals();
+  renderLearn();
+  renderWeekend();
+  renderSettings();
+  renderTips();
+  renderSyncUI();
+}
+
+// ==================== INIT ====================
+loadData();
+// Load custom chars into CHAR_LOOKUP
+getCustomChars().forEach(function(c) {
+  if (!CHAR_LOOKUP[c[0]]) CHAR_LOOKUP[c[0]] = { c:c[0], p:c[1], e:c[2], m:c[3], g:'custom' };
+});
+renderAll();
+
+// Auto-refresh current time indicator every minute
+setInterval(() => {
+  if (selectedDate.toDateString() === new Date().toDateString()) {
+    renderToday();
+  }
+}, 60000);
+</script>
+</body>
+</html>
