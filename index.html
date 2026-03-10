@@ -435,18 +435,166 @@ body {
 @media (min-width: 600px) {
   .tab-content { max-width: 560px; margin: 0 auto; }
 }
+
+/* ==================== i18n Toggle ==================== */
+.lang-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+}
+.lang-toggle:active { background: rgba(255,255,255,0.4); }
+
+/* ==================== SVG Char Illustrations ==================== */
+.char-grid {
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)) !important;
+}
+.char-cell {
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px;
+}
+.char-cell .char-svg { line-height: 0; }
+.char-cell .char-text { font-size: 16px; line-height: 1.2; }
+.char-detail-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  align-items: center;
+  justify-content: center;
+}
+.char-detail-overlay.show { display: flex; }
+.char-detail-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 280px;
+  text-align: center;
+  animation: slideUp 0.25s ease;
+}
+.char-detail-box .big-char { font-size: 48px; font-weight: 800; margin: 8px 0; }
+.char-detail-box .char-hint { font-size: 14px; color: var(--text-light); margin: 4px 0 12px; }
+
+/* ==================== Stories ==================== */
+.story-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.story-card:hover { border-color: var(--purple); background: var(--purple-light); }
+.story-card.locked { opacity: 0.5; pointer-events: none; }
+.story-card .story-title { font-weight: 600; font-size: 14px; }
+.story-card .story-level { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.story-card .story-progress {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.story-card .story-progress .fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 2px;
+}
+.story-modal-text {
+  font-size: 22px;
+  line-height: 2.2;
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+.story-modal-text .known { color: var(--green); font-weight: 700; }
+.story-modal-text .unknown { color: var(--red); }
+.story-modal-text ruby { font-size: 22px; }
+.story-modal-text rt { font-size: 10px; color: var(--red); font-weight: 400; letter-spacing: 0; }
+
+/* ==================== Recipes ==================== */
+.recipe-search {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.recipe-search input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.recipe-search input:focus { border-color: var(--primary); }
+.recipe-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.recipe-filters .filter-btn {
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.recipe-filters .filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.recipe-list { max-height: 400px; overflow-y: auto; }
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.recipe-item:hover { background: #f8f9fa; }
+.recipe-item:last-child { border-bottom: none; }
+.recipe-item .recipe-emoji { font-size: 24px; }
+.recipe-item .recipe-info { flex: 1; }
+.recipe-item .recipe-name { font-size: 13px; font-weight: 600; }
+.recipe-item .recipe-meta { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.recipe-detail-section { margin: 12px 0; }
+.recipe-detail-section h4 { font-size: 14px; margin-bottom: 6px; color: var(--primary); }
+.recipe-detail-section ol, .recipe-detail-section ul {
+  margin-left: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>Little Explorer Planner</h1>
-  <div class="subtitle">Daily Schedule & Learning Tracker</div>
+<div class="header" style="position:relative;">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLang()">中文</button>
+  <h1 id="appTitle">Little Explorer Planner</h1>
+  <div class="subtitle" id="appSubtitle">Daily Schedule & Learning Tracker</div>
   <div class="date-nav">
     <button onclick="changeDate(-1)">&#9664;</button>
     <span class="current-date" id="currentDate"></span>
     <button onclick="changeDate(1)">&#9654;</button>
-    <button onclick="goToday()" style="width:auto;padding:0 10px;border-radius:14px;font-size:12px;">Today</button>
+    <button onclick="goToday()" style="width:auto;padding:0 10px;border-radius:14px;font-size:12px;" id="todayBtn">Today</button>
   </div>
 </div>
 
@@ -454,19 +602,19 @@ body {
 <div class="tab-content active" id="tab-today">
   <div class="card">
     <div class="card-title">
-      <span>Daily Schedule</span>
+      <span id="dailyScheduleTitle">Daily Schedule</span>
       <span class="badge badge-green" id="dayType">Weekday</span>
     </div>
     <div class="timeline" id="todayTimeline"></div>
   </div>
 
   <div class="card" id="todayMealsCard">
-    <div class="card-title">Today's Meals</div>
+    <div class="card-title" id="todayMealsTitle">Today's Meals</div>
     <div id="todayMeals"></div>
   </div>
 
   <div class="card" id="todayLearnCard">
-    <div class="card-title">Today's Learning (7:30-8:15 PM)</div>
+    <div class="card-title" id="todayLearnTitle">Today's Learning (7:30-8:15 PM)</div>
     <div id="todayLearn"></div>
   </div>
 </div>
@@ -475,43 +623,52 @@ body {
 <div class="tab-content" id="tab-meals">
   <div class="card">
     <div class="card-title">
-      <span>Weekly Meal Plan</span>
-      <button class="btn btn-accent btn-small" onclick="generateWeeklyMenu()">Auto-Generate</button>
+      <span id="weeklyMealPlanTitle">Weekly Meal Plan</span>
+      <button class="btn btn-accent btn-small" onclick="generateWeeklyMenu()" id="autoGenBtn">Auto-Generate</button>
     </div>
     <div id="weekMenuGrid"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--text-light);">Tap any cell to change. Auto-generate rotates meals to avoid repetition.</div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="mealGridHint">Tap any cell to change. Auto-generate rotates meals to avoid repetition.</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Breakfast Options</div>
+    <div class="card-title" id="breakfastOptionsTitle">Breakfast Options</div>
     <div class="food-list" id="breakfastList"></div>
     <div class="add-input-row">
       <input id="addBreakfast" placeholder="Add breakfast item..." onkeydown="if(event.key==='Enter')addFood('breakfast')">
-      <button class="btn btn-primary btn-small" onclick="addFood('breakfast')">Add</button>
+      <button class="btn btn-primary btn-small" onclick="addFood('breakfast')" id="addBreakfastBtn">Add</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Dinner Options</div>
+    <div class="card-title" id="dinnerOptionsTitle">Dinner Options</div>
     <div class="food-list" id="dinnerList"></div>
     <div class="add-input-row">
       <input id="addDinner" placeholder="Add dinner item..." onkeydown="if(event.key==='Enter')addFood('dinner')">
-      <button class="btn btn-primary btn-small" onclick="addFood('dinner')">Add</button>
+      <button class="btn btn-primary btn-small" onclick="addFood('dinner')" id="addDinnerBtn">Add</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Snack Options</div>
+    <div class="card-title" id="snackOptionsTitle">Snack Options</div>
     <div class="food-list" id="snackList"></div>
     <div class="add-input-row">
       <input id="addSnack" placeholder="Add snack item..." onkeydown="if(event.key==='Enter')addFood('snack')">
-      <button class="btn btn-primary btn-small" onclick="addFood('snack')">Add</button>
+      <button class="btn btn-primary btn-small" onclick="addFood('snack')" id="addSnackBtn">Add</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Meal History</div>
+    <div class="card-title" id="mealHistoryTitle">Meal History</div>
     <div id="mealHistory" style="font-size:12px;color:var(--text-light);">Recent meals served will appear here to help avoid repetition.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="recipesCardTitle">Recipe Collection</div>
+    <div class="recipe-search">
+      <input id="recipeSearchInput" placeholder="Search recipes..." oninput="renderRecipes()">
+    </div>
+    <div class="recipe-filters" id="recipeFilters"></div>
+    <div class="recipe-list" id="recipeList"></div>
   </div>
 </div>
 
@@ -519,8 +676,8 @@ body {
 <div class="tab-content" id="tab-learn">
   <div class="card">
     <div class="card-title">
-      <span>Learning Session Timer</span>
-      <span class="badge badge-purple">30-45 min</span>
+      <span id="learningTimerTitle">Learning Session Timer</span>
+      <span class="badge badge-purple" id="timerBadge">30-45 min</span>
     </div>
     <div class="timer-display">
       <div class="timer-time" id="timerDisplay">00:00</div>
@@ -534,35 +691,40 @@ body {
 
   <div class="card">
     <div class="card-title">
-      <span>Current Phase</span>
+      <span id="currentPhaseTitle">Current Phase</span>
       <select id="phaseSelect" onchange="changePhase(this.value)" style="margin-left:auto;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;"></select>
     </div>
     <div id="phaseInfo"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Today's Activities</div>
+    <div class="card-title" id="todayActivitiesTitle">Today's Activities</div>
     <div id="todayActivities"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Letters (A-Z)</div>
+    <div class="card-title" id="lettersTitle">Letters (A-Z)</div>
     <div class="char-grid" id="letterGrid"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--text-light);">Tap to mark as learned. Green = learned, Yellow = this week's focus.</div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="tapToMarkHint">Tap to mark as learned. Green = learned, Yellow = this week's focus.</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Chinese Characters</div>
+    <div class="card-title" id="chineseCharsTitle">Chinese Characters</div>
     <div class="char-grid" id="chineseGrid"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Numbers (1-30)</div>
+    <div class="card-title" id="storiesCardTitle">Practice Stories</div>
+    <div id="storiesContainer"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="numbersTitle">Numbers (1-30)</div>
     <div class="char-grid" id="numberGrid"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Learning Tips for 3-Year-Olds</div>
+    <div class="card-title" id="learningTipsTitle">Learning Tips for 3-Year-Olds</div>
     <div style="font-size:13px;line-height:1.6;">
       <div class="tip-item">
         <div class="tip-num">1</div>
@@ -596,33 +758,33 @@ body {
 <div class="tab-content" id="tab-weekend">
   <div class="card">
     <div class="card-title">
-      <span>This Sunday's Plan</span>
+      <span id="sundayPlanTitle">This Sunday's Plan</span>
       <span class="badge badge-yellow" id="sundayDate"></span>
     </div>
     <div id="sundayPlan">
-      <div style="font-size:13px;color:var(--text-light);">No plan set yet. Pick a venue below or add a custom activity.</div>
+      <div style="font-size:13px;color:var(--text-light);" id="noSundayPlanText">No plan set yet. Pick a venue below or add a custom activity.</div>
     </div>
     <div style="margin-top:10px;">
-      <button class="btn btn-accent btn-small" onclick="suggestSundayPlan()">Suggest a Plan</button>
-      <button class="btn btn-outline btn-small" onclick="openCustomEvent()">+ Custom Event</button>
+      <button class="btn btn-accent btn-small" onclick="suggestSundayPlan()" id="suggestPlanBtn">Suggest a Plan</button>
+      <button class="btn btn-outline btn-small" onclick="openCustomEvent()" id="customEventBtn">+ Custom Event</button>
     </div>
   </div>
 
-  <div class="section-title">Parks & Outdoor</div>
+  <div class="section-title" id="parksOutdoorTitle">Parks & Outdoor</div>
   <div id="parksList"></div>
 
-  <div class="section-title">Indoor Venues</div>
+  <div class="section-title" id="indoorVenuesTitle">Indoor Venues</div>
   <div id="indoorList"></div>
 
-  <div class="section-title">Custom Events</div>
+  <div class="section-title" id="customEventsTitle">Custom Events</div>
   <div id="customEvents">
     <div class="card" style="text-align:center;">
-      <button class="btn btn-primary" onclick="openCustomEvent()">+ Add Event for This Week</button>
-      <div style="font-size:11px;color:var(--text-light);margin-top:6px;">Add local events, playdates, or special activities</div>
+      <button class="btn btn-primary" onclick="openCustomEvent()" id="addEventWeekBtn">+ Add Event for This Week</button>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="addEventHintText">Add local events, playdates, or special activities</div>
     </div>
   </div>
 
-  <div class="section-title">Outing History</div>
+  <div class="section-title" id="outingHistoryTitle">Outing History</div>
   <div class="card">
     <div id="outingHistory" style="font-size:12px;color:var(--text-light);">Past outings will appear here to help rotate venues.</div>
   </div>
@@ -631,18 +793,18 @@ body {
 <!-- ===================== TAB: SETTINGS ===================== -->
 <div class="tab-content" id="tab-settings">
   <div class="card">
-    <div class="card-title">Sleep Improvement Plan</div>
+    <div class="card-title" id="sleepPlanTitle">Sleep Improvement Plan</div>
     <div class="sleep-goal">
-      <div style="font-size:12px;color:var(--text-light);">Current → Target</div>
+      <div style="font-size:12px;color:var(--text-light);" id="currentToTargetLabel">Current → Target</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;">
         <div>
           <div style="font-size:28px;font-weight:800;color:var(--red);" id="currentSleepTime">11:00 PM</div>
-          <div style="font-size:11px;color:var(--text-light);">Current</div>
+          <div style="font-size:11px;color:var(--text-light);" id="currentSleepLabel">Current</div>
         </div>
         <div style="font-size:24px;">→</div>
         <div>
           <div style="font-size:28px;font-weight:800;color:var(--green);">10:00 PM</div>
-          <div style="font-size:11px;color:var(--text-light);">Target</div>
+          <div style="font-size:11px;color:var(--text-light);" id="targetSleepLabel">Target</div>
         </div>
       </div>
       <div class="progress-bar" style="margin-top:12px;">
@@ -651,17 +813,17 @@ body {
       <div style="font-size:11px;color:var(--text-light);margin-top:4px;" id="sleepProgressText"></div>
     </div>
     <div style="margin-top:8px;">
-      <label style="font-size:13px;font-weight:600;">Adjust current bedtime:</label>
+      <label style="font-size:13px;font-weight:600;" id="adjustBedtimeLabel">Adjust current bedtime:</label>
       <div style="display:flex;gap:8px;margin-top:4px;">
-        <button class="btn btn-green btn-small" onclick="adjustSleep(-15)">-15 min (earlier)</button>
-        <button class="btn btn-outline btn-small" onclick="adjustSleep(15)">+15 min (later)</button>
+        <button class="btn btn-green btn-small" onclick="adjustSleep(-15)" id="earlierBtn">-15 min (earlier)</button>
+        <button class="btn btn-outline btn-small" onclick="adjustSleep(15)" id="laterBtn">+15 min (later)</button>
       </div>
-      <div style="font-size:11px;color:var(--text-light);margin-top:6px;">Move 15 minutes earlier every 3-4 days. Log progress as you go.</div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="sleepAdjustHint">Move 15 minutes earlier every 3-4 days. Log progress as you go.</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Bedtime Routine Tips</div>
+    <div class="card-title" id="bedtimeTipsTitle">Bedtime Routine Tips</div>
     <div class="tip-item">
       <div class="tip-num">1</div>
       <div class="tip-text"><strong>Consistent wind-down:</strong> Start the same routine 45 min before target bedtime — dim lights, quiet activities.</div>
@@ -705,13 +867,13 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title">Edit Daily Schedule</div>
+    <div class="card-title" id="editScheduleTitle">Edit Daily Schedule</div>
     <div id="scheduleEditor"></div>
-    <button class="btn btn-primary btn-small" style="margin-top:8px;" onclick="openAddScheduleItem()">+ Add Activity</button>
+    <button class="btn btn-primary btn-small" style="margin-top:8px;" onclick="openAddScheduleItem()" id="addActivityBtnEl">+ Add Activity</button>
   </div>
 
   <div class="card">
-    <div class="card-title">Sharing & Sync</div>
+    <div class="card-title" id="sharingSyncTitle">Sharing & Sync</div>
     <div style="font-size:13px;line-height:1.6;margin-bottom:12px;">
       <strong>Best format for Huawei + iPhone:</strong>
       <ul style="margin:8px 0 0 16px;font-size:12px;">
@@ -722,29 +884,34 @@ body {
       </ul>
     </div>
     <div class="share-box">
-      <button class="btn btn-primary" onclick="exportData()">Export Data (Copy)</button>
+      <button class="btn btn-primary" onclick="exportData()" id="exportBtn">Export Data (Copy)</button>
       <div style="margin-top:8px;">
-        <button class="btn btn-outline" onclick="importData()">Import Data (Paste)</button>
+        <button class="btn btn-outline" onclick="importData()" id="importBtn">Import Data (Paste)</button>
       </div>
-      <div style="font-size:11px;color:var(--text-light);margin-top:6px;">
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="exportHintText">
         Export copies all data as text. Send via WhatsApp. Import on the other device.
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Reset</div>
-    <button class="btn btn-small" style="background:var(--red);color:white;" onclick="if(confirm('Reset ALL data? This cannot be undone.')){localStorage.clear();location.reload();}">Reset All Data</button>
+    <div class="card-title" id="resetCardTitle">Reset</div>
+    <button class="btn btn-small" style="background:var(--red);color:white;" onclick="if(confirm(t('resetConfirm'))){localStorage.clear();location.reload();}" id="resetAllBtn">Reset All Data</button>
   </div>
 </div>
 
 <!-- Tab Bar -->
 <div class="tab-bar">
-  <button class="active" onclick="switchTab('today',this)"><span class="icon">📅</span>Today</button>
-  <button onclick="switchTab('meals',this)"><span class="icon">🍽️</span>Meals</button>
-  <button onclick="switchTab('learn',this)"><span class="icon">📚</span>Learn</button>
-  <button onclick="switchTab('weekend',this)"><span class="icon">🌳</span>Weekend</button>
-  <button onclick="switchTab('settings',this)"><span class="icon">⚙️</span>Settings</button>
+  <button class="active" onclick="switchTab('today',this)"><span class="icon">📅</span><span id="tabToday">Today</span></button>
+  <button onclick="switchTab('meals',this)"><span class="icon">🍽️</span><span id="tabMeals">Meals</span></button>
+  <button onclick="switchTab('learn',this)"><span class="icon">📚</span><span id="tabLearn">Learn</span></button>
+  <button onclick="switchTab('weekend',this)"><span class="icon">🌳</span><span id="tabWeekend">Weekend</span></button>
+  <button onclick="switchTab('settings',this)"><span class="icon">⚙️</span><span id="tabSettings">Settings</span></button>
+</div>
+
+<!-- Character Detail Overlay -->
+<div class="char-detail-overlay" id="charDetailOverlay" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="char-detail-box" id="charDetailContent"></div>
 </div>
 
 <!-- Edit Modal -->
@@ -753,6 +920,532 @@ body {
 </div>
 
 <script>
+// ==================== i18n ====================
+let currentLang = localStorage.getItem('plannerLang') || 'en';
+
+const LANG = {
+  appTitle: { en: 'Little Explorer Planner', zh: '小探险家计划' },
+  appSubtitle: { en: 'Daily Schedule & Learning Tracker', zh: '每日安排与学习跟踪' },
+  today: { en: 'Today', zh: '今天' },
+  meals: { en: 'Meals', zh: '餐食' },
+  learn: { en: 'Learn', zh: '学习' },
+  weekend: { en: 'Weekend', zh: '周末' },
+  settings: { en: 'Settings', zh: '设置' },
+  dailySchedule: { en: 'Daily Schedule', zh: '每日安排' },
+  weekdayLabel: { en: 'Weekday', zh: '工作日' },
+  weekendLabel: { en: 'Weekend', zh: '周末' },
+  todaysMeals: { en: "Today's Meals", zh: '今日餐食' },
+  todaysLearning: { en: "Today's Learning (7:30-8:15 PM)", zh: '今日学习 (19:30-20:15)' },
+  weeklyMealPlan: { en: 'Weekly Meal Plan', zh: '每周餐食计划' },
+  autoGenerate: { en: 'Auto-Generate', zh: '自动生成' },
+  breakfastOptions: { en: 'Breakfast Options', zh: '早餐选项' },
+  dinnerOptions: { en: 'Dinner Options', zh: '晚餐选项' },
+  snackOptions: { en: 'Snack Options', zh: '零食选项' },
+  addPlaceholder: { en: 'Add {type} item...', zh: '添加{type}...' },
+  add: { en: 'Add', zh: '添加' },
+  mealHistory: { en: 'Meal History', zh: '用餐记录' },
+  mealGridHint: { en: 'Tap any cell to change. Auto-generate rotates meals to avoid repetition.', zh: '点击单元格更改。自动生成会轮换餐食避免重复。' },
+  breakfast: { en: 'Breakfast', zh: '早餐' },
+  dinner: { en: 'Dinner', zh: '晚餐' },
+  lunch: { en: 'Lunch', zh: '午餐' },
+  snack: { en: 'Snack', zh: '零食' },
+  bfast: { en: 'Bfast', zh: '早餐' },
+  notPlanned: { en: 'Not planned', zh: '未安排' },
+  noMealPlan: { en: 'No meal plan set. Go to Meals tab to generate.', zh: '未设置餐食计划。前往餐食页生成。' },
+  learningTimer: { en: 'Learning Session Timer', zh: '学习计时器' },
+  min3045: { en: '30-45 min', zh: '30-45 分钟' },
+  readyToStart: { en: 'Ready to start', zh: '准备开始' },
+  start: { en: 'Start', zh: '开始' },
+  pauseBtn: { en: 'Pause', zh: '暂停' },
+  resumeBtn: { en: 'Resume', zh: '继续' },
+  resetBtn: { en: 'Reset', zh: '重置' },
+  pausedLabel: { en: 'Paused', zh: '已暂停' },
+  learningInProgress: { en: 'Learning in progress...', zh: '学习中...' },
+  min30reached: { en: '30 min reached — great session!', zh: '30分钟 — 很棒!' },
+  min45wrapUp: { en: '45 min — time to wrap up!', zh: '45分钟 — 该结束了!' },
+  currentPhase: { en: 'Current Phase', zh: '当前阶段' },
+  todaysActivities: { en: "Today's Activities", zh: '今日活动' },
+  lettersAZ: { en: 'Letters (A-Z)', zh: '字母 (A-Z)' },
+  chineseChars: { en: 'Chinese Characters', zh: '中文汉字' },
+  numbers130: { en: 'Numbers (1-30)', zh: '数字 (1-30)' },
+  tapToMark: { en: 'Tap to mark as learned. Green = learned, Yellow = this week\'s focus.', zh: '点击标记已学。绿 = 已学，黄 = 本周重点。' },
+  learningTips: { en: 'Learning Tips for 3-Year-Olds', zh: '3岁儿童学习建议' },
+  sessionPlan: { en: 'Session Plan (30-45 min)', zh: '学习计划 (30-45分钟)' },
+  review: { en: 'Review', zh: '复习' },
+  lettersLabel: { en: 'Letters', zh: '字母' },
+  chineseLabel: { en: 'Chinese', zh: '中文' },
+  numbersLabel: { en: 'Numbers', zh: '数字' },
+  activityLabel: { en: 'Activity', zh: '活动' },
+  sundayPlan: { en: "This Sunday's Plan", zh: '本周日计划' },
+  noSundayPlan: { en: 'No plan set yet. Pick a venue below or add a custom activity.', zh: '尚未设置计划。从下方选择或添加活动。' },
+  suggestPlan: { en: 'Suggest a Plan', zh: '推荐计划' },
+  customEvent: { en: '+ Custom Event', zh: '+ 自定义活动' },
+  parksOutdoor: { en: 'Parks & Outdoor', zh: '公园与户外' },
+  indoorVenues: { en: 'Indoor Venues', zh: '室内场馆' },
+  customEvents: { en: 'Custom Events', zh: '自定义活动' },
+  outingHistory: { en: 'Outing History', zh: '出行记录' },
+  addEventWeek: { en: '+ Add Event for This Week', zh: '+ 添加本周活动' },
+  addEventHint: { en: 'Add local events, playdates, or special activities', zh: '添加本地活动、聚会或特别活动' },
+  lastVisitedLabel: { en: 'Last visited', zh: '上次去' },
+  notVisitedYet: { en: 'Not visited yet!', zh: '还没去过!' },
+  suggestion: { en: 'Suggestion', zh: '推荐' },
+  tryAnother: { en: 'Try Another', zh: '换一个' },
+  pickFromList: { en: 'Pick from List', zh: '从列表选' },
+  changePlan: { en: 'Change Plan', zh: '更改计划' },
+  sleepPlan: { en: 'Sleep Improvement Plan', zh: '睡眠改善计划' },
+  currentSleep: { en: 'Current', zh: '当前' },
+  targetSleep: { en: 'Target', zh: '目标' },
+  currentToTarget: { en: 'Current → Target', zh: '当前 → 目标' },
+  targetReached: { en: 'Target reached!', zh: '目标达成!' },
+  toGoal: { en: 'to goal', zh: '距目标' },
+  adjustBedtime: { en: 'Adjust current bedtime:', zh: '调整就寝时间:' },
+  earlierMin: { en: '-15 min (earlier)', zh: '-15分钟（提前）' },
+  laterMin: { en: '+15 min (later)', zh: '+15分钟（推后）' },
+  sleepAdjustHint: { en: 'Move 15 min earlier every 3-4 days.', zh: '每3-4天提前15分钟。' },
+  bedtimeRoutineTips: { en: 'Bedtime Routine Tips', zh: '睡前习惯建议' },
+  editSchedule: { en: 'Edit Daily Schedule', zh: '编辑每日安排' },
+  addActivityBtn: { en: '+ Add Activity', zh: '+ 添加活动' },
+  sharingSync: { en: 'Sharing & Sync', zh: '分享与同步' },
+  exportData: { en: 'Export Data (Copy)', zh: '导出数据（复制）' },
+  importData: { en: 'Import Data (Paste)', zh: '导入数据（粘贴）' },
+  resetLabel: { en: 'Reset', zh: '重置' },
+  resetAllData: { en: 'Reset All Data', zh: '重置所有数据' },
+  resetConfirm: { en: 'Reset ALL data? This cannot be undone.', zh: '重置所有数据？不可撤销。' },
+  exportSuccess: { en: 'Data copied to clipboard!', zh: '数据已复制到剪贴板！' },
+  importPrompt: { en: 'Paste the shared data here:', zh: '在此粘贴数据:' },
+  importSuccess: { en: 'Data imported successfully!', zh: '数据导入成功!' },
+  importError: { en: 'Invalid data format.', zh: '数据格式无效。' },
+  editActivityTitle: { en: 'Edit Activity', zh: '编辑活动' },
+  timeLabel: { en: 'Time:', zh: '时间:' },
+  activityInput: { en: 'Activity:', zh: '活动:' },
+  iconLabel: { en: 'Icon (emoji):', zh: '图标:' },
+  deleteBtn: { en: 'Delete', zh: '删除' },
+  cancelBtn: { en: 'Cancel', zh: '取消' },
+  saveBtn: { en: 'Save', zh: '保存' },
+  deleteConfirm: { en: 'Delete this activity?', zh: '删除此活动？' },
+  addActivityTitle: { en: 'Add Activity', zh: '添加活动' },
+  scheduleLabel: { en: 'Schedule:', zh: '时间表:' },
+  activityNamePH: { en: 'Activity name', zh: '活动名称' },
+  pickMealTitle: { en: 'Pick {type} for {day}', zh: '选择{day}的{type}' },
+  orTypeCustom: { en: 'Or type custom:', zh: '或输入自定义:' },
+  customMealPH: { en: 'Custom meal...', zh: '自定义餐食...' },
+  setBtn: { en: 'Set', zh: '设定' },
+  planLabel: { en: 'Plan:', zh: '计划:' },
+  notesOptional: { en: 'Notes (optional):', zh: '备注（可选）:' },
+  setPlan: { en: 'Set Plan', zh: '设定计划' },
+  addCustomEventTitle: { en: 'Add Custom Event', zh: '添加自定义活动' },
+  eventNameLabel: { en: 'Event Name:', zh: '活动名称:' },
+  dateLabel: { en: 'Date:', zh: '日期:' },
+  detailsLabel: { en: 'Details:', zh: '详情:' },
+  addEventBtn: { en: 'Add Event', zh: '添加活动' },
+  weekdaySchedule: { en: 'Weekday Schedule', zh: '工作日时间表' },
+  weekendSchedule: { en: 'Weekend Schedule', zh: '周末时间表' },
+  recentMealsHint: { en: 'Recent meals will appear here.', zh: '最近的用餐记录将在此显示。' },
+  pastOutingsHint: { en: 'Past outings will appear here.', zh: '出行记录将在此显示。' },
+  bestFormat: { en: 'Best format for Huawei + iPhone:', zh: '华为+苹果最佳方式:' },
+  exportHint: { en: 'Export copies all data as text. Send via messaging. Import on the other device.', zh: '导出数据为文本。通过消息发送。在另一设备导入。' },
+  // Schedule nameKeys
+  wakeUpMorning: { en: 'Wake up & morning routine', zh: '起床和晨间活动' },
+  breakfastTime: { en: 'Breakfast', zh: '早餐' },
+  goToSchool: { en: 'Go to school', zh: '上学' },
+  pickUpSchool: { en: 'Pick up from school', zh: '放学接回' },
+  playgroundSwimming: { en: 'Playground / Swimming', zh: '游乐场 / 游泳' },
+  dinnerTime: { en: 'Dinner', zh: '晚餐' },
+  showerTime: { en: 'Shower time', zh: '洗澡时间' },
+  learningTime: { en: 'Learning time', zh: '学习时间' },
+  freePlayWindDown: { en: 'Free play / wind-down', zh: '自由玩耍 / 放松' },
+  readBooks: { en: 'Read books', zh: '读书' },
+  bedtimeRoutine: { en: 'Bedtime routine', zh: '睡前活动' },
+  sleepTime: { en: 'Sleep', zh: '睡觉' },
+  wakeUp: { en: 'Wake up', zh: '起床' },
+  familyTime: { en: 'Free play / family time', zh: '自由玩耍 / 家庭时间' },
+  sundayOuting: { en: 'Sunday Outing (if Sunday)', zh: '周日出游' },
+  lunchTime: { en: 'Lunch', zh: '午餐' },
+  napTime: { en: 'Nap / quiet time', zh: '午睡 / 安静时间' },
+  snackTime: { en: 'Snack', zh: '零食时间' },
+  lightLearning: { en: 'Learning time (light)', zh: '学习时间（轻松）' },
+  // Stories
+  storiesTitle: { en: 'Practice Stories', zh: '练习故事' },
+  readStory: { en: 'Read', zh: '阅读' },
+  charsKnown: { en: 'chars known', zh: '字已学' },
+  locked: { en: 'Learn more to unlock', zh: '学更多汉字解锁' },
+  // Recipes
+  recipesTitle: { en: 'Recipe Collection', zh: '食谱集' },
+  searchRecipesPH: { en: 'Search recipes...', zh: '搜索食谱...' },
+  allCat: { en: 'All', zh: '全部' },
+  mainDish: { en: 'Main', zh: '主食' },
+  soupCat: { en: 'Soup', zh: '汤粥' },
+  noodleCat: { en: 'Noodle', zh: '面条' },
+  snackCat: { en: 'Snack', zh: '点心' },
+  vegCat: { en: 'Veggie', zh: '蔬菜' },
+  bfastCat: { en: 'Breakfast', zh: '早餐' },
+  ingredients: { en: 'Ingredients', zh: '食材' },
+  steps: { en: 'Steps', zh: '步骤' },
+  searchOnline: { en: 'Search Online', zh: '在线搜索' },
+  viewRecipe: { en: 'View Recipe', zh: '查看食谱' },
+  mins: { en: 'min', zh: '分钟' },
+  charDetail: { en: 'Character Detail', zh: '汉字详情' },
+  meaning: { en: 'Meaning', zh: '含义' },
+  markLearned: { en: 'Mark Learned', zh: '标记已学' },
+  markUnlearned: { en: 'Mark Unlearned', zh: '标记未学' },
+};
+
+function t(key) {
+  const entry = LANG[key];
+  if (!entry) return key;
+  return entry[currentLang] || entry.en || key;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  localStorage.setItem('plannerLang', currentLang);
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  renderAll();
+}
+
+function updateI18nLabels() {
+  const el = (id) => document.getElementById(id);
+  el('appTitle').textContent = t('appTitle');
+  el('appSubtitle').textContent = t('appSubtitle');
+  el('todayBtn').textContent = t('today');
+  el('langToggle').textContent = currentLang === 'en' ? '中文' : 'EN';
+  // Tab bar
+  el('tabToday').textContent = t('today');
+  el('tabMeals').textContent = t('meals');
+  el('tabLearn').textContent = t('learn');
+  el('tabWeekend').textContent = t('weekend');
+  el('tabSettings').textContent = t('settings');
+  // Today tab
+  el('dailyScheduleTitle').textContent = t('dailySchedule');
+  el('todayMealsTitle').textContent = t('todaysMeals');
+  el('todayLearnTitle').textContent = t('todaysLearning');
+  // Meals tab
+  el('weeklyMealPlanTitle').textContent = t('weeklyMealPlan');
+  el('autoGenBtn').textContent = t('autoGenerate');
+  el('mealGridHint').textContent = t('mealGridHint');
+  el('breakfastOptionsTitle').textContent = t('breakfastOptions');
+  el('dinnerOptionsTitle').textContent = t('dinnerOptions');
+  el('snackOptionsTitle').textContent = t('snackOptions');
+  el('mealHistoryTitle').textContent = t('mealHistory');
+  el('recipesCardTitle').textContent = t('recipesTitle');
+  el('addBreakfastBtn').textContent = t('add');
+  el('addDinnerBtn').textContent = t('add');
+  el('addSnackBtn').textContent = t('add');
+  el('recipeSearchInput').placeholder = t('searchRecipesPH');
+  // Learn tab
+  el('learningTimerTitle').textContent = t('learningTimer');
+  el('timerBadge').textContent = t('min3045');
+  el('currentPhaseTitle').textContent = t('currentPhase');
+  el('todayActivitiesTitle').textContent = t('todaysActivities');
+  el('lettersTitle').textContent = t('lettersAZ');
+  el('chineseCharsTitle').textContent = t('chineseChars');
+  el('storiesCardTitle').textContent = t('storiesTitle');
+  el('numbersTitle').textContent = t('numbers130');
+  el('tapToMarkHint').textContent = t('tapToMark');
+  el('learningTipsTitle').textContent = t('learningTips');
+  // Settings tab
+  el('sleepPlanTitle').textContent = t('sleepPlan');
+  el('currentToTargetLabel').textContent = t('currentToTarget');
+  el('currentSleepLabel').textContent = t('currentSleep');
+  el('targetSleepLabel').textContent = t('targetSleep');
+  el('adjustBedtimeLabel').textContent = t('adjustBedtime');
+  el('earlierBtn').textContent = t('earlierMin');
+  el('laterBtn').textContent = t('laterMin');
+  el('sleepAdjustHint').textContent = t('sleepAdjustHint');
+  el('bedtimeTipsTitle').textContent = t('bedtimeRoutineTips');
+  el('editScheduleTitle').textContent = t('editSchedule');
+  el('addActivityBtnEl').textContent = t('addActivityBtn');
+  el('sharingSyncTitle').textContent = t('sharingSync');
+  el('resetCardTitle').textContent = t('resetLabel');
+  el('resetAllBtn').textContent = t('resetAllData');
+  el('exportBtn').textContent = t('exportData');
+  el('importBtn').textContent = t('importData');
+  el('exportHintText').textContent = t('exportHint');
+  // Weekend tab
+  if (el('parksOutdoorTitle')) el('parksOutdoorTitle').textContent = t('parksOutdoor');
+  if (el('indoorVenuesTitle')) el('indoorVenuesTitle').textContent = t('indoorVenues');
+  if (el('customEventsTitle')) el('customEventsTitle').textContent = t('customEvents');
+  if (el('outingHistoryTitle')) el('outingHistoryTitle').textContent = t('outingHistory');
+  if (el('addEventWeekBtn')) el('addEventWeekBtn').textContent = t('addEventWeek');
+  if (el('addEventHintText')) el('addEventHintText').textContent = t('addEventHint');
+  if (el('sundayPlanTitle')) el('sundayPlanTitle').textContent = t('sundayPlan');
+  if (el('suggestPlanBtn')) el('suggestPlanBtn').textContent = t('suggestPlan');
+  if (el('customEventBtn')) el('customEventBtn').textContent = t('customEvent');
+}
+
+// ==================== SVG CHAR ILLUSTRATIONS ====================
+const CHAR_SVG = {
+  '一': { svg: '<line x1="15" y1="50" x2="85" y2="50" stroke="#E74C3C" stroke-width="8" stroke-linecap="round"/>', hint: {en:'one',zh:'一'}, color: '#E74C3C' },
+  '二': { svg: '<line x1="22" y1="35" x2="78" y2="35" stroke="#E67E22" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="65" x2="85" y2="65" stroke="#E67E22" stroke-width="7" stroke-linecap="round"/>', hint: {en:'two',zh:'二'}, color: '#E67E22' },
+  '三': { svg: '<line x1="25" y1="25" x2="75" y2="25" stroke="#F1C40F" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="50" x2="80" y2="50" stroke="#F1C40F" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="75" x2="85" y2="75" stroke="#F1C40F" stroke-width="7" stroke-linecap="round"/>', hint: {en:'three',zh:'三'}, color: '#F1C40F' },
+  '大': { svg: '<line x1="50" y1="15" x2="50" y2="65" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="15" y1="42" x2="85" y2="42" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="65" x2="20" y2="90" stroke="#3498DB" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="65" x2="80" y2="90" stroke="#3498DB" stroke-width="5" stroke-linecap="round"/>', hint: {en:'big',zh:'大'}, color: '#3498DB' },
+  '小': { svg: '<line x1="50" y1="20" x2="50" y2="80" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="50" x2="35" y2="70" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="75" y1="50" x2="65" y2="70" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>', hint: {en:'small',zh:'小'}, color: '#2ECC71' },
+  '上': { svg: '<line x1="50" y1="20" x2="50" y2="70" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/><line x1="30" y1="42" x2="70" y2="42" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="80" x2="80" y2="80" stroke="#9B59B6" stroke-width="6" stroke-linecap="round"/>', hint: {en:'up/above',zh:'上'}, color: '#9B59B6' },
+  '下': { svg: '<line x1="15" y1="25" x2="85" y2="25" stroke="#1ABC9C" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="25" x2="50" y2="75" stroke="#1ABC9C" stroke-width="6" stroke-linecap="round"/><line x1="35" y1="55" x2="50" y2="75" stroke="#1ABC9C" stroke-width="5" stroke-linecap="round"/><line x1="65" y1="55" x2="50" y2="75" stroke="#1ABC9C" stroke-width="5" stroke-linecap="round"/>', hint: {en:'down/below',zh:'下'}, color: '#1ABC9C' },
+  '人': { svg: '<line x1="50" y1="15" x2="25" y2="85" stroke="#E74C3C" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="15" x2="75" y2="85" stroke="#E74C3C" stroke-width="6" stroke-linecap="round"/>', hint: {en:'person',zh:'人'}, color: '#E74C3C' },
+  '口': { svg: '<rect x="25" y="25" width="50" height="50" fill="none" stroke="#E67E22" stroke-width="6" rx="3"/>', hint: {en:'mouth',zh:'口'}, color: '#E67E22' },
+  '手': { svg: '<line x1="50" y1="20" x2="50" y2="85" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="35" x2="80" y2="35" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="55" x2="75" y2="55" stroke="#2ECC71" stroke-width="5" stroke-linecap="round"/>', hint: {en:'hand',zh:'手'}, color: '#2ECC71' },
+  '日': { svg: '<rect x="25" y="20" width="50" height="60" fill="none" stroke="#F39C12" stroke-width="6" rx="3"/><line x1="25" y1="50" x2="75" y2="50" stroke="#F39C12" stroke-width="5"/>', hint: {en:'sun/day',zh:'日/太阳'}, color: '#F39C12' },
+  '月': { svg: '<path d="M60 15 C25 20, 25 80, 60 85" fill="none" stroke="#3498DB" stroke-width="6" stroke-linecap="round"/><line x1="38" y1="40" x2="58" y2="40" stroke="#3498DB" stroke-width="4" stroke-linecap="round"/><line x1="38" y1="60" x2="58" y2="60" stroke="#3498DB" stroke-width="4" stroke-linecap="round"/>', hint: {en:'moon/month',zh:'月/月亮'}, color: '#3498DB' },
+  '水': { svg: '<line x1="50" y1="10" x2="50" y2="90" stroke="#00BCD4" stroke-width="5" stroke-linecap="round"/><path d="M30 30 Q40 50, 20 70" fill="none" stroke="#00BCD4" stroke-width="4" stroke-linecap="round"/><path d="M70 30 Q60 50, 80 70" fill="none" stroke="#00BCD4" stroke-width="4" stroke-linecap="round"/>', hint: {en:'water',zh:'水'}, color: '#00BCD4' },
+  '火': { svg: '<path d="M50 10 Q45 35, 30 50 Q45 45, 50 70 Q55 45, 70 50 Q55 35, 50 10Z" fill="#FF5722" stroke="#E64A19" stroke-width="3"/><ellipse cx="50" cy="58" rx="8" ry="12" fill="#FFB74D"/>', hint: {en:'fire',zh:'火'}, color: '#FF5722' },
+  '山': { svg: '<polyline points="10,80 35,30 50,55 65,15 80,50 95,80" fill="none" stroke="#4CAF50" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>', hint: {en:'mountain',zh:'山'}, color: '#4CAF50' },
+  '木': { svg: '<line x1="50" y1="15" x2="50" y2="85" stroke="#795548" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="40" x2="80" y2="40" stroke="#4CAF50" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="65" x2="25" y2="90" stroke="#795548" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="65" x2="75" y2="90" stroke="#795548" stroke-width="5" stroke-linecap="round"/>', hint: {en:'tree/wood',zh:'木/树'}, color: '#795548' },
+  '石': { svg: '<line x1="30" y1="20" x2="70" y2="20" stroke="#78909C" stroke-width="5" stroke-linecap="round"/><polygon points="25,35 75,35 80,80 20,80" fill="#B0BEC5" stroke="#78909C" stroke-width="4"/>', hint: {en:'stone',zh:'石'}, color: '#78909C' },
+  '田': { svg: '<rect x="20" y="20" width="60" height="60" fill="none" stroke="#4CAF50" stroke-width="5" rx="2"/><line x1="50" y1="20" x2="50" y2="80" stroke="#4CAF50" stroke-width="4"/><line x1="20" y1="50" x2="80" y2="50" stroke="#4CAF50" stroke-width="4"/>', hint: {en:'field',zh:'田'}, color: '#4CAF50' },
+  '天': { svg: '<line x1="20" y1="20" x2="80" y2="20" stroke="#2196F3" stroke-width="6" stroke-linecap="round"/><line x1="30" y1="45" x2="70" y2="45" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="45" x2="20" y2="85" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="45" x2="80" y2="85" stroke="#2196F3" stroke-width="5" stroke-linecap="round"/>', hint: {en:'sky/heaven',zh:'天'}, color: '#2196F3' },
+  '地': { svg: '<rect x="15" y="30" width="25" height="40" fill="none" stroke="#8D6E63" stroke-width="4" rx="2"/><line x1="40" y1="50" x2="85" y2="50" stroke="#8D6E63" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="30" x2="60" y2="80" stroke="#8D6E63" stroke-width="4" stroke-linecap="round"/>', hint: {en:'earth/ground',zh:'地'}, color: '#8D6E63' },
+  '花': { svg: '<circle cx="50" cy="30" r="10" fill="#E91E63"/><circle cx="35" cy="38" r="8" fill="#F48FB1"/><circle cx="65" cy="38" r="8" fill="#F48FB1"/><circle cx="50" cy="30" r="5" fill="#FFF176"/><line x1="50" y1="42" x2="50" y2="85" stroke="#4CAF50" stroke-width="5" stroke-linecap="round"/>', hint: {en:'flower',zh:'花'}, color: '#E91E63' },
+  '爸': { svg: '<circle cx="50" cy="25" r="12" fill="none" stroke="#1565C0" stroke-width="4"/><line x1="50" y1="37" x2="50" y2="65" stroke="#1565C0" stroke-width="5" stroke-linecap="round"/><line x1="30" y1="48" x2="70" y2="48" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="30" y2="90" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="70" y2="90" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/>', hint: {en:'dad',zh:'爸爸'}, color: '#1565C0' },
+  '妈': { svg: '<circle cx="50" cy="25" r="12" fill="none" stroke="#E91E63" stroke-width="4"/><path d="M38 15 Q50 5, 62 15" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="50" y1="37" x2="50" y2="60" stroke="#E91E63" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="60" x2="35" y2="88" stroke="#E91E63" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="60" x2="65" y2="88" stroke="#E91E63" stroke-width="4" stroke-linecap="round"/>', hint: {en:'mom',zh:'妈妈'}, color: '#E91E63' },
+  '我': { svg: '<circle cx="50" cy="25" r="11" fill="none" stroke="#7B1FA2" stroke-width="4"/><line x1="50" y1="36" x2="50" y2="62" stroke="#7B1FA2" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="50" x2="28" y2="55" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/><circle cx="25" cy="55" r="4" fill="#7B1FA2"/><line x1="50" y1="62" x2="35" y2="88" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="65" y2="88" stroke="#7B1FA2" stroke-width="4" stroke-linecap="round"/>', hint: {en:'me/I',zh:'我'}, color: '#7B1FA2' },
+  '你': { svg: '<circle cx="50" cy="25" r="11" fill="none" stroke="#00897B" stroke-width="4"/><line x1="50" y1="36" x2="50" y2="62" stroke="#00897B" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="48" x2="75" y2="40" stroke="#00897B" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="35" y2="88" stroke="#00897B" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="62" x2="65" y2="88" stroke="#00897B" stroke-width="4" stroke-linecap="round"/>', hint: {en:'you',zh:'你'}, color: '#00897B' },
+  '他': { svg: '<circle cx="35" cy="25" r="10" fill="none" stroke="#558B2F" stroke-width="4"/><line x1="35" y1="35" x2="35" y2="60" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="35" y1="60" x2="22" y2="85" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="35" y1="60" x2="48" y2="85" stroke="#558B2F" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="25" x2="65" y2="85" stroke="#558B2F" stroke-width="3" stroke-linecap="round"/>', hint: {en:'he/him',zh:'他'}, color: '#558B2F' },
+  '好': { svg: '<circle cx="30" cy="28" r="8" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="30" y1="36" x2="30" y2="55" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="55" x2="20" y2="75" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><circle cx="65" cy="30" r="7" fill="none" stroke="#E91E63" stroke-width="3"/><line x1="65" y1="37" x2="65" y2="50" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><line x1="56" y1="44" x2="74" y2="44" stroke="#E91E63" stroke-width="3" stroke-linecap="round"/><text x="50" y="92" text-anchor="middle" font-size="16" fill="#E91E63">&#9829;</text>', hint: {en:'good',zh:'好'}, color: '#E91E63' },
+  '家': { svg: '<polygon points="50,10 15,45 85,45" fill="none" stroke="#FF9800" stroke-width="5" stroke-linejoin="round"/><rect x="30" y="45" width="40" height="38" fill="none" stroke="#FF9800" stroke-width="4"/><rect x="42" y="58" width="16" height="25" fill="none" stroke="#FF9800" stroke-width="3"/>', hint: {en:'home/family',zh:'家'}, color: '#FF9800' },
+  '鱼': { svg: '<ellipse cx="45" cy="50" rx="28" ry="18" fill="#42A5F5" stroke="#1565C0" stroke-width="3"/><polygon points="73,50 90,35 90,65" fill="#42A5F5" stroke="#1565C0" stroke-width="3"/><circle cx="32" cy="45" r="4" fill="white"/><circle cx="33" cy="45" r="2" fill="#1565C0"/>', hint: {en:'fish',zh:'鱼'}, color: '#42A5F5' },
+  '鸟': { svg: '<ellipse cx="50" cy="50" rx="22" ry="18" fill="#EF5350" stroke="#C62828" stroke-width="3"/><circle cx="40" cy="42" r="4" fill="white"/><circle cx="41" cy="42" r="2" fill="#333"/><polygon points="62,45 80,40 62,50" fill="#FFA726" stroke="#E65100" stroke-width="2"/><line x1="42" y1="68" x2="42" y2="82" stroke="#795548" stroke-width="3" stroke-linecap="round"/><line x1="58" y1="68" x2="58" y2="82" stroke="#795548" stroke-width="3" stroke-linecap="round"/>', hint: {en:'bird',zh:'鸟'}, color: '#EF5350' },
+  '马': { svg: '<ellipse cx="50" cy="50" rx="25" ry="20" fill="#8D6E63" stroke="#4E342E" stroke-width="3"/><circle cx="33" cy="35" r="12" fill="#8D6E63" stroke="#4E342E" stroke-width="3"/><circle cx="28" cy="32" r="3" fill="white"/><circle cx="29" cy="32" r="1.5" fill="#333"/><line x1="35" y1="70" x2="30" y2="88" stroke="#4E342E" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="70" x2="65" y2="88" stroke="#4E342E" stroke-width="4" stroke-linecap="round"/>', hint: {en:'horse',zh:'马'}, color: '#8D6E63' },
+  '牛': { svg: '<line x1="20" y1="25" x2="40" y2="40" stroke="#795548" stroke-width="5" stroke-linecap="round"/><line x1="80" y1="25" x2="60" y2="40" stroke="#795548" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="55" rx="24" ry="18" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><circle cx="40" cy="48" r="3" fill="#333"/><circle cx="60" cy="48" r="3" fill="#333"/><ellipse cx="50" cy="62" rx="10" ry="7" fill="#BCAAA4" stroke="#5D4037" stroke-width="2"/>', hint: {en:'cow/ox',zh:'牛'}, color: '#795548' },
+  '羊': { svg: '<circle cx="50" cy="45" r="22" fill="#EEE" stroke="#9E9E9E" stroke-width="3"/><circle cx="40" cy="40" r="3" fill="#333"/><circle cx="60" cy="40" r="3" fill="#333"/><path d="M30 30 Q25 15, 35 25" fill="none" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><path d="M70 30 Q75 15, 65 25" fill="none" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="67" x2="35" y2="85" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="67" x2="65" y2="85" stroke="#9E9E9E" stroke-width="3" stroke-linecap="round"/>', hint: {en:'sheep',zh:'羊'}, color: '#9E9E9E' },
+  '猫': { svg: '<circle cx="50" cy="50" r="22" fill="#FFB74D" stroke="#E65100" stroke-width="3"/><polygon points="30,35 22,12 38,28" fill="#FFB74D" stroke="#E65100" stroke-width="2"/><polygon points="70,35 78,12 62,28" fill="#FFB74D" stroke="#E65100" stroke-width="2"/><circle cx="40" cy="45" r="4" fill="#333"/><circle cx="60" cy="45" r="4" fill="#333"/><ellipse cx="50" cy="56" rx="4" ry="3" fill="#E91E63"/><line x1="15" y1="50" x2="30" y2="48" stroke="#E65100" stroke-width="2"/><line x1="70" y1="48" x2="85" y2="50" stroke="#E65100" stroke-width="2"/>', hint: {en:'cat',zh:'猫'}, color: '#FFB74D' },
+  '狗': { svg: '<circle cx="50" cy="48" r="22" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><circle cx="42" cy="42" r="4" fill="#333"/><circle cx="58" cy="42" r="4" fill="#333"/><ellipse cx="50" cy="55" rx="5" ry="4" fill="#333"/><path d="M25,38 Q15,20 28,30" fill="#A1887F" stroke="#5D4037" stroke-width="3"/><path d="M75,38 Q85,20 72,30" fill="#A1887F" stroke="#5D4037" stroke-width="3"/>', hint: {en:'dog',zh:'狗'}, color: '#A1887F' },
+  '虫': { svg: '<circle cx="30" cy="50" r="10" fill="#66BB6A" stroke="#2E7D32" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="#81C784" stroke="#2E7D32" stroke-width="3"/><circle cx="70" cy="50" r="10" fill="#66BB6A" stroke="#2E7D32" stroke-width="3"/><circle cx="25" cy="48" r="2" fill="#333"/><circle cx="35" cy="48" r="2" fill="#333"/><line x1="25" y1="38" x2="22" y2="28" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/><line x1="35" y1="38" x2="38" y2="28" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>', hint: {en:'insect/bug',zh:'虫'}, color: '#66BB6A' },
+};
+
+const CHAR_PINYIN = {
+  '一':'yī','二':'èr','三':'sān','大':'dà','小':'xiǎo','上':'shàng','下':'xià',
+  '人':'rén','口':'kǒu','手':'shǒu','日':'rì','月':'yuè','水':'shuǐ','火':'huǒ',
+  '山':'shān','木':'mù','石':'shí','田':'tián','天':'tiān','地':'dì','花':'huā',
+  '爸':'bà','妈':'mā','我':'wǒ','你':'nǐ','他':'tā','好':'hǎo','家':'jiā',
+  '鱼':'yú','鸟':'niǎo','马':'mǎ','牛':'niú','羊':'yáng','猫':'māo','狗':'gǒu','虫':'chóng',
+};
+
+function renderCharSVG(char, size) {
+  const d = CHAR_SVG[char];
+  if (!d) return '';
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" style="display:block;">${d.svg}</svg>`;
+}
+
+function showCharDetail(char) {
+  const d = CHAR_SVG[char];
+  if (!d) return;
+  const isLearned = data.learning.learnedChinese.includes(char);
+  const hintText = d.hint[currentLang] || d.hint.en;
+  const pinyin = CHAR_PINYIN[char] || '';
+  document.getElementById('charDetailContent').innerHTML = `
+    <div style="margin-bottom:8px;">${renderCharSVG(char, 100)}</div>
+    <div class="big-char" style="color:${d.color}">${char}</div>
+    <div style="font-size:16px;color:var(--text-light);margin-bottom:4px;">${pinyin}</div>
+    <div class="char-hint">${t('meaning')}: ${hintText}</div>
+    <div style="margin-bottom:8px;">${isLearned ? `<span class="badge badge-green">${t('markLearned')}</span>` : ''}</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn ${isLearned ? 'btn-outline' : 'btn-green'} btn-block" onclick="toggleLearnedFromDetail('${char}')">${isLearned ? t('markUnlearned') : t('markLearned')}</button>
+      <button class="btn btn-outline btn-block" onclick="document.getElementById('charDetailOverlay').classList.remove('show')">${t('cancelBtn')}</button>
+    </div>
+  `;
+  document.getElementById('charDetailOverlay').classList.add('show');
+}
+
+function toggleLearnedFromDetail(char) {
+  toggleLearned('chinese', char);
+  showCharDetail(char);
+}
+
+// ==================== STORIES ====================
+const STORIES = [
+  { title:{en:'One Two Three',zh:'一二三'}, text:'一，二，三！一二三，三二一。', chars:['一','二','三'], level:1, pinyin:{} },
+  { title:{en:'Big and Small',zh:'大和小'}, text:'大大大，小小小。一个大，一个小。', chars:['一','大','小'], level:1, pinyin:{'个':'gè','和':'hé'} },
+  { title:{en:'Up and Down',zh:'上和下'}, text:'上上下下，大上小下。一上二下三上下。', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{'和':'hé'} },
+  { title:{en:'A Person',zh:'一个人'}, text:'一个人，一个口，二个手。大人小人，上下走。', chars:['一','二','大','小','上','下','人','口','手'], level:2, pinyin:{'个':'gè','走':'zǒu'} },
+  { title:{en:'Sun and Moon',zh:'日和月'}, text:'日在上，月在下。大日小月，天上的日月。', chars:['日','月','上','下','大','小','天'], level:2, pinyin:{'在':'zài','的':'de','和':'hé'} },
+  { title:{en:'Water and Fire',zh:'水和火'}, text:'水火不同。水在下，火在上。大水大火，小水小火。', chars:['水','火','上','下','大','小'], level:2, pinyin:{'不':'bù','同':'tóng','在':'zài','和':'hé'} },
+  { title:{en:'Hands and Mouth',zh:'手和口'}, text:'一个口，二个手。小手大口，大手小口。人人有手有口。', chars:['一','二','大','小','人','口','手'], level:2, pinyin:{'个':'gè','有':'yǒu','和':'hé'} },
+  { title:{en:'Day and Night',zh:'日和月'}, text:'日是白天，月是夜。日上山，月下山。天上有日月。', chars:['日','月','上','下','山','天'], level:2, pinyin:{'是':'shì','白':'bái','夜':'yè','有':'yǒu','和':'hé'} },
+  { title:{en:'The Mountain',zh:'大山'}, text:'大山上有大石，小山下有小花。山上有木，山下有田。', chars:['大','小','上','下','山','石','花','木','田'], level:3, pinyin:{'有':'yǒu'} },
+  { title:{en:'Trees and Flowers',zh:'花和木'}, text:'山上有木，地上有花。大木在山上，小花在地下。天上日月，地上山水。', chars:['山','木','花','地','天','日','月','上','下','大','小','水'], level:3, pinyin:{'有':'yǒu','在':'zài','和':'hé'} },
+  { title:{en:'In the Field',zh:'在田里'}, text:'田在山下，田在地上。田里有水，田上有花。大田小田，天天有人。', chars:['田','山','下','地','上','水','花','大','小','天','人'], level:3, pinyin:{'在':'zài','里':'lǐ','有':'yǒu'} },
+  { title:{en:'Sky and Earth',zh:'天和地'}, text:'天上有日月，地上有山水。天大地大，人在天地中。花在地上，鸟在天上。', chars:['天','地','上','日','月','山','水','大','人','花','鸟'], level:3, pinyin:{'有':'yǒu','在':'zài','中':'zhōng','和':'hé'} },
+  { title:{en:'Stone and Water',zh:'石和水'}, text:'大石在山上，小石在水下。石头大大小小，水在石下流。', chars:['大','小','山','上','下','石','水'], level:3, pinyin:{'在':'zài','头':'tou','流':'liú','和':'hé'} },
+  { title:{en:'My Family',zh:'我的家'}, text:'我有一个家。家里有爸爸妈妈。爸爸好，妈妈好，我也好。', chars:['我','家','爸','妈','好','一'], level:4, pinyin:{'有':'yǒu','个':'gè','里':'lǐ','也':'yě','的':'de'} },
+  { title:{en:'You and Me',zh:'你和我'}, text:'你好！我好！你大我小。你是我的好朋友。', chars:['你','我','好','大','小'], level:4, pinyin:{'是':'shì','的':'de','朋':'péng','友':'yǒu','和':'hé'} },
+  { title:{en:'Dad and Mom',zh:'爸爸妈妈'}, text:'爸爸大，妈妈大，我小。爸爸的手大，我的手小。妈妈好，爸爸好。', chars:['爸','妈','我','大','小','手','好'], level:4, pinyin:{'的':'de'} },
+  { title:{en:'At Home',zh:'在家里'}, text:'家在山下。家里有爸妈和我。家上有天，家下有地。我们的家好大。', chars:['家','山','下','爸','妈','我','上','天','地','好','大'], level:4, pinyin:{'在':'zài','里':'lǐ','有':'yǒu','和':'hé','们':'men','的':'de'} },
+  { title:{en:'He and I',zh:'他和我'}, text:'他是人，我也是人。他大我小。他好，我也好。你好他好大家好。', chars:['他','我','人','大','小','好','你','家'], level:4, pinyin:{'是':'shì','也':'yě','和':'hé'} },
+  { title:{en:'My Good Family',zh:'好家人'}, text:'爸爸好，妈妈好，我好，你好，他也好。一家人，大大小小，上上下下，好好好！', chars:['爸','妈','我','你','他','好','一','家','人','大','小','上','下'], level:4, pinyin:{'也':'yě'} },
+  { title:{en:'The Fish',zh:'小鱼'}, text:'水里有小鱼。大鱼在下，小鱼在上。一二三，三个小鱼在水里。', chars:['水','小','鱼','大','上','下','一','二','三'], level:5, pinyin:{'里':'lǐ','有':'yǒu','在':'zài','个':'gè'} },
+  { title:{en:'The Bird',zh:'小鸟'}, text:'天上有小鸟。鸟在山上飞。大鸟小鸟，一二三四五。鸟好好看。', chars:['天','上','小','鸟','山','大','一','二','三','好'], level:5, pinyin:{'有':'yǒu','在':'zài','飞':'fēi','四':'sì','五':'wǔ','看':'kàn'} },
+  { title:{en:'Cat and Dog',zh:'猫和狗'}, text:'我家有猫有狗。猫小狗大。猫在上，狗在下。猫好，狗也好。', chars:['我','家','猫','狗','小','大','上','下','好'], level:5, pinyin:{'有':'yǒu','在':'zài','也':'yě','和':'hé'} },
+  { title:{en:'Farm Animals',zh:'农场动物'}, text:'山下有牛有羊有马。大牛小牛，大羊小羊。马在田上跑。', chars:['山','下','牛','羊','马','大','小','田','上'], level:5, pinyin:{'有':'yǒu','在':'zài','跑':'pǎo'} },
+  { title:{en:'The Bug',zh:'小虫'}, text:'地上有小虫。花上有小虫。虫在花上走，虫在地下爬。大虫小虫。', chars:['地','上','小','虫','花','下','大'], level:5, pinyin:{'有':'yǒu','在':'zài','走':'zǒu','爬':'pá'} },
+  { title:{en:'Nature',zh:'大自然'}, text:'天上有日月鸟，地上有山水田。水里有鱼，山上有花木。大自然好美！', chars:['天','上','日','月','鸟','地','山','水','田','鱼','花','木','大','好'], level:5, pinyin:{'有':'yǒu','里':'lǐ','自':'zì','然':'rán','美':'měi'} },
+  { title:{en:'My World',zh:'我的世界'}, text:'我的家在山下。家里有爸妈猫狗。天上有日月鸟。地上有花木田。山上有水石。好大的世界！', chars:['我','家','山','下','爸','妈','猫','狗','天','上','日','月','鸟','地','花','木','田','水','石','好','大'], level:5, pinyin:{'的':'de','在':'zài','里':'lǐ','有':'yǒu','世':'shì','界':'jiè'} },
+];
+
+function renderStories() {
+  const learned = data.learning.learnedChinese;
+  let html = '';
+  STORIES.forEach((story, i) => {
+    const knownCount = story.chars.filter(c => learned.includes(c)).length;
+    const total = story.chars.length;
+    const pct = total > 0 ? Math.round((knownCount / total) * 100) : 0;
+    const unlocked = pct >= 60;
+    const levelStars = '⭐'.repeat(story.level);
+    html += `<div class="story-card ${unlocked ? '' : 'locked'}" onclick="${unlocked ? `showStory(${i})` : ''}">
+      <div class="story-title">${story.title[currentLang] || story.title.en} <span style="font-size:11px;">${levelStars}</span></div>
+      <div class="story-level">${knownCount}/${total} ${t('charsKnown')} ${!unlocked ? '· ' + t('locked') : ''}</div>
+      <div class="story-progress"><div class="fill" style="width:${pct}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('storiesContainer').innerHTML = html;
+}
+
+function showStory(idx) {
+  const story = STORIES[idx];
+  if (!story) return;
+  const learned = data.learning.learnedChinese;
+  const allPinyin = { ...CHAR_PINYIN, ...story.pinyin };
+  let textHtml = '';
+  for (const char of story.text) {
+    if (/[\s，。！？、；：""''（）]/.test(char)) {
+      textHtml += char;
+    } else if (learned.includes(char)) {
+      textHtml += `<span class="known">${char}</span>`;
+    } else {
+      const py = allPinyin[char] || '';
+      if (py) {
+        textHtml += `<ruby class="unknown">${char}<rt>${py}</rt></ruby>`;
+      } else {
+        textHtml += `<span class="unknown">${char}</span>`;
+      }
+    }
+  }
+  openModal(`
+    <h3>${story.title[currentLang] || story.title.en}</h3>
+    <div class="story-modal-text">${textHtml}</div>
+    <div style="font-size:12px;color:var(--text-light);margin-top:8px;">
+      <span class="known" style="font-size:14px;">绿</span> = ${t('markLearned')} &nbsp;
+      <span class="unknown" style="font-size:14px;">红</span> = pinyin
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancelBtn')}</button>
+    </div>
+  `);
+}
+
+// ==================== RECIPES ====================
+const RECIPES = [
+  { name:{en:'Tomato Egg Stir-Fry',zh:'番茄炒蛋'}, cat:'main', diff:1, time:15, emoji:'🍳', ing:['番茄 2个/2 tomatoes','鸡蛋 3个/3 eggs','盐/salt','油/oil','糖 少许/pinch of sugar'], steps:['打蛋搅拌/Beat eggs','热油炒蛋盛出/Scramble eggs, set aside','炒番茄加糖/Stir-fry tomatoes with sugar','加入蛋翻炒/Add eggs back, stir'], tags:['quick','protein'] },
+  { name:{en:'Steamed Egg Custard',zh:'蒸蛋'}, cat:'main', diff:1, time:15, emoji:'🥚', ing:['鸡蛋 2个/2 eggs','温水 150ml/150ml warm water','盐/salt','酱油 少许/soy sauce','香油/sesame oil'], steps:['打蛋加温水搅拌/Beat eggs with warm water','过滤蛋液/Strain mixture','盖保鲜膜蒸10分钟/Cover, steam 10 min','淋酱油香油/Drizzle soy sauce & sesame oil'], tags:['easy','soft'] },
+  { name:{en:'Egg Fried Rice',zh:'蛋炒饭'}, cat:'main', diff:1, time:10, emoji:'🍚', ing:['隔夜饭 1碗/1 bowl leftover rice','鸡蛋 2个/2 eggs','葱/scallion','盐/salt','油/oil'], steps:['热油炒蛋碎/Scramble eggs in oil','加冷饭大火翻炒/Add rice, stir-fry high heat','加盐调味/Season with salt','撒葱花/Top with scallion'], tags:['quick','staple'] },
+  { name:{en:'Pork & Veggie Dumplings',zh:'猪肉蔬菜水饺'}, cat:'main', diff:3, time:60, emoji:'🥟', ing:['饺子皮/dumpling wrappers','猪肉末 200g/200g ground pork','白菜/napa cabbage','姜/ginger','酱油/soy sauce','香油/sesame oil'], steps:['白菜切碎挤水/Chop cabbage, squeeze dry','肉末加调料搅拌/Mix pork with seasonings','包饺子/Wrap dumplings','水开下锅煮8分钟/Boil 8 min after water boils'], tags:['family','freezable'] },
+  { name:{en:'Sweet Potato Congee',zh:'红薯粥'}, cat:'soup', diff:1, time:30, emoji:'🍠', ing:['大米 半杯/½ cup rice','红薯 1个/1 sweet potato','水 5杯/5 cups water'], steps:['大米洗净泡20分钟/Wash rice, soak 20 min','红薯去皮切块/Peel & dice sweet potato','大火煮开转小火/Bring to boil, simmer','煮至粘稠/Cook until thick'], tags:['sweet','warm'] },
+  { name:{en:'Tomato Egg Drop Soup',zh:'番茄蛋花汤'}, cat:'soup', diff:1, time:15, emoji:'🍅', ing:['番茄 1个/1 tomato','鸡蛋 1个/1 egg','盐/salt','香油/sesame oil','葱/scallion'], steps:['番茄切块煮开/Dice tomato, boil','打蛋液淋入/Drizzle beaten egg','加盐调味/Season','撒葱花香油/Add scallion & sesame oil'], tags:['quick','light'] },
+  { name:{en:'Fish Congee',zh:'鱼粥'}, cat:'soup', diff:2, time:40, emoji:'🐟', ing:['大米 半杯/½ cup rice','鱼片 100g/100g fish fillet','姜丝/ginger','盐/salt','葱/scallion','胡椒粉/white pepper'], steps:['煮白粥至浓稠/Cook plain congee until thick','加姜丝/Add ginger','放入鱼片煮熟/Add fish, cook through','加盐胡椒葱花/Season & garnish'], tags:['nutritious','protein'] },
+  { name:{en:'Corn & Rib Soup',zh:'玉米排骨汤'}, cat:'soup', diff:2, time:60, emoji:'🌽', ing:['排骨 300g/300g ribs','玉米 1根/1 corn cob','胡萝卜 1个/1 carrot','盐/salt','姜/ginger'], steps:['排骨焯水/Blanch ribs','放入锅加水姜/Add water & ginger','大火煮开转小火1小时/Boil then simmer 1 hr','加玉米胡萝卜煮20分钟/Add corn & carrot 20 min','加盐/Salt to taste'], tags:['nutritious','slow'] },
+  { name:{en:'Noodle Soup',zh:'汤面'}, cat:'noodle', diff:1, time:15, emoji:'🍜', ing:['面条/noodles','鸡蛋 1个/1 egg','青菜/greens','盐/salt','酱油/soy sauce'], steps:['水开下面条/Boil noodles','另锅煮蛋和青菜/Cook egg & greens','面条盛入汤碗/Place noodles in bowl','加汤和配菜/Add broth & toppings'], tags:['quick','comforting'] },
+  { name:{en:'Fried Noodles',zh:'炒面'}, cat:'noodle', diff:1, time:15, emoji:'🍝', ing:['面条/noodles','鸡蛋/egg','青菜/greens','酱油/soy sauce','油/oil'], steps:['面条煮熟沥干/Boil noodles, drain','热油炒蛋和菜/Stir-fry egg & veggies','加入面条和酱油/Add noodles & soy sauce','大火翻炒均匀/Toss on high heat'], tags:['quick','kids-love'] },
+  { name:{en:'Dan Dan Noodles (Mild)',zh:'担担面（儿童版）'}, cat:'noodle', diff:2, time:20, emoji:'🍜', ing:['面条/noodles','猪肉末 100g/100g ground pork','芝麻酱 2勺/2 tbsp sesame paste','酱油/soy sauce','醋 少许/splash of vinegar','花生碎/crushed peanuts'], steps:['炒肉末至熟/Brown pork','调芝麻酱汁/Mix sesame paste sauce','煮面沥干/Boil noodles, drain','拌酱和肉末/Toss with sauce & pork'], tags:['savory','protein'] },
+  { name:{en:'Banana Pancakes',zh:'香蕉煎饼'}, cat:'breakfast', diff:1, time:15, emoji:'🥞', ing:['香蕉 1根/1 banana','鸡蛋 1个/1 egg','面粉 3勺/3 tbsp flour','牛奶 少许/splash of milk'], steps:['香蕉压成泥/Mash banana','加蛋面粉牛奶搅拌/Mix with egg, flour, milk','小火煎至两面金黄/Pan-fry until golden','可配蜂蜜/Serve with honey'], tags:['sweet','no-sugar-added'] },
+  { name:{en:'Egg & Veggie Muffins',zh:'蔬菜蛋杯'}, cat:'breakfast', diff:1, time:25, emoji:'🧁', ing:['鸡蛋 4个/4 eggs','胡萝卜碎/diced carrot','玉米粒/corn kernels','盐/salt','芝士碎/shredded cheese'], steps:['打蛋加蔬菜搅拌/Mix eggs with veggies','倒入马芬模具/Pour into muffin tin','撒芝士/Top with cheese','180°C烤20分钟/Bake 180°C for 20 min'], tags:['meal-prep','protein'] },
+  { name:{en:'Chinese Crepes',zh:'鸡蛋饼'}, cat:'breakfast', diff:1, time:10, emoji:'🫓', ing:['面粉 4勺/4 tbsp flour','鸡蛋 1个/1 egg','水/water','葱花/scallion','盐/salt'], steps:['面粉加水蛋搅成糊/Mix flour, water, egg into batter','加葱花盐/Add scallion & salt','平底锅摊薄煎/Spread thin in pan, cook','卷起切段/Roll up & slice'], tags:['quick','traditional'] },
+  { name:{en:'Steamed Buns (Mantou)',zh:'馒头'}, cat:'breakfast', diff:2, time:60, emoji:'🫘', ing:['面粉 300g/300g flour','酵母 3g/3g yeast','糖 20g/20g sugar','温水 150ml/150ml warm water'], steps:['酵母温水化开/Dissolve yeast in warm water','和面揉光滑/Knead dough until smooth','发酵1小时/Rise 1 hour','分剂蒸15分钟/Shape & steam 15 min'], tags:['staple','freezable'] },
+  { name:{en:'Stir-Fried Broccoli',zh:'炒西兰花'}, cat:'veggie', diff:1, time:10, emoji:'🥦', ing:['西兰花 1个/1 broccoli','蒜 2瓣/2 garlic cloves','盐/salt','油/oil'], steps:['西兰花切小朵焯水/Cut & blanch broccoli','热油爆香蒜/Sauté garlic','加入西兰花翻炒/Add broccoli, stir-fry','加盐调味/Season with salt'], tags:['quick','healthy'] },
+  { name:{en:'Braised Tofu',zh:'红烧豆腐'}, cat:'veggie', diff:1, time:20, emoji:'🧈', ing:['豆腐 1块/1 block tofu','酱油/soy sauce','糖/sugar','葱/scallion','油/oil'], steps:['豆腐切块煎至金黄/Cube tofu, pan-fry golden','加酱油糖水/Add soy sauce, sugar, water','小火焖5分钟/Simmer 5 min','撒葱花/Garnish with scallion'], tags:['protein','vegetarian'] },
+  { name:{en:'Garlic Spinach',zh:'蒜蓉菠菜'}, cat:'veggie', diff:1, time:8, emoji:'🥬', ing:['菠菜 1把/1 bunch spinach','蒜 3瓣/3 garlic cloves','盐/salt','油/oil'], steps:['菠菜洗净焯水/Wash & blanch spinach','热油爆蒜/Sauté garlic','放入菠菜翻炒/Add spinach, quick stir','加盐/Season'], tags:['quick','iron-rich'] },
+  { name:{en:'Carrot & Egg Stir-Fry',zh:'胡萝卜炒蛋'}, cat:'veggie', diff:1, time:10, emoji:'🥕', ing:['胡萝卜 1根/1 carrot','鸡蛋 2个/2 eggs','盐/salt','油/oil'], steps:['胡萝卜切丝/Julienne carrot','热油炒蛋碎盛出/Scramble eggs, set aside','炒胡萝卜丝/Stir-fry carrot','加入蛋翻炒/Add eggs back'], tags:['quick','vitamin-a'] },
+  { name:{en:'Mashed Potato',zh:'土豆泥'}, cat:'veggie', diff:1, time:20, emoji:'🥔', ing:['土豆 2个/2 potatoes','牛奶 少许/splash of milk','黄油/butter','盐/salt'], steps:['土豆去皮切块煮熟/Peel, dice, boil potatoes','沥水压成泥/Drain & mash','加牛奶黄油搅拌/Mix in milk & butter','加盐调味/Season'], tags:['soft','toddler-friendly'] },
+  { name:{en:'Steamed Chicken',zh:'蒸鸡肉'}, cat:'main', diff:1, time:25, emoji:'🍗', ing:['鸡腿肉 200g/200g chicken thigh','姜/ginger','葱/scallion','盐/salt','酱油/soy sauce'], steps:['鸡肉切块加姜葱腌15分钟/Marinate chicken with ginger & scallion','放入盘中/Place in dish','大火蒸15分钟/Steam 15 min on high','淋酱油/Drizzle soy sauce'], tags:['simple','protein'] },
+  { name:{en:'Curry Chicken Rice',zh:'咖喱鸡饭'}, cat:'main', diff:2, time:35, emoji:'🍛', ing:['鸡腿肉 200g/200g chicken','土豆 1个/1 potato','胡萝卜 1个/1 carrot','咖喱块 2块/2 curry cubes','米饭/rice'], steps:['鸡肉土豆胡萝卜切块/Dice chicken & veggies','炒鸡肉变色/Brown chicken','加水煮软蔬菜/Add water, cook veggies','加咖喱块搅拌/Add curry cubes, stir','配米饭/Serve with rice'], tags:['one-pot','kids-love'] },
+  { name:{en:'Hainanese Chicken Rice',zh:'海南鸡饭'}, cat:'main', diff:2, time:45, emoji:'🍚', ing:['鸡腿 2个/2 chicken legs','大米/rice','姜/ginger','蒜/garlic','香油/sesame oil','酱油/soy sauce'], steps:['整鸡腿煮熟/Poach whole chicken legs','鸡汤煮饭/Cook rice in chicken broth','鸡肉切块/Slice chicken','配姜蓉酱油/Serve with ginger sauce'], tags:['classic','singaporean'] },
+  { name:{en:'Braised Pork Belly',zh:'红烧肉'}, cat:'main', diff:2, time:60, emoji:'🥩', ing:['五花肉 300g/300g pork belly','酱油/soy sauce','糖/sugar','姜/ginger','八角/star anise'], steps:['五花肉切块焯水/Cube & blanch pork','炒糖色/Caramelize sugar','加肉翻炒/Add pork, coat','加酱油水焖45分钟/Add soy sauce, water, braise 45 min'], tags:['classic','rich'] },
+  { name:{en:'Steamed Fish',zh:'清蒸鱼'}, cat:'main', diff:2, time:20, emoji:'🐟', ing:['鱼 1条/1 whole fish','姜丝/ginger','葱丝/scallion','酱油/soy sauce','油/oil'], steps:['鱼洗净放盘/Clean fish, place on plate','铺姜丝/Top with ginger','大火蒸10分钟/Steam 10 min','淋热油酱油葱丝/Pour hot oil, soy sauce, scallion'], tags:['healthy','protein'] },
+  { name:{en:'Pork Meatballs',zh:'猪肉丸子'}, cat:'main', diff:2, time:30, emoji:'🧆', ing:['猪肉末 300g/300g ground pork','葱姜末/minced scallion & ginger','酱油/soy sauce','淀粉/starch','盐/salt'], steps:['肉末加调料搅拌/Mix pork with seasonings','搓成小丸子/Roll into small balls','水开下锅煮/Drop into boiling water','煮至浮起即熟/Cook until they float'], tags:['freezable','protein'] },
+  { name:{en:'Fried Rice Cake',zh:'炒年糕'}, cat:'main', diff:2, time:15, emoji:'🍙', ing:['年糕/rice cakes','白菜/napa cabbage','酱油/soy sauce','糖/sugar','油/oil'], steps:['年糕切片泡软/Slice rice cakes, soak','炒白菜/Stir-fry cabbage','加年糕和酱油糖/Add rice cakes, soy sauce, sugar','翻炒至软糯/Cook until soft & chewy'], tags:['chewy','kids-love'] },
+  { name:{en:'Wonton Soup',zh:'馄饨汤'}, cat:'soup', diff:2, time:40, emoji:'🥟', ing:['馄饨皮/wonton wrappers','猪肉末 150g/150g ground pork','虾仁 50g/50g shrimp','紫菜/seaweed','葱/scallion'], steps:['肉末虾仁调馅/Mix pork & shrimp filling','包馄饨/Wrap wontons','水开下锅煮/Boil until they float','加紫菜葱花汤/Serve in broth with seaweed & scallion'], tags:['comforting','protein'] },
+  { name:{en:'Millet Congee',zh:'小米粥'}, cat:'soup', diff:1, time:30, emoji:'🥣', ing:['小米 半杯/½ cup millet','水 5杯/5 cups water','红枣 3个/3 red dates'], steps:['小米洗净/Wash millet','大火煮开/Bring to boil','转小火加红枣/Simmer, add dates','煮30分钟至浓稠/Cook 30 min until thick'], tags:['digestive','warm'] },
+  { name:{en:'Egg Pancake Roll',zh:'蛋饼卷'}, cat:'snack', diff:1, time:10, emoji:'🌯', ing:['鸡蛋 2个/2 eggs','面粉 2勺/2 tbsp flour','火腿/ham','生菜/lettuce'], steps:['蛋面粉搅成糊/Mix egg & flour','摊成薄饼/Make thin crepe','放火腿生菜/Add ham & lettuce','卷起切段/Roll & slice'], tags:['quick','portable'] },
+  { name:{en:'Steamed Cake',zh:'蒸蛋糕'}, cat:'snack', diff:2, time:30, emoji:'🍰', ing:['鸡蛋 3个/3 eggs','面粉 80g/80g flour','糖 40g/40g sugar','牛奶 30ml/30ml milk'], steps:['蛋白打至硬性发泡/Whip egg whites stiff','蛋黄加糖面粉牛奶/Mix yolks, sugar, flour, milk','轻拌蛋白/Fold in egg whites','蒸20分钟/Steam 20 min'], tags:['sweet','no-oven'] },
+  { name:{en:'Seaweed Rice Balls',zh:'海苔饭团'}, cat:'snack', diff:1, time:10, emoji:'🍙', ing:['米饭/rice','海苔/seaweed sheets','盐/salt','芝麻/sesame seeds'], steps:['米饭加少许盐/Mix rice with pinch of salt','手沾水捏成团/Wet hands, shape into balls','撒芝麻/Sprinkle sesame','包海苔/Wrap with seaweed'], tags:['portable','fun'] },
+  { name:{en:'Fruit Yogurt Bowl',zh:'水果酸奶碗'}, cat:'snack', diff:1, time:5, emoji:'🥣', ing:['酸奶/yogurt','香蕉/banana','蓝莓/blueberries','燕麦/granola'], steps:['酸奶倒入碗中/Pour yogurt in bowl','切水果摆上/Slice fruit, arrange','撒燕麦/Top with granola','即可食用/Serve immediately'], tags:['no-cook','healthy'] },
+  { name:{en:'Mini Siew Mai',zh:'迷你烧卖'}, cat:'snack', diff:2, time:30, emoji:'🥟', ing:['猪肉末 200g/200g ground pork','虾仁 50g/50g shrimp','烧卖皮/siew mai wrappers','酱油/soy sauce','姜末/minced ginger'], steps:['虾仁切碎加肉末/Chop shrimp, mix with pork','加酱油姜拌匀/Add soy sauce & ginger','包入烧卖皮/Wrap in siew mai skins','大火蒸10分钟/Steam 10 min'], tags:['dim-sum','freezable'] },
+  { name:{en:'Corn Fritters',zh:'玉米饼'}, cat:'snack', diff:1, time:15, emoji:'🌽', ing:['玉米粒 1杯/1 cup corn','鸡蛋 1个/1 egg','面粉 3勺/3 tbsp flour','盐/salt'], steps:['玉米加蛋面粉搅拌/Mix corn, egg, flour','加盐调味/Season with salt','小火煎至两面金黄/Pan-fry until golden','沥油即可/Drain & serve'], tags:['sweet','crispy'] },
+  { name:{en:'Macaroni Soup',zh:'通心粉汤'}, cat:'noodle', diff:1, time:20, emoji:'🍝', ing:['通心粉/macaroni','火腿/ham','青菜/greens','鸡汤/chicken broth'], steps:['煮通心粉至软/Boil macaroni','鸡汤加火腿煮/Heat broth with ham','加青菜/Add greens','加入通心粉/Add macaroni to soup'], tags:['comforting','easy'] },
+  { name:{en:'Zucchini Fritters',zh:'西葫芦饼'}, cat:'veggie', diff:1, time:15, emoji:'🥒', ing:['西葫芦 1个/1 zucchini','鸡蛋 1个/1 egg','面粉/flour','盐/salt'], steps:['西葫芦擦丝挤水/Grate zucchini, squeeze dry','加蛋面粉盐拌匀/Mix with egg, flour, salt','小火煎至金黄/Pan-fry until golden','翻面煎熟/Flip & cook through'], tags:['hidden-veggie','crispy'] },
+  { name:{en:'Pumpkin Congee',zh:'南瓜粥'}, cat:'soup', diff:1, time:30, emoji:'🎃', ing:['南瓜 200g/200g pumpkin','大米 半杯/½ cup rice','水/water'], steps:['南瓜去皮切块/Peel & dice pumpkin','大米泡水/Soak rice','一起煮至浓稠/Cook together until thick','南瓜煮化即可/Pumpkin should melt into congee'], tags:['sweet','vitamin-a'] },
+];
+
+let recipeFilter = 'all';
+
+function renderRecipes() {
+  const searchVal = (document.getElementById('recipeSearchInput')?.value || '').toLowerCase();
+  // Filters
+  const cats = ['all','main','soup','noodle','breakfast','veggie','snack'];
+  const catLabels = { all:t('allCat'), main:t('mainDish'), soup:t('soupCat'), noodle:t('noodleCat'), breakfast:t('bfastCat'), veggie:t('vegCat'), snack:t('snackCat') };
+  let filterHtml = cats.map(c => `<button class="filter-btn ${recipeFilter===c?'active':''}" onclick="recipeFilter='${c}';renderRecipes()">${catLabels[c]}</button>`).join('');
+  document.getElementById('recipeFilters').innerHTML = filterHtml;
+  // Filter recipes
+  let filtered = RECIPES.filter(r => {
+    if (recipeFilter !== 'all' && r.cat !== recipeFilter) return false;
+    if (searchVal) {
+      const n = (r.name[currentLang] || r.name.en).toLowerCase();
+      const nOther = (r.name[currentLang === 'en' ? 'zh' : 'en'] || '').toLowerCase();
+      if (!n.includes(searchVal) && !nOther.includes(searchVal)) return false;
+    }
+    return true;
+  });
+  let html = '';
+  filtered.forEach((r, i) => {
+    const realIdx = RECIPES.indexOf(r);
+    const stars = '⭐'.repeat(r.diff);
+    html += `<div class="recipe-item" onclick="showRecipeDetail(${realIdx})">
+      <div class="recipe-emoji">${r.emoji}</div>
+      <div class="recipe-info">
+        <div class="recipe-name">${r.name[currentLang] || r.name.en}</div>
+        <div class="recipe-meta">${stars} · ${r.time}${t('mins')} · ${catLabels[r.cat] || r.cat}</div>
+      </div>
+    </div>`;
+  });
+  if (!html) html = `<div style="text-align:center;color:var(--text-light);padding:16px;font-size:13px;">No recipes found</div>`;
+  document.getElementById('recipeList').innerHTML = html;
+}
+
+function showRecipeDetail(idx) {
+  const r = RECIPES[idx];
+  if (!r) return;
+  const isZh = currentLang === 'zh';
+  const getName = (biStr) => { const parts = biStr.split('/'); return isZh ? (parts[0] || biStr) : (parts[1] || parts[0] || biStr); };
+  let ingHtml = r.ing.map(i => `<li>${getName(i)}</li>`).join('');
+  let stepsHtml = r.steps.map((s, i) => `<li>${getName(s)}</li>`).join('');
+  const searchName = encodeURIComponent(r.name.zh);
+  openModal(`
+    <h3>${r.emoji} ${r.name[currentLang] || r.name.en}</h3>
+    <div style="font-size:12px;color:var(--text-light);">${'⭐'.repeat(r.diff)} · ${r.time}${t('mins')}</div>
+    <div class="recipe-detail-section">
+      <h4>${t('ingredients')}</h4>
+      <ul>${ingHtml}</ul>
+    </div>
+    <div class="recipe-detail-section">
+      <h4>${t('steps')}</h4>
+      <ol>${stepsHtml}</ol>
+    </div>
+    <div class="modal-actions">
+      <a href="https://www.xiachufang.com/search/?keyword=${searchName}" target="_blank" class="btn btn-accent btn-block" style="text-decoration:none;">${t('searchOnline')}</a>
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancelBtn')}</button>
+    </div>
+  `);
+}
+
+function getRecipeForMeal(mealName) {
+  if (!mealName) return null;
+  const lower = mealName.toLowerCase();
+  return RECIPES.find(r => {
+    const en = (r.name.en || '').toLowerCase();
+    const zh = r.name.zh || '';
+    return lower.includes(en) || lower.includes(zh) || en.includes(lower) || zh.includes(lower);
+  });
+}
+
 // ==================== DATA MODEL ====================
 const DEFAULT_DATA = {
   currentSleepMinutes: 23 * 60, // 11:00 PM in minutes from midnight
@@ -760,35 +1453,35 @@ const DEFAULT_DATA = {
 
   schedule: {
     weekday: [
-      { time: "07:30", activity: "Wake up & morning routine", icon: "☀️" },
-      { time: "08:00", activity: "Breakfast", icon: "🥣", mealType: "breakfast" },
-      { time: "09:00", activity: "Go to school", icon: "🏫" },
-      { time: "16:30", activity: "Pick up from school", icon: "🎒" },
-      { time: "17:00", activity: "Playground / Swimming", icon: "🏊" },
-      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner" },
-      { time: "19:15", activity: "Shower time", icon: "🚿" },
-      { time: "19:30", activity: "Learning time", icon: "📚", type: "learning" },
-      { time: "20:15", activity: "Free play / wind-down", icon: "🧸" },
-      { time: "21:00", activity: "Read books", icon: "📖" },
-      { time: "21:30", activity: "Bedtime routine", icon: "🌙" },
-      { time: "22:00", activity: "Sleep", icon: "😴" },
+      { time: "07:30", activity: "Wake up & morning routine", icon: "☀️", nameKey: "wakeUpMorning" },
+      { time: "08:00", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:00", activity: "Go to school", icon: "🏫", nameKey: "goToSchool" },
+      { time: "16:30", activity: "Pick up from school", icon: "🎒", nameKey: "pickUpSchool" },
+      { time: "17:00", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Learning time", icon: "📚", type: "learning", nameKey: "learningTime" },
+      { time: "20:15", activity: "Free play / wind-down", icon: "🧸", nameKey: "freePlayWindDown" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
     ],
     weekend: [
-      { time: "08:00", activity: "Wake up", icon: "☀️" },
-      { time: "08:30", activity: "Breakfast", icon: "🥣", mealType: "breakfast" },
-      { time: "09:30", activity: "Free play / family time", icon: "🏠" },
-      { time: "10:00", activity: "Sunday Outing (if Sunday)", icon: "🌳" },
-      { time: "12:30", activity: "Lunch", icon: "🍱" },
-      { time: "13:00", activity: "Nap / quiet time", icon: "😴" },
-      { time: "15:00", activity: "Snack", icon: "🍎" },
-      { time: "15:30", activity: "Playground / Swimming", icon: "🏊" },
-      { time: "17:30", activity: "Learning time (light)", icon: "📚", type: "learning" },
-      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner" },
-      { time: "19:15", activity: "Shower time", icon: "🚿" },
-      { time: "19:30", activity: "Free play / family time", icon: "🧸" },
-      { time: "21:00", activity: "Read books", icon: "📖" },
-      { time: "21:30", activity: "Bedtime routine", icon: "🌙" },
-      { time: "22:00", activity: "Sleep", icon: "😴" },
+      { time: "08:00", activity: "Wake up", icon: "☀️", nameKey: "wakeUp" },
+      { time: "08:30", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:30", activity: "Free play / family time", icon: "🏠", nameKey: "familyTime" },
+      { time: "10:00", activity: "Sunday Outing (if Sunday)", icon: "🌳", nameKey: "sundayOuting" },
+      { time: "12:30", activity: "Lunch", icon: "🍱", nameKey: "lunchTime" },
+      { time: "13:00", activity: "Nap / quiet time", icon: "😴", nameKey: "napTime" },
+      { time: "15:00", activity: "Snack", icon: "🍎", nameKey: "snackTime" },
+      { time: "15:30", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "17:30", activity: "Learning time (light)", icon: "📚", type: "learning", nameKey: "lightLearning" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Free play / family time", icon: "🧸", nameKey: "familyTime" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
     ],
   },
 
@@ -977,6 +1670,8 @@ function saveData() {
 // ==================== UTILITIES ====================
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_ZH = ['日','一','二','三','四','五','六'];
+const DAYS_FULL_ZH = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
 
 function getWeekKey(date) {
   const d = new Date(date);
@@ -987,6 +1682,9 @@ function getWeekKey(date) {
 }
 
 function formatDate(date) {
+  if (currentLang === 'zh') {
+    return `${DAYS_FULL_ZH[date.getDay()]}，${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`;
+  }
   return `${DAYS_FULL[date.getDay()]}, ${date.toLocaleDateString('en-SG', { day:'numeric', month:'short', year:'numeric' })}`;
 }
 
@@ -1050,7 +1748,7 @@ document.getElementById('editModal').addEventListener('click', function(e) {
 function renderToday() {
   document.getElementById('currentDate').textContent = formatDate(selectedDate);
   const weekend = isWeekend(selectedDate);
-  document.getElementById('dayType').textContent = weekend ? 'Weekend' : 'Weekday';
+  document.getElementById('dayType').textContent = weekend ? t('weekendLabel') : t('weekdayLabel');
   document.getElementById('dayType').className = 'badge ' + (weekend ? 'badge-yellow' : 'badge-green');
 
   const schedule = weekend ? data.schedule.weekend : data.schedule.weekday;
@@ -1065,11 +1763,12 @@ function renderToday() {
     const isPast = isToday && nowMin >= nextMin;
     const cls = isCurrent ? 'current' : (isPast ? 'past' : '');
 
+    const activityName = item.nameKey ? t(item.nameKey) : item.activity;
     html += `<div class="timeline-item ${cls}" onclick="editScheduleItem('${weekend ? 'weekend' : 'weekday'}', ${idx})">
       <div class="time-col">${item.time}</div>
       <div class="activity-icon">${item.icon || '📌'}</div>
       <div class="activity-col">
-        <div class="activity-name">${item.activity}</div>
+        <div class="activity-name">${activityName}</div>
         ${item.mealType ? `<div class="activity-detail">${getTodayMeal(item.mealType)}</div>` : ''}
         ${item.type === 'learning' ? `<div class="activity-detail">${getTodayLearningSummary()}</div>` : ''}
       </div>
@@ -1084,19 +1783,25 @@ function renderToday() {
   const menu = data.weeklyMenu[weekKey];
   if (menu && menu[dayKey]) {
     const m = menu[dayKey];
+    const bfRecipe = getRecipeForMeal(m.breakfast);
+    const dnRecipe = getRecipeForMeal(m.dinner);
+    const bfBtn = bfRecipe ? `<div style="margin-top:4px;"><button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(bfRecipe)})">${t('viewRecipe')}</button></div>` : '';
+    const dnBtn = dnRecipe ? `<div style="margin-top:4px;"><button class="btn btn-outline btn-small" onclick="showRecipeDetail(${RECIPES.indexOf(dnRecipe)})">${t('viewRecipe')}</button></div>` : '';
     document.getElementById('todayMeals').innerHTML = `
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:120px;padding:8px;background:#FFF8E1;border-radius:8px;">
-          <div style="font-size:11px;font-weight:600;color:#F57F17;">Breakfast</div>
+          <div style="font-size:11px;font-weight:600;color:#F57F17;">${t('breakfast')}</div>
           <div style="font-size:13px;margin-top:2px;">${m.breakfast || '—'}</div>
+          ${bfBtn}
         </div>
         <div style="flex:1;min-width:120px;padding:8px;background:#E8F5E8;border-radius:8px;">
-          <div style="font-size:11px;font-weight:600;color:#2E7D32;">Dinner</div>
+          <div style="font-size:11px;font-weight:600;color:#2E7D32;">${t('dinner')}</div>
           <div style="font-size:13px;margin-top:2px;">${m.dinner || '—'}</div>
+          ${dnBtn}
         </div>
       </div>`;
   } else {
-    document.getElementById('todayMeals').innerHTML = '<div style="font-size:13px;color:var(--text-light);">No meal plan set. Go to Meals tab to generate.</div>';
+    document.getElementById('todayMeals').innerHTML = `<div style="font-size:13px;color:var(--text-light);">${t('noMealPlan')}</div>`;
   }
 
   // Today's learning
@@ -1108,7 +1813,7 @@ function getTodayMeal(type) {
   const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
   const menu = data.weeklyMenu[weekKey];
   if (menu && menu[dayKey] && menu[dayKey][type]) return menu[dayKey][type];
-  return 'Not planned';
+  return t('notPlanned');
 }
 
 function getTodayLearningSummary() {
@@ -1129,10 +1834,10 @@ function renderTodayLearnWidget() {
   let html = `<div class="learn-card">
     <div class="learn-title">${phase.name}</div>
     <div class="learn-desc" style="margin-top:6px;">
-      <strong>10 min:</strong> Letters — ${phase.letters.join(', ')}<br>
-      <strong>10 min:</strong> Chinese — ${phase.chinese.join(' ')}<br>
-      <strong>10 min:</strong> Numbers — ${phase.numbers.join(', ')}<br>
-      <strong>Activity:</strong> ${acts[dayIdx % acts.length]}
+      <strong>10 min:</strong> ${t('lettersLabel')} — ${phase.letters.join(', ')}<br>
+      <strong>10 min:</strong> ${t('chineseLabel')} — ${phase.chinese.join(' ')}<br>
+      <strong>10 min:</strong> ${t('numbersLabel')} — ${phase.numbers.join(', ')}<br>
+      <strong>${t('activityLabel')}:</strong> ${acts[dayIdx % acts.length]}
     </div>
   </div>`;
   document.getElementById('todayLearn').innerHTML = html;
@@ -1147,17 +1852,18 @@ function renderMeals() {
   let html = '<div class="week-grid">';
   // Header row
   html += '<div class="cell header-cell"></div>';
-  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+  const dayLabels = currentLang === 'zh' ? ['一','二','三','四','五','六','日'] : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  dayLabels.forEach(d => {
     html += `<div class="cell header-cell">${d}</div>`;
   });
   // Breakfast row
-  html += '<div class="cell row-header">Bfast</div>';
+  html += `<div class="cell row-header">${t('bfast')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
     const meal = menu[d]?.breakfast || '';
     html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','breakfast')">${meal || '+'}</div>`;
   });
   // Dinner row
-  html += '<div class="cell row-header">Dinner</div>';
+  html += `<div class="cell row-header">${t('dinner')}</div>`;
   ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
     const meal = menu[d]?.dinner || '';
     html += `<div class="cell ${meal ? 'filled' : 'empty'}" onclick="editMeal('${weekKey}','${d}','dinner')">${meal || '+'}</div>`;
@@ -1172,6 +1878,9 @@ function renderMeals() {
 
   // Meal history
   renderMealHistory();
+
+  // Recipes
+  renderRecipes();
 }
 
 function renderFoodList(type, containerId) {
@@ -1256,17 +1965,17 @@ function editMeal(weekKey, day, type) {
   ).join('');
 
   openModal(`
-    <h3>Pick ${type} for ${day.charAt(0).toUpperCase() + day.slice(1)}</h3>
+    <h3>${t('pickMealTitle').replace('{type}',type).replace('{day}',day.charAt(0).toUpperCase()+day.slice(1))}</h3>
     ${optionsHtml}
     <div style="margin-top:12px;">
-      <label>Or type custom:</label>
+      <label>${t('orTypeCustom')}</label>
       <div class="add-input-row">
-        <input id="customMealInput" placeholder="Custom meal..." value="${current}">
-        <button class="btn btn-primary btn-small" onclick="selectMealCustom('${weekKey}','${day}','${type}')">Set</button>
+        <input id="customMealInput" placeholder="${t('customMealPH')}" value="${current}">
+        <button class="btn btn-primary btn-small" onclick="selectMealCustom('${weekKey}','${day}','${type}')">${t('setBtn')}</button>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
     </div>
   `);
 }
@@ -1320,9 +2029,9 @@ function renderLearn() {
     document.getElementById('phaseInfo').innerHTML = `
       <div style="font-size:13px;margin-bottom:6px;"><strong>${phase.duration}</strong> — ${phase.desc}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <div class="badge badge-green">Letters: ${phase.letters.join(' ')}</div>
-        <div class="badge badge-purple">Chinese: ${phase.chinese.join(' ')}</div>
-        <div class="badge badge-yellow">Numbers: ${phase.numbers.join(' ')}</div>
+        <div class="badge badge-green">${t('lettersLabel')}: ${phase.letters.join(' ')}</div>
+        <div class="badge badge-purple">${t('chineseLabel')}: ${phase.chinese.join(' ')}</div>
+        <div class="badge badge-yellow">${t('numbersLabel')}: ${phase.numbers.join(' ')}</div>
       </div>
     `;
   }
@@ -1349,9 +2058,16 @@ function renderLearn() {
     const learned = data.learning.learnedChinese.includes(c);
     const isCurrent = phase && phase.chinese.includes(c);
     const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
-    chineseHtml += `<div class="char-cell ${cls}" onclick="toggleLearned('chinese','${c}')">${c}</div>`;
+    const svgEl = renderCharSVG(c, 24);
+    chineseHtml += `<div class="char-cell ${cls}" onclick="showCharDetail('${c}')">
+      ${svgEl ? `<div class="char-svg">${svgEl}</div>` : ''}
+      <div class="char-text">${c}</div>
+    </div>`;
   });
   document.getElementById('chineseGrid').innerHTML = chineseHtml;
+
+  // Stories
+  renderStories();
 
   // Number grid
   let numberHtml = '';
@@ -1373,13 +2089,13 @@ function renderTodayActivities() {
 
   let html = `
     <div class="learn-card" style="border-left-color:#4A90D9;background:#E8F1FB;">
-      <div class="learn-title" style="color:#1565C0;">Session Plan (30-45 min)</div>
+      <div class="learn-title" style="color:#1565C0;">${t('sessionPlan')}</div>
       <div class="learn-desc" style="color:#1976D2;">
-        <div style="margin:4px 0;">1. <strong>Review</strong> (5 min) — Quick review of previously learned items</div>
-        <div style="margin:4px 0;">2. <strong>Letters</strong> (10 min) — Focus: ${phase.letters.join(', ')}</div>
-        <div style="margin:4px 0;">3. <strong>Chinese</strong> (10 min) — Focus: ${phase.chinese.join(' ')}</div>
-        <div style="margin:4px 0;">4. <strong>Numbers</strong> (10 min) — Focus: ${phase.numbers.join(', ')}</div>
-        <div style="margin:4px 0;">5. <strong>Activity</strong> (5-10 min) — ${acts[dayIdx % acts.length]}</div>
+        <div style="margin:4px 0;">1. <strong>${t('review')}</strong> (5 min)</div>
+        <div style="margin:4px 0;">2. <strong>${t('lettersLabel')}</strong> (10 min) — ${t('focus')}: ${phase.letters.join(', ')}</div>
+        <div style="margin:4px 0;">3. <strong>${t('chineseLabel')}</strong> (10 min) — ${t('focus')}: ${phase.chinese.join(' ')}</div>
+        <div style="margin:4px 0;">4. <strong>${t('numbersLabel')}</strong> (10 min) — ${t('focus')}: ${phase.numbers.join(', ')}</div>
+        <div style="margin:4px 0;">5. <strong>${t('activityLabel')}</strong> (5-10 min) — ${acts[dayIdx % acts.length]}</div>
       </div>
     </div>`;
   document.getElementById('todayActivities').innerHTML = html;
@@ -1407,12 +2123,12 @@ function toggleTimer() {
   if (timerRunning) {
     clearInterval(timerInterval);
     timerRunning = false;
-    document.getElementById('timerBtn').textContent = 'Resume';
-    document.getElementById('timerLabel').textContent = 'Paused';
+    document.getElementById('timerBtn').textContent = t('resumeBtn');
+    document.getElementById('timerLabel').textContent = t('pausedLabel');
   } else {
     timerRunning = true;
-    document.getElementById('timerBtn').textContent = 'Pause';
-    document.getElementById('timerLabel').textContent = 'Learning in progress...';
+    document.getElementById('timerBtn').textContent = t('pauseBtn');
+    document.getElementById('timerLabel').textContent = t('learningInProgress');
     timerInterval = setInterval(() => {
       timerSeconds++;
       const m = Math.floor(timerSeconds / 60);
@@ -1420,11 +2136,11 @@ function toggleTimer() {
       document.getElementById('timerDisplay').textContent =
         `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
       if (timerSeconds === 30 * 60) {
-        document.getElementById('timerLabel').textContent = '30 min reached — great session!';
+        document.getElementById('timerLabel').textContent = t('min30reached');
         document.getElementById('timerDisplay').style.color = 'var(--green)';
       }
       if (timerSeconds === 45 * 60) {
-        document.getElementById('timerLabel').textContent = '45 min — time to wrap up!';
+        document.getElementById('timerLabel').textContent = t('min45wrapUp');
         document.getElementById('timerDisplay').style.color = 'var(--accent)';
       }
     }, 1000);
@@ -1437,8 +2153,8 @@ function resetTimer() {
   timerSeconds = 0;
   document.getElementById('timerDisplay').textContent = '00:00';
   document.getElementById('timerDisplay').style.color = 'var(--purple)';
-  document.getElementById('timerBtn').textContent = 'Start';
-  document.getElementById('timerLabel').textContent = 'Ready to start';
+  document.getElementById('timerBtn').textContent = t('start');
+  document.getElementById('timerLabel').textContent = t('readyToStart');
 }
 
 // ==================== RENDER: WEEKEND ====================
@@ -1464,7 +2180,7 @@ function renderWeekend() {
           ${plan.notes ? `<div style="font-size:12px;margin-top:4px;color:var(--text);">${plan.notes}</div>` : ''}
         </div>
       </div>
-      <button class="btn btn-outline btn-small" onclick="clearSundayPlan('${sundayKey}')">Change Plan</button>
+      <button class="btn btn-outline btn-small" onclick="clearSundayPlan('${sundayKey}')">${t('changePlan')}</button>
     `;
   }
 
@@ -1476,7 +2192,7 @@ function renderWeekend() {
       <div class="venue-info">
         <div class="venue-name">${v.name}</div>
         <div class="venue-desc">${v.desc}</div>
-        ${v.lastVisited ? `<div class="venue-last">Last visited: ${v.lastVisited}</div>` : ''}
+        ${v.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${v.lastVisited}</div>` : ''}
       </div>
     </div>`;
   });
@@ -1490,7 +2206,7 @@ function renderWeekend() {
       <div class="venue-info">
         <div class="venue-name">${v.name}</div>
         <div class="venue-desc">${v.desc}</div>
-        ${v.lastVisited ? `<div class="venue-last">Last visited: ${v.lastVisited}</div>` : ''}
+        ${v.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${v.lastVisited}</div>` : ''}
       </div>
     </div>`;
   });
@@ -1506,13 +2222,13 @@ function renderWeekend() {
 function setSundayPlan(type, idx, sundayKey) {
   const venue = data.venues[type][idx];
   openModal(`
-    <h3>Plan: ${venue.name}</h3>
+    <h3>${t('planLabel')} ${venue.name}</h3>
     <p style="font-size:13px;color:var(--text-light);">${venue.desc}</p>
-    <label>Notes (optional):</label>
-    <textarea id="venueNotes" rows="3" placeholder="What to bring, timing, etc..."></textarea>
+    <label>${t('notesOptional')}</label>
+    <textarea id="venueNotes" rows="3" placeholder="..."></textarea>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmSundayPlan('${type}',${idx},'${sundayKey}')">Set Plan</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="confirmSundayPlan('${type}',${idx},'${sundayKey}')">${t('setPlan')}</button>
     </div>
   `);
 }
@@ -1556,12 +2272,12 @@ function suggestSundayPlan() {
         <div class="venue-info">
           <div class="venue-name">${pick.name}</div>
           <div class="venue-desc">${pick.desc}</div>
-          ${pick.lastVisited ? `<div class="venue-last">Last visited: ${pick.lastVisited}</div>` : '<div class="venue-last">Not visited yet!</div>'}
+          ${pick.lastVisited ? `<div class="venue-last">${t('lastVisitedLabel')}: ${pick.lastVisited}</div>` : `<div class="venue-last">${t('notVisitedYet')}</div>`}
         </div>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-outline" onclick="closeModal();suggestSundayPlan();">Try Another</button>
-        <button class="btn btn-primary" onclick="closeModal()">Pick from List</button>
+        <button class="btn btn-outline" onclick="closeModal();suggestSundayPlan();">${t('tryAnother')}</button>
+        <button class="btn btn-primary" onclick="closeModal()">${t('pickFromList')}</button>
       </div>
     `);
   }
@@ -1569,16 +2285,16 @@ function suggestSundayPlan() {
 
 function openCustomEvent() {
   openModal(`
-    <h3>Add Custom Event</h3>
-    <label>Event Name:</label>
-    <input id="eventName" placeholder="e.g., Kids Festival at Sentosa">
-    <label>Date:</label>
+    <h3>${t('addCustomEventTitle')}</h3>
+    <label>${t('eventNameLabel')}</label>
+    <input id="eventName" placeholder="${currentLang==='zh'?'例如：圣淘沙儿童节':'e.g., Kids Festival at Sentosa'}">
+    <label>${t('dateLabel')}</label>
     <input id="eventDate" type="date">
-    <label>Details:</label>
-    <textarea id="eventDetails" rows="3" placeholder="Time, location, what to bring..."></textarea>
+    <label>${t('detailsLabel')}</label>
+    <textarea id="eventDetails" rows="3" placeholder="..."></textarea>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="addCustomEvent()">Add Event</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="addCustomEvent()">${t('addEventBtn')}</button>
     </div>
   `);
 }
@@ -1633,7 +2349,7 @@ function renderSettings() {
   document.getElementById('currentSleepTime').textContent = minutesToTime(current);
   document.getElementById('sleepProgress').style.width = progress + '%';
   document.getElementById('sleepProgressText').textContent =
-    progress >= 100 ? 'Target reached!' : `${Math.round(progress)}% to goal`;
+    progress >= 100 ? t('targetReached') : `${Math.round(progress)}% ${t('toGoal')}`;
 
   // Schedule editor
   renderScheduleEditor();
@@ -1648,23 +2364,25 @@ function adjustSleep(delta) {
 }
 
 function renderScheduleEditor() {
-  let html = '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">Weekday Schedule</div>';
+  let html = `<div style="font-size:13px;font-weight:600;margin-bottom:8px;">${t('weekdaySchedule')}</div>`;
   data.schedule.weekday.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
     html += `<div class="toggle-row" onclick="editScheduleItem('weekday',${idx})">
       <div>
         <span style="font-weight:600;color:var(--primary);min-width:50px;display:inline-block;">${item.time}</span>
-        <span>${item.icon || ''} ${item.activity}</span>
+        <span>${item.icon || ''} ${actName}</span>
       </div>
       <span style="color:var(--text-light);font-size:16px;">✏️</span>
     </div>`;
   });
 
-  html += '<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">Weekend Schedule</div>';
+  html += `<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">${t('weekendSchedule')}</div>`;
   data.schedule.weekend.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
     html += `<div class="toggle-row" onclick="editScheduleItem('weekend',${idx})">
       <div>
         <span style="font-weight:600;color:var(--primary);min-width:50px;display:inline-block;">${item.time}</span>
-        <span>${item.icon || ''} ${item.activity}</span>
+        <span>${item.icon || ''} ${actName}</span>
       </div>
       <span style="color:var(--text-light);font-size:16px;">✏️</span>
     </div>`;
@@ -1676,17 +2394,17 @@ function renderScheduleEditor() {
 function editScheduleItem(type, idx) {
   const item = data.schedule[type][idx];
   openModal(`
-    <h3>Edit Activity</h3>
-    <label>Time:</label>
+    <h3>${t('editActivityTitle')}</h3>
+    <label>${t('timeLabel')}</label>
     <input id="editTime" type="time" value="${item.time}">
-    <label>Activity:</label>
+    <label>${t('activityInput')}</label>
     <input id="editActivity" value="${item.activity}">
-    <label>Icon (emoji):</label>
+    <label>${t('iconLabel')}</label>
     <input id="editIcon" value="${item.icon || ''}" placeholder="e.g., 🏊">
     <div class="modal-actions">
-      <button class="btn" style="background:var(--red);color:white;" onclick="deleteScheduleItem('${type}',${idx})">Delete</button>
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveScheduleItem('${type}',${idx})">Save</button>
+      <button class="btn" style="background:var(--red);color:white;" onclick="deleteScheduleItem('${type}',${idx})">${t('deleteBtn')}</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="saveScheduleItem('${type}',${idx})">${t('saveBtn')}</button>
     </div>
   `);
 }
@@ -1703,7 +2421,7 @@ function saveScheduleItem(type, idx) {
 }
 
 function deleteScheduleItem(type, idx) {
-  if (confirm('Delete this activity?')) {
+  if (confirm(t('deleteConfirm'))) {
     data.schedule[type].splice(idx, 1);
     saveData();
     closeModal();
@@ -1713,21 +2431,21 @@ function deleteScheduleItem(type, idx) {
 
 function openAddScheduleItem() {
   openModal(`
-    <h3>Add Activity</h3>
-    <label>Schedule:</label>
+    <h3>${t('addActivityTitle')}</h3>
+    <label>${t('scheduleLabel')}</label>
     <select id="addSchedType">
-      <option value="weekday">Weekday</option>
-      <option value="weekend">Weekend</option>
+      <option value="weekday">${t('weekdayLabel')}</option>
+      <option value="weekend">${t('weekendLabel')}</option>
     </select>
-    <label>Time:</label>
+    <label>${t('timeLabel')}</label>
     <input id="addSchedTime" type="time" value="12:00">
-    <label>Activity:</label>
-    <input id="addSchedActivity" placeholder="Activity name">
-    <label>Icon (emoji):</label>
+    <label>${t('activityInput')}</label>
+    <input id="addSchedActivity" placeholder="${t('activityNamePH')}">
+    <label>${t('iconLabel')}</label>
     <input id="addSchedIcon" placeholder="e.g., 🏊">
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="addScheduleItem()">Add</button>
+      <button class="btn btn-outline" onclick="closeModal()">${t('cancelBtn')}</button>
+      <button class="btn btn-primary" onclick="addScheduleItem()">${t('add')}</button>
     </div>
   `);
 }
@@ -1750,7 +2468,7 @@ function exportData() {
   const json = JSON.stringify(data, null, 2);
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(json).then(() => {
-      alert('Data copied to clipboard! Paste it into WhatsApp or any messaging app to share.');
+      alert(t('exportSuccess'));
     }).catch(() => {
       prompt('Copy this data:', json);
     });
@@ -1760,21 +2478,22 @@ function exportData() {
 }
 
 function importData() {
-  const json = prompt('Paste the shared data here:');
+  const json = prompt(t('importPrompt'));
   if (!json) return;
   try {
     const imported = JSON.parse(json);
     data = imported;
     saveData();
     renderAll();
-    alert('Data imported successfully!');
+    alert(t('importSuccess'));
   } catch (e) {
-    alert('Invalid data format. Please check and try again.');
+    alert(t('importError'));
   }
 }
 
 // ==================== RENDER ALL ====================
 function renderAll() {
+  updateI18nLabels();
   renderToday();
   renderMeals();
   renderLearn();
