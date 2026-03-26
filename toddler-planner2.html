@@ -1,0 +1,3898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Little Explorer Planner</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4A90D9">
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-light: #E8F1FB;
+  --accent: #FF8C42;
+  --green: #5CB85C;
+  --green-light: #E8F5E8;
+  --red: #E74C3C;
+  --yellow: #F5A623;
+  --yellow-light: #FFF8E1;
+  --purple: #9B59B6;
+  --purple-light: #F3E5F5;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #2C3E50;
+  --text-light: #7F8C8D;
+  --border: #E0E6ED;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-tap-highlight-color: transparent;
+}
+.header {
+  background: linear-gradient(135deg, var(--primary), #357ABD);
+  color: white;
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 { font-size: 20px; font-weight: 700; }
+.header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+.header .date-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.header .date-nav button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+.header .date-nav .current-date {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.tab-bar button {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 8px 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-light);
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.tab-bar button.active { color: var(--primary); }
+.tab-bar button .icon { font-size: 22px; line-height: 1; }
+.tab-content { display: none; padding: 16px; }
+.tab-content.active { display: block; }
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-light); color: #2E7D32; }
+.badge-yellow { background: var(--yellow-light); color: #F57F17; }
+.badge-purple { background: var(--purple-light); color: #7B1FA2; }
+/* Timeline */
+.timeline { position: relative; }
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 8px;
+  padding: 8px;
+}
+.timeline-item:hover { background: #f8f9fa; }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item.current { background: var(--primary-light); border-radius: 8px; }
+.timeline-item.past { opacity: 0.5; }
+.time-col {
+  min-width: 52px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding-top: 2px;
+}
+.activity-col { flex: 1; }
+.activity-name { font-size: 14px; font-weight: 500; }
+.activity-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.activity-icon { font-size: 20px; }
+/* Meal Planner */
+.week-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 11px;
+}
+.week-grid .cell {
+  background: white;
+  padding: 6px 4px;
+  text-align: center;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.week-grid .cell:hover { background: #f0f4ff; }
+.week-grid .header-cell {
+  background: var(--primary-light);
+  font-weight: 700;
+  color: var(--primary);
+  cursor: default;
+}
+.week-grid .row-header {
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--text-light);
+}
+.week-grid .cell.filled { color: var(--text); }
+.week-grid .cell.empty { color: #ccc; font-style: italic; }
+/* Food list */
+.food-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.food-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0f4ff;
+  border: 1px solid #d0daf0;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: default;
+}
+.food-tag .remove {
+  cursor: pointer;
+  color: var(--red);
+  font-weight: bold;
+  margin-left: 2px;
+}
+.add-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.add-input-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.add-input-row input:focus { border-color: var(--primary); }
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-accent { background: var(--accent); color: white; }
+.btn-green { background: var(--green); color: white; }
+.btn-outline {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn-small { padding: 5px 10px; font-size: 11px; }
+.btn-block { width: 100%; }
+/* Learning */
+.learn-card {
+  border-left: 4px solid var(--purple);
+  padding: 12px;
+  background: var(--purple-light);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+}
+.learn-card .learn-title { font-weight: 700; font-size: 14px; color: #6A1B9A; }
+.learn-card .learn-desc { font-size: 12px; color: #7B1FA2; margin-top: 4px; }
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), #CE93D8);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.char-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.char-cell.learned { background: var(--green-light); border-color: var(--green); color: var(--green); }
+.char-cell.current { background: var(--yellow-light); border-color: var(--yellow); }
+/* Weekend */
+.venue-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.venue-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.venue-card.selected { border-color: var(--green); background: var(--green-light); }
+.venue-icon { font-size: 28px; }
+.venue-info { flex: 1; }
+.venue-name { font-weight: 600; font-size: 14px; }
+.venue-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.venue-last { font-size: 10px; color: var(--accent); margin-top: 2px; }
+/* Tips */
+.tip-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tip-item:last-child { border-bottom: none; }
+.tip-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.tip-text { font-size: 13px; line-height: 1.5; }
+.tip-text strong { color: var(--primary); }
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } }
+.modal h3 { font-size: 17px; margin-bottom: 12px; }
+.modal label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+.modal input, .modal select, .modal textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.modal input:focus, .modal select:focus, .modal textarea:focus {
+  border-color: var(--primary);
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.modal-actions .btn { flex: 1; }
+/* Section title */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 16px 0 8px;
+}
+.section-title:first-child { margin-top: 0; }
+/* Toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.toggle-row:last-child { border-bottom: none; }
+/* Sleep tracker */
+.sleep-goal {
+  text-align: center;
+  padding: 16px;
+}
+.sleep-goal .time-display {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.sleep-goal .target { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+/* Export/Import */
+.share-box {
+  background: #f8f9fa;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+/* Timer */
+.timer-display {
+  text-align: center;
+  padding: 16px;
+}
+.timer-display .timer-time {
+  font-size: 48px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--purple);
+}
+.timer-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+/* Responsive */
+@media (min-width: 600px) {
+  .tab-content { max-width: 560px; margin: 0 auto; }
+}
+
+/* ==================== i18n Toggle ==================== */
+.lang-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+}
+.lang-toggle:active { background: rgba(255,255,255,0.4); }
+
+/* ==================== Flip Card Characters ==================== */
+.char-grid {
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)) !important;
+}
+.char-cell {
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px;
+  position: relative;
+}
+.char-cell .char-text { font-size: 20px; font-weight: 800; line-height: 1.2; }
+.char-cell .char-pinyin { font-size: 8px; color: var(--text-light); line-height: 1; }
+
+/* ==================== Expanded Flip Card Overlay ==================== */
+.flip-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 260;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.flip-overlay.show { display: flex; }
+.flip-card-big {
+  width: 240px;
+  height: 300px;
+  perspective: 800px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.flip-card-big .flip-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+.flip-card-big.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-big .flip-front,
+.flip-card-big .flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.flip-card-big .flip-front {
+  background: var(--card);
+  border: 3px solid var(--primary);
+}
+.flip-card-big .flip-front .big-emoji { font-size: 40px; margin-bottom: 4px; }
+.flip-card-big .flip-front .big-char { font-size: 72px; font-weight: 800; color: var(--primary); line-height: 1; }
+.flip-card-big .flip-front .big-pinyin { font-size: 20px; color: var(--text-light); margin-top: 4px; }
+.flip-card-big .flip-front .big-meaning { font-size: 14px; color: var(--text-light); margin-top: 2px; }
+.flip-card-big .flip-front .flip-hint {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 12px;
+  opacity: 0.6;
+}
+.flip-card-big .flip-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #fff8e1, #fff3e0);
+  border: 3px solid var(--accent);
+  padding: 16px;
+}
+.flip-card-big .flip-back svg {
+  width: 80%;
+  height: 50%;
+}
+.flip-card-big .flip-back .pic-emoji { font-size: 64px; line-height: 1; }
+.flip-card-big .flip-back .pic-char {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-top: 8px;
+}
+.flip-card-big .flip-back .pic-label {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.flip-card-big .flip-back .flip-hint {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 12px;
+  opacity: 0.6;
+}
+.flip-card-big.learned .flip-front { border-color: var(--green); }
+.flip-card-big.current .flip-front { border-color: var(--yellow); }
+/* Expanded card action buttons */
+.flip-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.flip-actions .btn { min-width: 100px; }
+/* ==================== Matching Game ==================== */
+.match-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 270;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 16px;
+}
+.match-overlay.show { display: flex; }
+.match-game {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+.match-game-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--primary);
+}
+.match-game-subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+.match-row-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 8px 0 6px;
+}
+.match-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+.match-card {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.match-card.char-type { color: var(--primary); background: #f0f4ff; }
+.match-card.emoji-type { background: #fff8e1; }
+.match-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,140,66,0.3); transform: scale(1.08); }
+.match-card.matched {
+  background: var(--green-light);
+  border-color: var(--green);
+  opacity: 0.5;
+  cursor: default;
+  transform: scale(0.95);
+}
+.match-card.wrong {
+  animation: matchShake 0.4s ease;
+  border-color: var(--red);
+}
+@keyframes matchShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.match-score {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 10px 0;
+}
+.match-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.match-actions .btn { flex: 1; }
+/* Celebration */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba(0,0,0,0.4);
+  animation: celebFadeIn 0.3s ease;
+}
+@keyframes celebFadeIn { from { opacity: 0; } }
+.celebration-box {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  text-align: center;
+  animation: celebBounce 0.5s ease;
+  position: relative;
+  z-index: 2;
+}
+@keyframes celebBounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.celebration-emoji { font-size: 64px; line-height: 1; }
+.celebration-text { font-size: 22px; font-weight: 800; color: var(--primary); margin: 12px 0 4px; }
+.celebration-sub { font-size: 14px; color: var(--text-light); }
+.confetti-piece {
+  position: fixed;
+  z-index: 299;
+  font-size: 20px;
+  animation: confettiFall linear forwards;
+  pointer-events: none;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
+}
+/* ==================== Phonics Game ==================== */
+.phonics-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+  margin: 8px 0;
+}
+.phonics-letter-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+.phonics-letter-card:active { transform: scale(0.95); }
+.phonics-letter-card .ph-letter { font-size: 24px; font-weight: 800; color: var(--primary); }
+.phonics-letter-card .ph-sound { font-size: 10px; color: var(--accent); font-weight: 600; }
+.phonics-letter-card .ph-example { font-size: 16px; margin-top: 2px; }
+.phonics-quiz-area {
+  background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin: 12px 0;
+}
+.phonics-prompt-emoji { font-size: 56px; line-height: 1; }
+.phonics-prompt-word { font-size: 18px; font-weight: 700; color: var(--text); margin: 8px 0 4px; }
+.phonics-prompt-hint { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
+.phonics-choices {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.phonics-choice-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 2.5px solid var(--border);
+  background: white;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phonics-choice-btn:active { transform: scale(0.95); }
+.phonics-choice-btn.correct {
+  background: var(--green-light);
+  border-color: var(--green);
+  color: var(--green);
+  animation: celebBounce 0.4s ease;
+}
+.phonics-choice-btn.wrong {
+  background: #FFEBEE;
+  border-color: var(--red);
+  color: var(--red);
+  animation: matchShake 0.4s ease;
+}
+.phonics-progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.phonics-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.phonics-dot.done { background: var(--green); }
+.phonics-dot.current { background: var(--accent); transform: scale(1.3); }
+.phonics-streak {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 6px;
+}
+.char-detail-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  align-items: center;
+  justify-content: center;
+}
+.char-detail-overlay.show { display: flex; }
+.char-detail-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 280px;
+  text-align: center;
+  animation: slideUp 0.25s ease;
+}
+.char-detail-box .big-char { font-size: 48px; font-weight: 800; margin: 8px 0; }
+.char-detail-box .char-hint { font-size: 14px; color: var(--text-light); margin: 4px 0 12px; }
+
+/* ==================== Stories ==================== */
+.story-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.story-card:hover { border-color: var(--purple); background: var(--purple-light); }
+.story-card.locked { opacity: 0.5; pointer-events: none; }
+.story-card .story-title { font-weight: 600; font-size: 14px; }
+.story-card .story-level { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.story-card .story-progress {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.story-card .story-progress .fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 2px;
+}
+.story-modal-text {
+  font-size: 22px;
+  line-height: 2.2;
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+.story-modal-text .known { color: var(--green); font-weight: 700; }
+.story-modal-text .unknown { color: var(--red); }
+.story-modal-text ruby { font-size: 22px; }
+.story-modal-text rt { font-size: 10px; color: var(--red); font-weight: 400; letter-spacing: 0; }
+
+/* ==================== Recipes ==================== */
+.recipe-search {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.recipe-search input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.recipe-search input:focus { border-color: var(--primary); }
+.recipe-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.recipe-filters .filter-btn {
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.recipe-filters .filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.recipe-list { max-height: 400px; overflow-y: auto; }
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.recipe-item:hover { background: #f8f9fa; }
+.recipe-item:last-child { border-bottom: none; }
+.recipe-item .recipe-emoji { font-size: 24px; }
+.recipe-item .recipe-info { flex: 1; }
+.recipe-item .recipe-name { font-size: 13px; font-weight: 600; }
+.recipe-item .recipe-meta { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.recipe-detail-section { margin: 12px 0; }
+.recipe-detail-section h4 { font-size: 14px; margin-bottom: 6px; color: var(--primary); }
+.recipe-detail-section ol, .recipe-detail-section ul {
+  margin-left: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* ==================== Dark Mode ==================== */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    --bg: #1a1a2e; --card: #16213e; --text: #e0e0e0; --text-light: #a0a0a0;
+    --border: #2a2a4a; --primary-light: #1a2744; --green-light: #1a2e1a;
+    --yellow-light: #2e2a1a; --purple-light: #2a1a2e; --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  html:not(.light) .header { background: linear-gradient(135deg, #1a2744, #0f1a30); }
+  html:not(.light) .tab-bar { background: #16213e; border-top-color: #2a2a4a; }
+  html:not(.light) .week-grid .cell, html:not(.light) .week-grid .header-cell,
+  html:not(.light) .week-grid .row-header, html:not(.light) .modal,
+  html:not(.light) .char-detail-box { background: var(--card); }
+  html:not(.light) .timeline-item:hover, html:not(.light) .food-tag,
+  html:not(.light) .share-box, html:not(.light) .week-grid .cell:hover,
+  html:not(.light) .recipe-item:hover { background: #1a2744; }
+  html:not(.light) .timeline-item.current { background: var(--primary-light); }
+  html:not(.light) .food-tag, html:not(.light) .share-box { border-color: #2a2a4a; }
+  html:not(.light) .toggle-row, html:not(.light) .timeline-item,
+  html:not(.light) .tip-item, html:not(.light) .recipe-item { border-bottom-color: #2a2a4a; }
+  html:not(.light) .recipe-filters .filter-btn { background: var(--card); border-color: #2a2a4a; color: var(--text); }
+  html:not(.light) .venue-card, html:not(.light) .story-card { border-color: #2a2a4a; }
+  html:not(.light) .venue-card:hover { background: var(--primary-light); border-color: var(--primary); }
+  html:not(.light) .story-card:hover { background: var(--purple-light); border-color: var(--purple); }
+  html:not(.light) .char-cell { border-color: #3a3a5a; }
+  html:not(.light) .btn-outline { background: var(--card); color: var(--primary); border-color: var(--primary); }
+  html:not(.light) .modal-overlay { background: rgba(0,0,0,0.6); }
+  html:not(.light) .modal input, html:not(.light) .modal select,
+  html:not(.light) .modal textarea, html:not(.light) .recipe-search input,
+  html:not(.light) .add-input-row input { background: #1a1a2e; color: var(--text); border-color: #2a2a4a; }
+  html:not(.light) .learn-card { background: var(--purple-light); }
+  html:not(.light) .learn-card .learn-title { color: #CE93D8; }
+  html:not(.light) .learn-card .learn-desc { color: #BA68C8; }
+  html:not(.light) .badge-green { background: var(--green-light); color: #66BB6A; }
+  html:not(.light) .badge-yellow { background: var(--yellow-light); color: #FFA726; }
+  html:not(.light) .badge-purple { background: var(--purple-light); color: #CE93D8; }
+  html:not(.light) .progress-bar { background: #2a2a4a; }
+}
+html.dark {
+  --bg: #1a1a2e; --card: #16213e; --text: #e0e0e0; --text-light: #a0a0a0;
+  --border: #2a2a4a; --primary-light: #1a2744; --green-light: #1a2e1a;
+  --yellow-light: #2e2a1a; --purple-light: #2a1a2e; --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+html.dark .header { background: linear-gradient(135deg, #1a2744, #0f1a30); }
+html.dark .tab-bar { background: #16213e; border-top-color: #2a2a4a; }
+html.dark .week-grid .cell, html.dark .week-grid .header-cell,
+html.dark .week-grid .row-header, html.dark .modal,
+html.dark .char-detail-box { background: var(--card); }
+html.dark .timeline-item:hover, html.dark .food-tag,
+html.dark .share-box, html.dark .week-grid .cell:hover,
+html.dark .recipe-item:hover { background: #1a2744; }
+html.dark .timeline-item.current { background: var(--primary-light); }
+html.dark .food-tag, html.dark .share-box { border-color: #2a2a4a; }
+html.dark .toggle-row, html.dark .timeline-item,
+html.dark .tip-item, html.dark .recipe-item { border-bottom-color: #2a2a4a; }
+html.dark .recipe-filters .filter-btn { background: var(--card); border-color: #2a2a4a; color: var(--text); }
+html.dark .venue-card, html.dark .story-card { border-color: #2a2a4a; }
+html.dark .venue-card:hover { background: var(--primary-light); border-color: var(--primary); }
+html.dark .story-card:hover { background: var(--purple-light); border-color: var(--purple); }
+html.dark .char-cell { border-color: #3a3a5a; }
+html.dark .btn-outline { background: var(--card); color: var(--primary); border-color: var(--primary); }
+html.dark .modal-overlay { background: rgba(0,0,0,0.6); }
+html.dark .modal input, html.dark .modal select,
+html.dark .modal textarea, html.dark .recipe-search input,
+html.dark .add-input-row input { background: #1a1a2e; color: var(--text); border-color: #2a2a4a; }
+html.dark .learn-card { background: var(--purple-light); }
+html.dark .learn-card .learn-title { color: #CE93D8; }
+html.dark .learn-card .learn-desc { color: #BA68C8; }
+html.dark .badge-green { background: var(--green-light); color: #66BB6A; }
+html.dark .badge-yellow { background: var(--yellow-light); color: #FFA726; }
+html.dark .badge-purple { background: var(--purple-light); color: #CE93D8; }
+html.dark .progress-bar { background: #2a2a4a; }
+
+/* Theme toggle button */
+.theme-toggle {
+  position: absolute;
+  top: 16px;
+  right: 72px;
+  background: rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+  width: 36px; height: 28px;
+  border-radius: 14px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.theme-toggle:active { background: rgba(255,255,255,0.4); }
+
+/* ==================== Visual Timeline ==================== */
+.visual-timeline { position: relative; padding-left: 28px; }
+.visual-timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+.visual-timeline .vt-progress-line {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--green), var(--primary));
+  transition: height 0.5s ease;
+  z-index: 1;
+}
+.visual-timeline .vt-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.3s, transform 0.3s;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: vtSlideIn 0.3s ease forwards;
+}
+.visual-timeline .vt-item:hover { background: var(--primary-light); }
+@keyframes vtSlideIn { to { opacity: 1; transform: translateX(0); } }
+.visual-timeline .vt-dot {
+  position: absolute;
+  left: -24px;
+  top: 14px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--card);
+  z-index: 2;
+  transition: all 0.3s;
+}
+.visual-timeline .vt-item.past .vt-dot { background: var(--green); }
+.visual-timeline .vt-item.current .vt-dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(74,144,217,0.3);
+  animation: vtPulse 2s ease-in-out infinite;
+}
+@keyframes vtPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(74,144,217,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(74,144,217,0.1); }
+}
+.visual-timeline .vt-item.past .vt-check {
+  position: absolute;
+  left: -26px;
+  top: 12px;
+  font-size: 10px;
+  color: white;
+  z-index: 3;
+  width: 16px; height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.visual-timeline .vt-item.past { opacity: 0.6; }
+.visual-timeline .vt-item.current { background: var(--primary-light); }
+
+/* ==================== Drag & Reorder ==================== */
+.drag-handle {
+  cursor: grab;
+  font-size: 16px;
+  color: var(--text-light);
+  user-select: none;
+  touch-action: none;
+  padding: 4px;
+}
+.drag-handle:active { cursor: grabbing; }
+.schedule-drag-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.schedule-drag-item.dragging {
+  background: var(--primary-light);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+/* ==================== TTS Speaker Button ==================== */
+.tts-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.tts-btn:hover { background: rgba(0,0,0,0.05); }
+.tts-btn:active { transform: scale(0.9); }
+.char-cell .tts-mini {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  font-size: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 2px;
+  line-height: 1;
+  z-index: 1;
+}
+.char-cell:hover .tts-mini { opacity: 1; }
+
+/* ==================== Learning Dashboard ==================== */
+.dashboard-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.dashboard-bar .bar-label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 60px;
+}
+.dashboard-bar .bar-track {
+  flex: 1;
+  height: 16px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dashboard-bar .bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+.dashboard-bar .bar-value {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: right;
+}
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-top: 8px;
+}
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: #e0e0e0;
+  min-width: 12px;
+}
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #FF8C42, #FF6B35);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ==================== Notifications Toggle ==================== */
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.switch input:checked + .slider { background: var(--green); }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+</style>
+</head>
+<body>
+
+<div class="header" style="position:relative;">
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">&#9790;</button>
+  <button class="lang-toggle" id="langToggle" onclick="toggleLang()">中文</button>
+  <h1 id="appTitle">Little Explorer Planner</h1>
+  <div class="subtitle" id="appSubtitle">Daily Schedule & Learning Tracker</div>
+  <div class="date-nav">
+    <button onclick="changeDate(-1)">&#9664;</button>
+    <span class="current-date" id="currentDate"></span>
+    <button onclick="changeDate(1)">&#9654;</button>
+    <button onclick="goToday()" style="width:auto;padding:0 10px;border-radius:14px;font-size:12px;" id="todayBtn">Today</button>
+  </div>
+</div>
+
+<!-- ===================== TAB: TODAY ===================== -->
+<div class="tab-content active" id="tab-today">
+  <div class="card">
+    <div class="card-title">
+      <span id="dailyScheduleTitle">Daily Schedule</span>
+      <span class="badge badge-green" id="dayType">Weekday</span>
+    </div>
+    <div class="timeline" id="todayTimeline"></div>
+  </div>
+
+  <div class="card" id="todayMealsCard">
+    <div class="card-title" id="todayMealsTitle">Today's Meals</div>
+    <div id="todayMeals"></div>
+  </div>
+
+  <div class="card" id="todayLearnCard">
+    <div class="card-title" id="todayLearnTitle">Today's Learning (7:30-8:15 PM)</div>
+    <div id="todayLearn"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: MEALS ===================== -->
+<div class="tab-content" id="tab-meals">
+  <div class="card">
+    <div class="card-title">
+      <span id="weeklyMealPlanTitle">Weekly Meal Plan</span>
+      <button class="btn btn-accent btn-small" onclick="generateWeeklyMenu()" id="autoGenBtn">Auto-Generate</button>
+    </div>
+    <div id="weekMenuGrid"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="mealGridHint">Tap any cell to change. Auto-generate rotates meals to avoid repetition.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="breakfastOptionsTitle">Breakfast Options</div>
+    <div class="food-list" id="breakfastList"></div>
+    <div class="add-input-row">
+      <input id="addBreakfast" placeholder="Add breakfast item..." onkeydown="if(event.key==='Enter')addFood('breakfast')">
+      <button class="btn btn-primary btn-small" onclick="addFood('breakfast')" id="addBreakfastBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="dinnerOptionsTitle">Dinner Options</div>
+    <div class="food-list" id="dinnerList"></div>
+    <div class="add-input-row">
+      <input id="addDinner" placeholder="Add dinner item..." onkeydown="if(event.key==='Enter')addFood('dinner')">
+      <button class="btn btn-primary btn-small" onclick="addFood('dinner')" id="addDinnerBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="snackOptionsTitle">Snack Options</div>
+    <div class="food-list" id="snackList"></div>
+    <div class="add-input-row">
+      <input id="addSnack" placeholder="Add snack item..." onkeydown="if(event.key==='Enter')addFood('snack')">
+      <button class="btn btn-primary btn-small" onclick="addFood('snack')" id="addSnackBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="sideOptionsTitle">Side Dish Options</div>
+    <div class="food-list" id="sidesList"></div>
+    <div class="add-input-row">
+      <input id="addSides" placeholder="Add side dish..." onkeydown="if(event.key==='Enter')addFood('sides')">
+      <button class="btn btn-primary btn-small" onclick="addFood('sides')" id="addSidesBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="mealHistoryTitle">Meal History</div>
+    <div id="mealHistory" style="font-size:12px;color:var(--text-light);">Recent meals served will appear here to help avoid repetition.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="recipesCardTitle">Recipe Collection</div>
+    <div class="recipe-search">
+      <input id="recipeSearchInput" placeholder="Search recipes..." oninput="renderRecipes()">
+    </div>
+    <div class="recipe-filters" id="recipeFilters"></div>
+    <div class="recipe-list" id="recipeList"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: LEARN ===================== -->
+<div class="tab-content" id="tab-learn">
+  <!-- Learning Progress Dashboard (NEW) -->
+  <div class="card" id="learningDashboardCard">
+    <div class="card-title" id="learningDashboardTitle">Learning Progress</div>
+    <div id="learningDashboard"></div>
+  </div>
+
+  <!-- Review Suggestions (NEW - Spaced Repetition) -->
+  <div class="card" id="reviewSuggestionsCard" style="display:none;">
+    <div class="card-title" id="reviewSuggestionsTitle">Review Suggestions</div>
+    <div id="reviewSuggestions"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span id="learningTimerTitle">Learning Session Timer</span>
+      <span class="badge badge-purple" id="timerBadge">30-45 min</span>
+    </div>
+    <div class="timer-display">
+      <div class="timer-time" id="timerDisplay">00:00</div>
+      <div style="font-size:12px;color:var(--text-light);margin-top:4px;" id="timerLabel">Ready to start</div>
+    </div>
+    <div class="timer-controls">
+      <button class="btn btn-primary" onclick="toggleTimer()" id="timerBtn">Start</button>
+      <button class="btn btn-outline" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span id="currentPhaseTitle">Current Phase</span>
+      <select id="phaseSelect" onchange="changePhase(this.value)" style="margin-left:auto;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;"></select>
+    </div>
+    <div id="phaseInfo"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="todayActivitiesTitle">Today's Activities</div>
+    <div id="todayActivities"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="lettersTitle">Letters (A-Z)</div>
+    <div class="char-grid" id="letterGrid"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-light);" id="tapToMarkHint">Tap to mark as learned. Green = learned, Yellow = this week's focus.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span id="chineseCharsTitle">Chinese Characters</span><button class="btn btn-accent btn-small" onclick="startMatchingGame()" style="margin-left:auto;font-size:11px;padding:4px 10px;">🎮 Match</button></div>
+    <div class="recipe-filters" id="charCategoryTabs" style="margin-bottom:6px;"></div>
+    <div class="char-grid" id="chineseGrid"></div>
+    <div id="charPagination" style="display:flex;justify-content:center;gap:8px;margin-top:10px;"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--text-light);" id="charCountInfo"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="storiesCardTitle">Practice Stories</div>
+    <div id="storiesContainer"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="numbersTitle">Numbers (1-30)</div>
+    <div class="char-grid" id="numberGrid"></div>
+  </div>
+
+  <div class="card" style="border-top:3px solid var(--accent);">
+    <div class="card-title" id="phonicsTitle">Phonics</div>
+    <div id="phonicsContent"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="learningTipsTitle">Learning Tips for 3-Year-Olds</div>
+    <div id="learningTipsContent" style="font-size:13px;line-height:1.6;"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: WEEKEND ===================== -->
+<div class="tab-content" id="tab-weekend">
+  <div class="card">
+    <div class="card-title">
+      <span id="sundayPlanTitle">This Sunday's Plan</span>
+      <span class="badge badge-yellow" id="sundayDate"></span>
+    </div>
+    <div id="sundayPlan">
+      <div style="font-size:13px;color:var(--text-light);" id="noSundayPlanText">No plan set yet. Pick a venue below or add a custom activity.</div>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn btn-accent btn-small" onclick="suggestSundayPlan()" id="suggestPlanBtn">Suggest a Plan</button>
+      <button class="btn btn-outline btn-small" onclick="openCustomEvent()" id="customEventBtn">+ Custom Event</button>
+    </div>
+  </div>
+
+  <div class="section-title" id="parksOutdoorTitle">Parks & Outdoor</div>
+  <div id="parksList"></div>
+
+  <div class="section-title" id="indoorVenuesTitle">Indoor Venues</div>
+  <div id="indoorList"></div>
+
+  <div class="section-title" id="customEventsTitle">Custom Events</div>
+  <div id="customEvents">
+    <div class="card" style="text-align:center;">
+      <button class="btn btn-primary" onclick="openCustomEvent()" id="addEventWeekBtn">+ Add Event for This Week</button>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="addEventHintText">Add local events, playdates, or special activities</div>
+    </div>
+  </div>
+
+  <div class="section-title" id="outingHistoryTitle">Outing History</div>
+  <div class="card">
+    <div id="outingHistory" style="font-size:12px;color:var(--text-light);">Past outings will appear here to help rotate venues.</div>
+  </div>
+</div>
+
+<!-- ===================== TAB: SETTINGS ===================== -->
+<div class="tab-content" id="tab-settings">
+  <div class="card">
+    <div class="card-title" id="sleepPlanTitle">Sleep Improvement Plan</div>
+    <div class="sleep-goal">
+      <div style="font-size:12px;color:var(--text-light);" id="currentToTargetLabel">Current → Target</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;">
+        <div>
+          <div style="font-size:28px;font-weight:800;color:var(--red);" id="currentSleepTime">11:00 PM</div>
+          <div style="font-size:11px;color:var(--text-light);" id="currentSleepLabel">Current</div>
+        </div>
+        <div style="font-size:24px;">→</div>
+        <div>
+          <div style="font-size:28px;font-weight:800;color:var(--green);">10:00 PM</div>
+          <div style="font-size:11px;color:var(--text-light);" id="targetSleepLabel">Target</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:12px;">
+        <div class="fill" id="sleepProgress" style="width:0%;background:linear-gradient(90deg,var(--green),#81C784);"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:4px;" id="sleepProgressText"></div>
+    </div>
+    <div style="margin-top:8px;">
+      <label style="font-size:13px;font-weight:600;" id="adjustBedtimeLabel">Adjust current bedtime:</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-green btn-small" onclick="adjustSleep(-15)" id="earlierBtn">-15 min (earlier)</button>
+        <button class="btn btn-outline btn-small" onclick="adjustSleep(15)" id="laterBtn">+15 min (later)</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="sleepAdjustHint">Move 15 minutes earlier every 3-4 days. Log progress as you go.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="bedtimeTipsTitle">Bedtime Routine Tips</div>
+    <div id="bedtimeTipsContent"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="editScheduleTitle">Edit Daily Schedule</div>
+    <div id="scheduleEditor"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn btn-primary btn-small" onclick="openAddScheduleItem()" id="addActivityBtnEl">+ Add Activity</button>
+      <button class="btn btn-outline btn-small" onclick="autoSortSchedule()" id="autoSortBtn">Sort by Time</button>
+    </div>
+  </div>
+
+  <!-- Reminders (NEW) -->
+  <div class="card">
+    <div class="card-title" id="remindersTitle">Reminders</div>
+    <div class="toggle-row">
+      <div>
+        <div style="font-size:13px;font-weight:600;" id="enableRemindersLabel">Enable Reminders</div>
+        <div style="font-size:11px;color:var(--text-light);" id="remindersStatusText">Off</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="remindersToggle" onchange="toggleReminders()">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="sharingSyncTitle">Sharing & Sync</div>
+    <div id="syncUI"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="manualExportTitle">Manual Export/Import</div>
+    <div class="share-box">
+      <button class="btn btn-primary" onclick="exportData()" id="exportBtn">Export Data (Copy)</button>
+      <div style="margin-top:8px;">
+        <button class="btn btn-outline" onclick="importData()" id="importBtn">Import Data (Paste)</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px;" id="exportHintText">
+        Export copies all data as text. Send via WhatsApp. Import on the other device.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="resetCardTitle">Reset</div>
+    <button class="btn btn-small" style="background:var(--red);color:white;" onclick="if(confirm(t('resetConfirm'))){localStorage.clear();location.reload();}" id="resetAllBtn">Reset All Data</button>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="active" onclick="switchTab('today',this)"><span class="icon">📅</span><span id="tabToday">Today</span></button>
+  <button onclick="switchTab('meals',this)"><span class="icon">🍽️</span><span id="tabMeals">Meals</span></button>
+  <button onclick="switchTab('learn',this)"><span class="icon">📚</span><span id="tabLearn">Learn</span></button>
+  <button onclick="switchTab('weekend',this)"><span class="icon">🌳</span><span id="tabWeekend">Weekend</span></button>
+  <button onclick="switchTab('settings',this)"><span class="icon">⚙️</span><span id="tabSettings">Settings</span></button>
+</div>
+
+<!-- Flip Card Expanded Overlay -->
+<div class="flip-overlay" id="flipOverlay" onclick="if(event.target===this)closeFlipCard()">
+  <div class="flip-card-big" id="flipCardBig" onclick="this.classList.toggle('flipped')">
+    <div class="flip-inner">
+      <div class="flip-front" id="flipFront"></div>
+      <div class="flip-back" id="flipBack"></div>
+    </div>
+  </div>
+  <div class="flip-actions" id="flipActions"></div>
+</div>
+
+<!-- Character Detail Overlay -->
+<div class="char-detail-overlay" id="charDetailOverlay" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="char-detail-box" id="charDetailContent"></div>
+</div>
+
+<!-- Matching Game Overlay -->
+<div class="match-overlay" id="matchOverlay" onclick="if(event.target===this)closeMatchingGame()">
+  <div class="match-game" id="matchGameContent"></div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ==================== THEME ====================
+function initTheme() {
+  const saved = localStorage.getItem('plannerTheme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+  } else if (saved === 'light') {
+    document.documentElement.classList.add('light');
+    document.documentElement.classList.remove('dark');
+  }
+  updateThemeIcon();
+}
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark') ||
+    (!html.classList.contains('light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (isDark) {
+    html.classList.remove('dark');
+    html.classList.add('light');
+    localStorage.setItem('plannerTheme', 'light');
+  } else {
+    html.classList.add('dark');
+    html.classList.remove('light');
+    localStorage.setItem('plannerTheme', 'dark');
+  }
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark') ||
+    (!html.classList.contains('light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = isDark ? '\u2600' : '\u263E';
+}
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (!localStorage.getItem('plannerTheme')) updateThemeIcon();
+  });
+}
+initTheme();
+
+// ==================== i18n ====================
+let currentLang = localStorage.getItem('plannerLang') || 'zh';
+
+const LANG = {
+  appTitle: { en: 'Little Explorer Planner', zh: '小探险家计划' },
+  appSubtitle: { en: 'Daily Schedule & Learning Tracker', zh: '每日安排与学习跟踪' },
+  today: { en: 'Today', zh: '今天' },
+  meals: { en: 'Meals', zh: '餐食' },
+  learn: { en: 'Learn', zh: '学习' },
+  weekend: { en: 'Weekend', zh: '周末' },
+  settings: { en: 'Settings', zh: '设置' },
+  dailySchedule: { en: 'Daily Schedule', zh: '每日安排' },
+  weekdayLabel: { en: 'Weekday', zh: '工作日' },
+  weekendLabel: { en: 'Weekend', zh: '周末' },
+  todaysMeals: { en: "Today's Meals", zh: '今日餐食' },
+  todaysLearning: { en: "Today's Learning (7:30-8:15 PM)", zh: '今日学习 (19:30-20:15)' },
+  weeklyMealPlan: { en: 'Weekly Meal Plan', zh: '每周餐食计划' },
+  autoGenerate: { en: 'Auto-Generate', zh: '自动生成' },
+  breakfastOptions: { en: 'Breakfast Options', zh: '早餐选项' },
+  dinnerOptions: { en: 'Dinner Options', zh: '晚餐选项' },
+  snackOptions: { en: 'Snack Options', zh: '零食选项' },
+  addPlaceholder: { en: 'Add {type} item...', zh: '添加{type}...' },
+  add: { en: 'Add', zh: '添加' },
+  mealHistory: { en: 'Meal History', zh: '用餐记录' },
+  mealGridHint: { en: 'Tap any cell to change. Auto-generate rotates meals to avoid repetition.', zh: '点击单元格更改。自动生成会轮换餐食避免重复。' },
+  breakfast: { en: 'Breakfast', zh: '早餐' },
+  dinner: { en: 'Dinner', zh: '晚餐' },
+  lunch: { en: 'Lunch', zh: '午餐' },
+  snack: { en: 'Snack', zh: '零食' },
+  bfast: { en: 'Bfast', zh: '早餐' },
+  notPlanned: { en: 'Not planned', zh: '未安排' },
+  noMealPlan: { en: 'No meal plan set. Go to Meals tab to generate.', zh: '未设置餐食计划。前往餐食页生成。' },
+  learningTimer: { en: 'Learning Session Timer', zh: '学习计时器' },
+  min3045: { en: '30-45 min', zh: '30-45 分钟' },
+  readyToStart: { en: 'Ready to start', zh: '准备开始' },
+  start: { en: 'Start', zh: '开始' },
+  pauseBtn: { en: 'Pause', zh: '暂停' },
+  resumeBtn: { en: 'Resume', zh: '继续' },
+  resetBtn: { en: 'Reset', zh: '重置' },
+  pausedLabel: { en: 'Paused', zh: '已暂停' },
+  learningInProgress: { en: 'Learning in progress...', zh: '学习中...' },
+  min30reached: { en: '30 min reached — great session!', zh: '30分钟 — 很棒!' },
+  min45wrapUp: { en: '45 min — time to wrap up!', zh: '45分钟 — 该结束了!' },
+  currentPhase: { en: 'Current Phase', zh: '当前阶段' },
+  todaysActivities: { en: "Today's Activities", zh: '今日活动' },
+  lettersAZ: { en: 'Letters (A-Z)', zh: '字母 (A-Z)' },
+  chineseChars: { en: 'Chinese Characters', zh: '中文汉字' },
+  numbers130: { en: 'Numbers (1-30)', zh: '数字 (1-30)' },
+  tapToMark: { en: 'Tap to mark as learned. Green = learned, Yellow = this week\'s focus.', zh: '点击标记已学。绿 = 已学，黄 = 本周重点。' },
+  learningTips: { en: 'Learning Tips for 3-Year-Olds', zh: '3岁儿童学习建议' },
+  phonicsTitle: { en: 'Phonics', zh: '自然拼读' },
+  matchingGame: { en: 'Play Matching Game', zh: '玩配对游戏' },
+  sessionPlan: { en: 'Session Plan (30-45 min)', zh: '学习计划 (30-45分钟)' },
+  review: { en: 'Review', zh: '复习' },
+  lettersLabel: { en: 'Letters', zh: '字母' },
+  chineseLabel: { en: 'Chinese', zh: '中文' },
+  numbersLabel: { en: 'Numbers', zh: '数字' },
+  activityLabel: { en: 'Activity', zh: '活动' },
+  sundayPlan: { en: "This Sunday's Plan", zh: '本周日计划' },
+  noSundayPlan: { en: 'No plan set yet. Pick a venue below or add a custom activity.', zh: '尚未设置计划。从下方选择或添加活动。' },
+  suggestPlan: { en: 'Suggest a Plan', zh: '推荐计划' },
+  customEvent: { en: '+ Custom Event', zh: '+ 自定义活动' },
+  parksOutdoor: { en: 'Parks & Outdoor', zh: '公园与户外' },
+  indoorVenues: { en: 'Indoor Venues', zh: '室内场馆' },
+  customEvents: { en: 'Custom Events', zh: '自定义活动' },
+  outingHistory: { en: 'Outing History', zh: '出行记录' },
+  addEventWeek: { en: '+ Add Event for This Week', zh: '+ 添加本周活动' },
+  addEventHint: { en: 'Add local events, playdates, or special activities', zh: '添加本地活动、聚会或特别活动' },
+  lastVisitedLabel: { en: 'Last visited', zh: '上次去' },
+  notVisitedYet: { en: 'Not visited yet!', zh: '还没去过!' },
+  suggestion: { en: 'Suggestion', zh: '推荐' },
+  tryAnother: { en: 'Try Another', zh: '换一个' },
+  pickFromList: { en: 'Pick from List', zh: '从列表选' },
+  changePlan: { en: 'Change Plan', zh: '更改计划' },
+  sleepPlan: { en: 'Sleep Improvement Plan', zh: '睡眠改善计划' },
+  currentSleep: { en: 'Current', zh: '当前' },
+  targetSleep: { en: 'Target', zh: '目标' },
+  currentToTarget: { en: 'Current → Target', zh: '当前 → 目标' },
+  targetReached: { en: 'Target reached!', zh: '目标达成!' },
+  toGoal: { en: 'to goal', zh: '距目标' },
+  adjustBedtime: { en: 'Adjust current bedtime:', zh: '调整就寝时间:' },
+  earlierMin: { en: '-15 min (earlier)', zh: '-15分钟（提前）' },
+  laterMin: { en: '+15 min (later)', zh: '+15分钟（推后）' },
+  sleepAdjustHint: { en: 'Move 15 min earlier every 3-4 days.', zh: '每3-4天提前15分钟。' },
+  bedtimeRoutineTips: { en: 'Bedtime Routine Tips', zh: '睡前习惯建议' },
+  editSchedule: { en: 'Edit Daily Schedule', zh: '编辑每日安排' },
+  addActivityBtn: { en: '+ Add Activity', zh: '+ 添加活动' },
+  sharingSync: { en: 'Sharing & Sync', zh: '分享与同步' },
+  exportData: { en: 'Export Data (Copy)', zh: '导出数据（复制）' },
+  importData: { en: 'Import Data (Paste)', zh: '导入数据（粘贴）' },
+  resetLabel: { en: 'Reset', zh: '重置' },
+  resetAllData: { en: 'Reset All Data', zh: '重置所有数据' },
+  resetConfirm: { en: 'Reset ALL data? This cannot be undone.', zh: '重置所有数据？不可撤销。' },
+  exportSuccess: { en: 'Data copied to clipboard!', zh: '数据已复制到剪贴板！' },
+  importPrompt: { en: 'Paste the shared data here:', zh: '在此粘贴数据:' },
+  importSuccess: { en: 'Data imported successfully!', zh: '数据导入成功!' },
+  importError: { en: 'Invalid data format.', zh: '数据格式无效。' },
+  editActivityTitle: { en: 'Edit Activity', zh: '编辑活动' },
+  timeLabel: { en: 'Time:', zh: '时间:' },
+  activityInput: { en: 'Activity:', zh: '活动:' },
+  iconLabel: { en: 'Icon (emoji):', zh: '图标:' },
+  deleteBtn: { en: 'Delete', zh: '删除' },
+  cancelBtn: { en: 'Cancel', zh: '取消' },
+  saveBtn: { en: 'Save', zh: '保存' },
+  deleteConfirm: { en: 'Delete this activity?', zh: '删除此活动？' },
+  addActivityTitle: { en: 'Add Activity', zh: '添加活动' },
+  scheduleLabel: { en: 'Schedule:', zh: '时间表:' },
+  activityNamePH: { en: 'Activity name', zh: '活动名称' },
+  pickMealTitle: { en: 'Pick {type} for {day}', zh: '选择{day}的{type}' },
+  orTypeCustom: { en: 'Or type custom:', zh: '或输入自定义:' },
+  customMealPH: { en: 'Custom meal...', zh: '自定义餐食...' },
+  setBtn: { en: 'Set', zh: '设定' },
+  planLabel: { en: 'Plan:', zh: '计划:' },
+  notesOptional: { en: 'Notes (optional):', zh: '备注（可选）:' },
+  setPlan: { en: 'Set Plan', zh: '设定计划' },
+  addCustomEventTitle: { en: 'Add Custom Event', zh: '添加自定义活动' },
+  eventNameLabel: { en: 'Event Name:', zh: '活动名称:' },
+  dateLabel: { en: 'Date:', zh: '日期:' },
+  detailsLabel: { en: 'Details:', zh: '详情:' },
+  addEventBtn: { en: 'Add Event', zh: '添加活动' },
+  weekdaySchedule: { en: 'Weekday Schedule', zh: '工作日时间表' },
+  weekendSchedule: { en: 'Weekend Schedule', zh: '周末时间表' },
+  recentMealsHint: { en: 'Recent meals will appear here.', zh: '最近的用餐记录将在此显示。' },
+  pastOutingsHint: { en: 'Past outings will appear here.', zh: '出行记录将在此显示。' },
+  bestFormat: { en: 'Best format for Huawei + iPhone:', zh: '华为+苹果最佳方式:' },
+  exportHint: { en: 'Export copies all data as text. Send via messaging. Import on the other device.', zh: '导出数据为文本。通过消息发送。在另一设备导入。' },
+  wakeUpMorning: { en: 'Wake up & morning routine', zh: '起床和晨间活动' },
+  breakfastTime: { en: 'Breakfast', zh: '早餐' },
+  goToSchool: { en: 'Go to school', zh: '上学' },
+  pickUpSchool: { en: 'Pick up from school', zh: '放学接回' },
+  playgroundSwimming: { en: 'Playground / Swimming', zh: '游乐场 / 游泳' },
+  dinnerTime: { en: 'Dinner', zh: '晚餐' },
+  showerTime: { en: 'Shower time', zh: '洗澡时间' },
+  learningTime: { en: 'Learning time', zh: '学习时间' },
+  freePlayWindDown: { en: 'Free play / wind-down', zh: '自由玩耍 / 放松' },
+  readBooks: { en: 'Read books', zh: '读书' },
+  bedtimeRoutine: { en: 'Bedtime routine', zh: '睡前活动' },
+  sleepTime: { en: 'Sleep', zh: '睡觉' },
+  wakeUp: { en: 'Wake up', zh: '起床' },
+  familyTime: { en: 'Free play / family time', zh: '自由玩耍 / 家庭时间' },
+  sundayOuting: { en: 'Sunday Outing (if Sunday)', zh: '周日出游' },
+  lunchTime: { en: 'Lunch', zh: '午餐' },
+  napTime: { en: 'Nap / quiet time', zh: '午睡 / 安静时间' },
+  snackTime: { en: 'Snack', zh: '零食时间' },
+  lightLearning: { en: 'Learning time (light)', zh: '学习时间（轻松）' },
+  storiesTitle: { en: 'Practice Stories', zh: '练习故事' },
+  readStory: { en: 'Read', zh: '阅读' },
+  charsKnown: { en: 'chars known', zh: '字已学' },
+  locked: { en: 'Learn more to unlock', zh: '学更多汉字解锁' },
+  recipesTitle: { en: 'Recipe Collection', zh: '食谱集' },
+  searchRecipesPH: { en: 'Search recipes...', zh: '搜索食谱...' },
+  allCat: { en: 'All', zh: '全部' },
+  mainDish: { en: 'Main', zh: '主食' },
+  soupCat: { en: 'Soup', zh: '汤粥' },
+  noodleCat: { en: 'Noodle', zh: '面条' },
+  snackCat: { en: 'Snack', zh: '点心' },
+  vegCat: { en: 'Veggie', zh: '蔬菜' },
+  bfastCat: { en: 'Breakfast', zh: '早餐' },
+  ingredients: { en: 'Ingredients', zh: '食材' },
+  steps: { en: 'Steps', zh: '步骤' },
+  searchOnline: { en: 'Search Online', zh: '在线搜索' },
+  viewRecipe: { en: 'View Recipe', zh: '查看食谱' },
+  mins: { en: 'min', zh: '分钟' },
+  mainDishLabel: { en: 'Main Dish', zh: '主菜' },
+  sideDishLabel: { en: 'Side Dish', zh: '配菜' },
+  sideOptions: { en: 'Side Dish Options', zh: '配菜选项' },
+  addSidePlaceholder: { en: 'Add side dish...', zh: '添加配菜...' },
+  nonePicked: { en: 'None', zh: '无' },
+  charDetail: { en: 'Character Detail', zh: '汉字详情' },
+  syncTitle: { en: 'Cloud Sync', zh: '云同步' },
+  childCode: { en: 'Child Code', zh: '孩子代码' },
+  currentChild: { en: 'Current child', zh: '当前孩子' },
+  createChild: { en: 'Create New Child', zh: '新建孩子' },
+  joinChild: { en: 'Join Existing Code', zh: '加入已有代码' },
+  childName: { en: 'Child\'s Name', zh: '孩子姓名' },
+  enterCode: { en: 'Enter 6-digit code', zh: '输入6位代码' },
+  syncNow: { en: 'Sync Now', zh: '立即同步' },
+  lastSynced: { en: 'Last synced', zh: '上次同步' },
+  syncing: { en: 'Syncing...', zh: '同步中...' },
+  syncOk: { en: 'Synced!', zh: '已同步!' },
+  syncFail: { en: 'Sync failed', zh: '同步失败' },
+  switchChild: { en: 'Switch Child', zh: '切换孩子' },
+  shareCodeHint: { en: 'Share this code with family members so they see the same schedule.', zh: '把代码分享给家人，大家看到同一个时间表。' },
+  noChildYet: { en: 'Create a child profile or join an existing code to enable cloud sync.', zh: '创建孩子档案或加入已有代码来启用云同步。' },
+  manualExport: { en: 'Manual Export/Import', zh: '手动导出/导入' },
+  meaning: { en: 'Meaning', zh: '含义' },
+  markLearned: { en: 'Mark Learned', zh: '标记已学' },
+  markUnlearned: { en: 'Mark Unlearned', zh: '标记未学' },
+  // New i18n keys for features
+  darkMode: { en: 'Dark Mode', zh: '深色模式' },
+  lightMode: { en: 'Light Mode', zh: '浅色模式' },
+  learningProgress: { en: 'Learning Progress', zh: '学习进度' },
+  streak: { en: 'Streak', zh: '连续' },
+  days: { en: 'days', zh: '天' },
+  thisWeek: { en: 'This week', zh: '本周' },
+  lastWeek: { en: 'Last week', zh: '上周' },
+  reviewSuggestionsLabel: { en: 'Review Suggestions', zh: '复习建议' },
+  dueForReview: { en: 'Due for review', zh: '需要复习' },
+  learnedDaysAgo: { en: 'Learned {n} days ago', zh: '{n}天前学的' },
+  enableReminders: { en: 'Enable Reminders', zh: '启用提醒' },
+  remindersOn: { en: 'Notifications enabled', zh: '通知已启用' },
+  remindersOff: { en: 'Off', zh: '关闭' },
+  reminderTitle: { en: 'Schedule Reminder', zh: '日程提醒' },
+  sortByTime: { en: 'Sort by Time', zh: '按时间排序' },
+  last30Days: { en: 'Last 30 days', zh: '最近30天' },
+  focus: { en: 'Focus', zh: '重点' },
+};
+
+function t(key) {
+  const entry = LANG[key];
+  if (!entry) return key;
+  return entry[currentLang] || entry.en || key;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  localStorage.setItem('plannerLang', currentLang);
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  renderAll();
+}
+
+function fd(biStr) {
+  if (!biStr) return biStr;
+  const slash = biStr.indexOf('/');
+  if (slash === -1) return biStr;
+  return currentLang === 'zh' ? biStr.substring(0, slash) : biStr.substring(slash + 1);
+}
+
+function getMealParts(meal) {
+  if (!meal) return { main: '', side: '' };
+  if (typeof meal === 'string') return { main: meal, side: '' };
+  return { main: meal.main || '', side: meal.side || '' };
+}
+function getMealDisplay(meal) {
+  const { main, side } = getMealParts(meal);
+  const parts = [];
+  if (main) parts.push(fd(main));
+  if (side) parts.push(fd(side));
+  return parts.join(' + ') || '';
+}
+
+function searchOnlineRecipe(biStr) {
+  if (!biStr) return;
+  const slash = biStr.indexOf('/');
+  const zh = slash > -1 ? biStr.substring(0, slash) : biStr;
+  const keyword = encodeURIComponent(zh + ' 做法');
+  window.open('https://www.xiachufang.com/search/?keyword=' + keyword, '_blank');
+}
+
+function updateI18nLabels() {
+  const el = (id) => document.getElementById(id);
+  el('appTitle').textContent = t('appTitle');
+  const activeCode = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+  el('appSubtitle').textContent = activeProfile ? '\u{1F9D2} ' + activeProfile.name : t('appSubtitle');
+  el('todayBtn').textContent = t('today');
+  el('langToggle').textContent = currentLang === 'en' ? '中文' : 'EN';
+  el('tabToday').textContent = t('today');
+  el('tabMeals').textContent = t('meals');
+  el('tabLearn').textContent = t('learn');
+  el('tabWeekend').textContent = t('weekend');
+  el('tabSettings').textContent = t('settings');
+  el('dailyScheduleTitle').textContent = t('dailySchedule');
+  el('todayMealsTitle').textContent = t('todaysMeals');
+  el('todayLearnTitle').textContent = t('todaysLearning');
+  el('weeklyMealPlanTitle').textContent = t('weeklyMealPlan');
+  el('autoGenBtn').textContent = t('autoGenerate');
+  el('mealGridHint').textContent = t('mealGridHint');
+  el('breakfastOptionsTitle').textContent = t('breakfastOptions');
+  el('dinnerOptionsTitle').textContent = t('dinnerOptions');
+  el('snackOptionsTitle').textContent = t('snackOptions');
+  el('mealHistoryTitle').textContent = t('mealHistory');
+  el('sideOptionsTitle').textContent = t('sideOptions');
+  el('addSidesBtn').textContent = t('add');
+  el('recipesCardTitle').textContent = t('recipesTitle');
+  el('addBreakfastBtn').textContent = t('add');
+  el('addDinnerBtn').textContent = t('add');
+  el('addSnackBtn').textContent = t('add');
+  el('recipeSearchInput').placeholder = t('searchRecipesPH');
+  el('learningTimerTitle').textContent = t('learningTimer');
+  el('timerBadge').textContent = t('min3045');
+  el('currentPhaseTitle').textContent = t('currentPhase');
+  el('todayActivitiesTitle').textContent = t('todaysActivities');
+  el('lettersTitle').textContent = t('lettersAZ');
+  el('chineseCharsTitle').textContent = t('chineseChars');
+  el('storiesCardTitle').textContent = t('storiesTitle');
+  el('numbersTitle').textContent = t('numbers130');
+  el('tapToMarkHint').textContent = t('tapToMark');
+  el('learningTipsTitle').textContent = t('learningTips');
+  if (el('phonicsTitle')) el('phonicsTitle').textContent = t('phonicsTitle');
+  el('sleepPlanTitle').textContent = t('sleepPlan');
+  el('currentToTargetLabel').textContent = t('currentToTarget');
+  el('currentSleepLabel').textContent = t('currentSleep');
+  el('targetSleepLabel').textContent = t('targetSleep');
+  el('adjustBedtimeLabel').textContent = t('adjustBedtime');
+  el('earlierBtn').textContent = t('earlierMin');
+  el('laterBtn').textContent = t('laterMin');
+  el('sleepAdjustHint').textContent = t('sleepAdjustHint');
+  el('bedtimeTipsTitle').textContent = t('bedtimeRoutineTips');
+  el('editScheduleTitle').textContent = t('editSchedule');
+  el('addActivityBtnEl').textContent = t('addActivityBtn');
+  el('sharingSyncTitle').textContent = t('sharingSync');
+  el('resetCardTitle').textContent = t('resetLabel');
+  el('resetAllBtn').textContent = t('resetAllData');
+  el('exportBtn').textContent = t('exportData');
+  el('importBtn').textContent = t('importData');
+  el('exportHintText').textContent = t('exportHint');
+  if (el('manualExportTitle')) el('manualExportTitle').textContent = t('manualExport');
+  if (el('parksOutdoorTitle')) el('parksOutdoorTitle').textContent = t('parksOutdoor');
+  if (el('indoorVenuesTitle')) el('indoorVenuesTitle').textContent = t('indoorVenues');
+  if (el('customEventsTitle')) el('customEventsTitle').textContent = t('customEvents');
+  if (el('outingHistoryTitle')) el('outingHistoryTitle').textContent = t('outingHistory');
+  if (el('addEventWeekBtn')) el('addEventWeekBtn').textContent = t('addEventWeek');
+  if (el('addEventHintText')) el('addEventHintText').textContent = t('addEventHint');
+  if (el('sundayPlanTitle')) el('sundayPlanTitle').textContent = t('sundayPlan');
+  if (el('suggestPlanBtn')) el('suggestPlanBtn').textContent = t('suggestPlan');
+  if (el('customEventBtn')) el('customEventBtn').textContent = t('customEvent');
+  // New labels
+  if (el('learningDashboardTitle')) el('learningDashboardTitle').textContent = t('learningProgress');
+  if (el('reviewSuggestionsTitle')) el('reviewSuggestionsTitle').textContent = t('reviewSuggestionsLabel');
+  if (el('remindersTitle')) el('remindersTitle').textContent = t('enableReminders');
+  if (el('enableRemindersLabel')) el('enableRemindersLabel').textContent = t('enableReminders');
+  if (el('autoSortBtn')) el('autoSortBtn').textContent = t('sortByTime');
+}
+
+// ==================== CHARACTER DATABASE (500 chars) ====================
+const CHAR_DB = {
+  num:{en:'Numbers',zh:'数字',icon:'🔢',items:[
+    ['一','yī','one','☝️'],['二','èr','two','✌️'],['三','sān','three','3️⃣'],['四','sì','four','4️⃣'],['五','wǔ','five','🖐️'],
+    ['六','liù','six','6️⃣'],['七','qī','seven','7️⃣'],['八','bā','eight','8️⃣'],['九','jiǔ','nine','9️⃣'],['十','shí','ten','🔟'],
+    ['百','bǎi','hundred','💯'],['千','qiān','thousand','🏔️'],['万','wàn','ten thousand','🌟'],['零','líng','zero','0️⃣'],
+    ['两','liǎng','two/pair','✌️'],['半','bàn','half','½'],['双','shuāng','pair','👐'],['几','jǐ','how many','❓'],['第','dì','ordinal','🏅'],['数','shù','count','🔢']]},
+  fam:{en:'Family',zh:'家人',icon:'👨‍👩‍👦',items:[
+    ['爸','bà','dad','👨'],['妈','mā','mom','👩'],['爷','yé','grandpa','👴'],['奶','nǎi','grandma','👵'],['哥','gē','brother','👦'],
+    ['姐','jiě','sister','👧'],['弟','dì','younger brother','🧒'],['妹','mèi','younger sister','👧'],['叔','shū','uncle','👨'],
+    ['婆','pó','grandma','👵'],['公','gōng','grandpa','👴'],['儿','ér','child/son','👶'],['女','nǚ','girl','👧'],['孩','hái','child','🧒'],
+    ['男','nán','boy','👦'],['朋','péng','friend','🤝'],['友','yǒu','friend','🤝'],['亲','qīn','family','👪'],
+    ['我','wǒ','I/me','🙋'],['你','nǐ','you','🫵'],['他','tā','he','👤'],['她','tā','she','👤'],['们','men','plural','👥'],
+    ['这','zhè','this','👈'],['那','nà','that','👉'],['谁','shuí','who','❓'],['人','rén','person','🧑'],['家','jiā','home','🏠'],
+    ['好','hǎo','good','👍'],['夫','fū','husband','👨']]},
+  body:{en:'Body',zh:'身体',icon:'🫀',items:[
+    ['头','tóu','head','🗣️'],['发','fà','hair','💇'],['眼','yǎn','eye','👁️'],['耳','ěr','ear','👂'],['口','kǒu','mouth','👄'],
+    ['鼻','bí','nose','👃'],['脸','liǎn','face','😊'],['手','shǒu','hand','✋'],['指','zhǐ','finger','☝️'],['脚','jiǎo','foot','🦶'],
+    ['腿','tuǐ','leg','🦵'],['肚','dù','belly','🤰'],['心','xīn','heart','❤️'],['牙','yá','tooth','🦷'],['舌','shé','tongue','👅'],
+    ['身','shēn','body','🧍'],['骨','gǔ','bone','🦴'],['血','xuè','blood','🩸'],['皮','pí','skin','🤲'],['背','bèi','back','🔙'],
+    ['腰','yāo','waist','🧍'],['肩','jiān','shoulder','💪'],['眉','méi','eyebrow','🤨'],['脑','nǎo','brain','🧠'],['胃','wèi','stomach','🫁']]},
+  nat:{en:'Nature',zh:'自然',icon:'🌍',items:[
+    ['天','tiān','sky','🌤️'],['地','dì','earth','🌍'],['日','rì','sun','☀️'],['月','yuè','moon','🌙'],['星','xīng','star','⭐'],
+    ['山','shān','mountain','⛰️'],['水','shuǐ','water','💧'],['火','huǒ','fire','🔥'],['风','fēng','wind','💨'],['云','yún','cloud','☁️'],
+    ['雨','yǔ','rain','🌧️'],['雪','xuě','snow','❄️'],['石','shí','stone','🪨'],['田','tián','field','🌾'],['河','hé','river','🏞️'],
+    ['海','hǎi','sea','🌊'],['湖','hú','lake','🏞️'],['光','guāng','light','💡'],['阳','yáng','sunny','☀️'],['阴','yīn','cloudy','🌑'],
+    ['雷','léi','thunder','⚡'],['电','diàn','electricity','⚡'],['冰','bīng','ice','🧊'],['沙','shā','sand','🏖️'],['土','tǔ','soil','🟤'],
+    ['晴','qíng','clear sky','🌤️'],['雾','wù','fog','🌫️'],['霜','shuāng','frost','🥶'],['露','lù','dew','💧'],['泉','quán','spring','⛲']]},
+  ani:{en:'Animals',zh:'动物',icon:'🐾',items:[
+    ['鸡','jī','chicken','🐔'],['鸭','yā','duck','🦆'],['鱼','yú','fish','🐟'],['鸟','niǎo','bird','🐦'],['马','mǎ','horse','🐴'],
+    ['牛','niú','cow','🐄'],['羊','yáng','sheep','🐑'],['猫','māo','cat','🐱'],['狗','gǒu','dog','🐕'],['猪','zhū','pig','🐷'],
+    ['虫','chóng','bug','🐛'],['蛇','shé','snake','🐍'],['龙','lóng','dragon','🐲'],['兔','tù','rabbit','🐰'],['象','xiàng','elephant','🐘'],
+    ['猴','hóu','monkey','🐵'],['蝶','dié','butterfly','🦋'],['鼠','shǔ','mouse','🐭'],['蛙','wā','frog','🐸'],['熊','xióng','bear','🐻'],
+    ['虎','hǔ','tiger','🐯'],['狼','láng','wolf','🐺'],['蜂','fēng','bee','🐝'],['鹅','é','goose','🦢'],['龟','guī','turtle','🐢'],
+    ['鸽','gē','pigeon','🕊️'],['雀','què','sparrow','🐦'],['燕','yàn','swallow','🐦'],['鲸','jīng','whale','🐋'],['蚁','yǐ','ant','🐜']]},
+  pla:{en:'Plants',zh:'植物',icon:'🌱',items:[
+    ['花','huā','flower','🌸'],['草','cǎo','grass','🌿'],['木','mù','wood','🌳'],['树','shù','tree','🌲'],['叶','yè','leaf','🍃'],
+    ['果','guǒ','fruit','🍎'],['竹','zhú','bamboo','🎋'],['松','sōng','pine','🌲'],['梅','méi','plum','🌸'],['兰','lán','orchid','🌺'],
+    ['菊','jú','chrysanthemum','🌼'],['莲','lián','lotus','🪷'],['瓜','guā','melon','🍈'],['种','zhǒng','seed','🌱'],['根','gēn','root','🌱'],
+    ['桃','táo','peach','🍑'],['橘','jú','tangerine','🍊'],['梨','lí','pear','🍐'],['莓','méi','berry','🫐'],['藤','téng','vine','🌿']]},
+  food:{en:'Food',zh:'食物',icon:'🍚',items:[
+    ['饭','fàn','rice/meal','🍚'],['菜','cài','dish/veggie','🥬'],['肉','ròu','meat','🥩'],['蛋','dàn','egg','🥚'],['米','mǐ','rice','🌾'],
+    ['面','miàn','noodle','🍜'],['汤','tāng','soup','🍲'],['茶','chá','tea','🍵'],['糖','táng','candy','🍬'],['盐','yán','salt','🧂'],
+    ['油','yóu','oil','🫒'],['豆','dòu','bean','🫘'],['虾','xiā','shrimp','🦐'],['饼','bǐng','pancake','🥞'],['粥','zhōu','porridge','🥣'],
+    ['饺','jiǎo','dumpling','🥟'],['包','bāo','bun','🫓'],['酒','jiǔ','wine','🍷'],['醋','cù','vinegar','🫗'],['酱','jiàng','sauce','🥫'],
+    ['姜','jiāng','ginger','🫚'],['蒜','suàn','garlic','🧄'],['葱','cōng','scallion','🧅'],['奶','nǎi','milk','🥛'],['粉','fěn','powder','🍜']]},
+  col:{en:'Colors',zh:'颜色',icon:'🎨',items:[
+    ['红','hóng','red','🔴'],['黄','huáng','yellow','🟡'],['蓝','lán','blue','🔵'],['绿','lǜ','green','🟢'],['白','bái','white','⚪'],
+    ['黑','hēi','black','⚫'],['紫','zǐ','purple','🟣'],['橙','chéng','orange','🟠']]},
+  desc:{en:'Descriptors',zh:'描述',icon:'📏',items:[
+    ['大','dà','big','⬆️'],['小','xiǎo','small','⬇️'],['长','cháng','long','📏'],['短','duǎn','short','📐'],['高','gāo','tall','📈'],
+    ['低','dī','low','📉'],['轻','qīng','light','🪶'],['重','zhòng','heavy','🏋️'],['胖','pàng','fat','🐷'],['瘦','shòu','thin','🧍'],
+    ['快','kuài','fast','🏎️'],['慢','màn','slow','🐌'],['冷','lěng','cold','🥶'],['热','rè','hot','🥵'],['新','xīn','new','🆕'],
+    ['旧','jiù','old','♻️'],['多','duō','many','📊'],['少','shǎo','few','📉'],['美','měi','beautiful','🌹'],['丑','chǒu','ugly','👹'],
+    ['干','gān','dry','🏜️'],['净','jìng','clean','✨'],['甜','tián','sweet','🍯'],['苦','kǔ','bitter','😖'],['酸','suān','sour','🍋'],
+    ['辣','là','spicy','🌶️'],['香','xiāng','fragrant','🌹'],['软','ruǎn','soft','🧸'],['硬','yìng','hard','🪨'],['满','mǎn','full','🥛'],
+    ['空','kōng','empty','📭'],['亮','liàng','bright','💡'],['暗','àn','dark','🌑'],['暖','nuǎn','warm','🌡️'],['凉','liáng','cool','🌊']]},
+  dir:{en:'Directions',zh:'方位',icon:'🧭',items:[
+    ['上','shàng','up','⬆️'],['下','xià','down','⬇️'],['左','zuǒ','left','⬅️'],['右','yòu','right','➡️'],['前','qián','front','▶️'],
+    ['后','hòu','behind','◀️'],['里','lǐ','inside','📥'],['外','wài','outside','📤'],['中','zhōng','middle','⏺️'],['东','dōng','east','🧭'],
+    ['西','xī','west','🧭'],['南','nán','south','🧭'],['北','běi','north','🧭'],['远','yuǎn','far','🔭'],['近','jìn','near','🔍']]},
+  act:{en:'Actions',zh:'动作',icon:'🎬',items:[
+    ['吃','chī','eat','🍽️'],['喝','hē','drink','🥤'],['走','zǒu','walk','🚶'],['跑','pǎo','run','🏃'],['跳','tiào','jump','🤸'],
+    ['看','kàn','look','👀'],['听','tīng','listen','👂'],['说','shuō','speak','🗣️'],['读','dú','read','📖'],['写','xiě','write','✍️'],
+    ['画','huà','draw','🎨'],['飞','fēi','fly','🕊️'],['坐','zuò','sit','💺'],['站','zhàn','stand','🧍'],['开','kāi','open','🔓'],
+    ['关','guān','close','🔒'],['拿','ná','take','✊'],['放','fàng','put','📦'],['拉','lā','pull','🤏'],['推','tuī','push','🫸'],
+    ['打','dǎ','hit','🏓'],['切','qiē','cut','✂️'],['洗','xǐ','wash','🧼'],['穿','chuān','wear','👔'],['脱','tuō','take off','👕'],
+    ['睡','shuì','sleep','😴'],['醒','xǐng','wake','🌅'],['来','lái','come','🏃'],['去','qù','go','🚶'],['出','chū','exit','🚪'],
+    ['入','rù','enter','🚪'],['回','huí','return','🔄'],['送','sòng','send','🎁'],['买','mǎi','buy','🛒'],['卖','mài','sell','💰'],
+    ['做','zuò','make','🔨'],['用','yòng','use','🔧'],['找','zhǎo','find','🔍'],['给','gěi','give','🤲'],['问','wèn','ask','❓'],
+    ['答','dá','answer','✅'],['想','xiǎng','think','💭'],['学','xué','learn','📚'],['教','jiāo','teach','👨‍🏫'],['玩','wán','play','🎮'],
+    ['笑','xiào','laugh','😄'],['哭','kū','cry','😢'],['唱','chàng','sing','🎤'],['爬','pá','crawl','🐛'],['游','yóu','swim','🏊'],
+    ['吹','chuī','blow','💨'],['扔','rēng','throw','🤾'],['接','jiē','catch','🤲'],['抱','bào','hug','🤗'],['踢','tī','kick','⚽'],
+    ['拍','pāi','clap','👏'],['摸','mō','touch','🤚'],['选','xuǎn','choose','☑️'],['等','děng','wait','⏳'],['帮','bāng','help','🤝'],
+    ['挖','wā','dig','🏗️'],['喂','wèi','feed','🍼'],['叫','jiào','call','📢'],['记','jì','remember','📝'],['换','huàn','change','🔄']]},
+  obj:{en:'Things',zh:'物品',icon:'🏠',items:[
+    ['门','mén','door','🚪'],['窗','chuāng','window','🪟'],['床','chuáng','bed','🛏️'],['灯','dēng','lamp','💡'],['车','chē','car','🚗'],
+    ['船','chuán','boat','⛵'],['刀','dāo','knife','🔪'],['碗','wǎn','bowl','🥣'],['杯','bēi','cup','☕'],['瓶','píng','bottle','🍶'],
+    ['伞','sǎn','umbrella','☂️'],['钟','zhōng','clock','🕐'],['锁','suǒ','lock','🔒'],['箱','xiāng','box','📦'],['袋','dài','bag','👜'],
+    ['钱','qián','money','💰'],['球','qiú','ball','⚽'],['桌','zhuō','desk','🪑'],['椅','yǐ','chair','💺'],['柜','guì','cabinet','🗄️'],
+    ['镜','jìng','mirror','🪞'],['绳','shéng','rope','🧵'],['剪','jiǎn','scissors','✂️'],['尺','chǐ','ruler','📏'],
+    ['衣','yī','clothes','👔'],['服','fú','clothing','👕'],['裤','kù','pants','👖'],['裙','qún','skirt','👗'],['鞋','xié','shoes','👟'],['袜','wà','socks','🧦']]},
+  time:{en:'Time',zh:'时间',icon:'⏰',items:[
+    ['年','nián','year','📅'],['时','shí','hour','⏰'],['分','fēn','minute','⏱️'],['秒','miǎo','second','⏱️'],['今','jīn','today','📆'],
+    ['明','míng','tomorrow','🌅'],['昨','zuó','yesterday','📅'],['早','zǎo','morning','🌅'],['午','wǔ','noon','☀️'],['晚','wǎn','evening','🌙'],
+    ['春','chūn','spring','🌸'],['夏','xià','summer','☀️'],['秋','qiū','autumn','🍂'],['冬','dōng','winter','❄️'],['周','zhōu','week','📅']]},
+  com:{en:'Common',zh:'常用',icon:'📖',items:[
+    ['是','shì','is','✅'],['有','yǒu','have','📦'],['在','zài','at','📍'],['不','bù','not','❌'],['了','le','done','✔️'],
+    ['的','de','possessive','📝'],['和','hé','and','➕'],['也','yě','also','➕'],['还','hái','still','⏳'],['都','dōu','all','👥'],
+    ['很','hěn','very','💯'],['太','tài','too much','‼️'],['可','kě','can','✅'],['会','huì','will','🎓'],['能','néng','able','💪'],
+    ['要','yào','want','🙋'],['让','ràng','let','👐'],['对','duì','correct','✅'],['从','cóng','from','⬅️'],['到','dào','arrive','➡️'],
+    ['过','guò','pass','⏩'],['知','zhī','know','🧠'],['道','dào','way','🛤️'],['同','tóng','same','🟰'],['别','bié','don\'t','⛔'],
+    ['再','zài','again','🔄'],['已','yǐ','already','✔️'],['只','zhī','only','☝️'],['个','gè','mw','📦'],['把','bǎ','handle','🤏'],
+    ['被','bèi','by','📋'],['着','zhe','-ing','⏳'],['校','xiào','school','🏫'],['书','shū','book','📚'],['笔','bǐ','pen','🖊️'],
+    ['纸','zhǐ','paper','📄'],['字','zì','character','🔤'],['课','kè','class','📝'],['老','lǎo','old','👴'],['师','shī','teacher','👨‍🏫'],
+    ['路','lù','road','🛤️'],['街','jiē','street','🏘️'],['桥','qiáo','bridge','🌉'],['城','chéng','city','🏙️'],['村','cūn','village','🏘️'],
+    ['房','fáng','house','🏠'],['店','diàn','shop','🏪'],['园','yuán','garden','🏞️'],['世','shì','world','🌍'],['国','guó','country','🏳️'],
+    ['爱','ài','love','❤️'],['怕','pà','fear','😨'],['喜','xǐ','happy','😊'],['怒','nù','angry','😡'],['急','jí','urgent','😰'],
+    ['累','lèi','tired','😫'],['饿','è','hungry','🤤'],['忙','máng','busy','🏃'],['生','shēng','born','👶'],['活','huó','live','🌱'],
+    ['力','lì','power','💪'],['气','qì','air','💨'],['声','shēng','sound','🔊'],['名','míng','name','📛'],['岁','suì','age','🎂'],
+    ['机','jī','machine','✈️'],['每','měi','every','📅'],['比','bǐ','compare','🤔'],['最','zuì','most','🏆'],['加','jiā','add','➕'],
+    ['自','zì','self','🙋'],['见','jiàn','see','👀']]},
+};
+
+const CHAR_LOOKUP = {};
+const ALL_CHARS_FLAT = [];
+for (const gk of Object.keys(CHAR_DB)) {
+  for (const item of CHAR_DB[gk].items) {
+    const obj = { c: item[0], p: item[1], e: item[2], m: item[3], g: gk };
+    CHAR_LOOKUP[item[0]] = obj;
+    ALL_CHARS_FLAT.push(obj);
+  }
+}
+
+let charGroup = 'all';
+let charPage = 0;
+const CHARS_PER_PAGE = 60;
+
+function renderCharSVG(char, size) {
+  const d = CHAR_LOOKUP[char];
+  if (!d) return '';
+  return '<span style="font-size:' + size + 'px;line-height:1;">' + d.m + '</span>';
+}
+
+// ==================== TTS (Audio Pronunciation) ====================
+function speakChinese(char) {
+  if (!window.speechSynthesis) return;
+  var u = new SpeechSynthesisUtterance(char);
+  u.lang = 'zh-CN';
+  u.rate = 0.8;
+  window.speechSynthesis.speak(u);
+}
+var hasTTS = typeof window !== 'undefined' && 'speechSynthesis' in window;
+
+function flipCard(el, char) {
+  // Open expanded flip card overlay
+  const d = CHAR_LOOKUP[char];
+  if (!d) return;
+  const isLearned = data.learning.learnedChinese.includes(char);
+  const isCurrent = data.phases[data.learning.currentPhase]?.chinese?.includes(char);
+  const card = document.getElementById('flipCardBig');
+  card.classList.remove('flipped');
+  card.className = 'flip-card-big' + (isLearned ? ' learned' : '') + (isCurrent ? ' current' : '');
+
+  // Front: character only (large, clean)
+  const ttsBtn = hasTTS ? '<button class="tts-btn" onclick="event.stopPropagation();speakChinese(\'' + char + '\')" style="font-size:28px;margin-top:12px;">🔊</button>' : '';
+  document.getElementById('flipFront').innerHTML =
+    '<div class="big-char">' + char + '</div>' +
+    '<div class="big-pinyin">' + d.p + '</div>' +
+    ttsBtn +
+    '<div class="flip-hint">' + (currentLang === 'zh' ? '点击翻转看图 →' : 'Tap to see picture →') + '</div>';
+
+  // Back: pictographic image
+  const pic = PICTOGRAPHS[char] || '';
+  const backContent = pic
+    ? pic + '<div class="pic-char">' + char + '</div><div class="pic-label">' + d.p + ' · ' + d.e + '</div>'
+    : '<div class="pic-emoji">' + d.m + '</div><div class="pic-char">' + char + '</div><div class="pic-label">' + d.p + ' · ' + d.e + '</div>';
+  document.getElementById('flipBack').innerHTML =
+    backContent +
+    '<div class="flip-hint">' + (currentLang === 'zh' ? '← 点击翻回' : '← Tap to flip back') + '</div>';
+
+  // Action buttons
+  const learnBtn = isLearned
+    ? '<button class="btn btn-outline" onclick="toggleLearnedFlip(\'' + char + '\')">' + t('markUnlearned') + '</button>'
+    : '<button class="btn btn-green" onclick="toggleLearnedFlip(\'' + char + '\')">' + t('markLearned') + '</button>';
+  const detailBtn = '<button class="btn btn-primary" onclick="closeFlipCard();showCharDetail(\'' + char + '\')">' + (currentLang === 'zh' ? '详情' : 'Details') + '</button>';
+  const closeBtn = '<button class="btn btn-outline" onclick="closeFlipCard()">' + t('cancelBtn') + '</button>';
+  document.getElementById('flipActions').innerHTML = learnBtn + detailBtn + closeBtn;
+
+  document.getElementById('flipOverlay').classList.add('show');
+}
+
+function closeFlipCard() {
+  document.getElementById('flipOverlay').classList.remove('show');
+}
+
+function toggleLearnedFlip(char) {
+  toggleLearned('chinese', char);
+  // Re-open the flip card to update state
+  closeFlipCard();
+  setTimeout(function() { flipCard(null, char); }, 100);
+}
+
+function showCharDetail(char) {
+  const d = CHAR_LOOKUP[char];
+  if (!d) return;
+  const isLearned = data.learning.learnedChinese.includes(char);
+  const isCustom = d.g === 'custom';
+  var deleteBtn = isCustom ? '<button class="btn btn-small" style="background:var(--red);color:white;margin-top:8px;" onclick="removeCustomChar(\'' + char + '\');document.getElementById(\'charDetailOverlay\').classList.remove(\'show\');">' + (currentLang==='zh'?'删除此字':'Delete') + '</button>' : '';
+  var ttsBtn = hasTTS ? '<button class="tts-btn" onclick="event.stopPropagation();speakChinese(\'' + char + '\')" style="font-size:24px;margin:8px 0;" title="Pronounce">🔊</button>' : '';
+  var picSvg = PICTOGRAPHS[char] ? '<div style="width:120px;height:90px;margin:8px auto;background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:12px;padding:8px;display:flex;align-items:center;justify-content:center;">' + PICTOGRAPHS[char] + '</div>' : '';
+  document.getElementById('charDetailContent').innerHTML =
+    picSvg +
+    '<div style="font-size:64px;line-height:1;">' + d.m + '</div>' +
+    '<div class="big-char" style="color:var(--primary)">' + char + '</div>' +
+    ttsBtn +
+    '<div style="font-size:18px;color:var(--text-light);margin-bottom:4px;">' + d.p + '</div>' +
+    '<div class="char-hint">' + t('meaning') + ': ' + d.e + '</div>' +
+    '<div style="margin:8px 0;">' + (isLearned ? '<span class="badge badge-green">' + t('markLearned') + '</span>' : '') + '</div>' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button class="btn ' + (isLearned ? 'btn-outline' : 'btn-green') + ' btn-block" onclick="toggleLearnedFromDetail(\'' + char + '\')">' + (isLearned ? t('markUnlearned') : t('markLearned')) + '</button>' +
+    '<button class="btn btn-outline btn-block" onclick="document.getElementById(\'charDetailOverlay\').classList.remove(\'show\')">' + t('cancelBtn') + '</button>' +
+    '</div>' + deleteBtn;
+  document.getElementById('charDetailOverlay').classList.add('show');
+}
+
+function toggleLearnedFromDetail(char) {
+  toggleLearned('chinese', char);
+  showCharDetail(char);
+}
+
+// ==================== PICTOGRAPHIC SVGs (象形文字) ====================
+// Simple SVG illustrations showing how character shape relates to meaning
+const PICTOGRAPHS = {
+  '山': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><line x1="30" y1="6" x2="30" y2="42" stroke="#5D4037" stroke-width="4" stroke-linecap="round"/><line x1="12" y1="16" x2="12" y2="42" stroke="#795548" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="16" x2="48" y2="42" stroke="#795548" stroke-width="3.5" stroke-linecap="round"/><line x1="4" y1="42" x2="56" y2="42" stroke="#8D6E63" stroke-width="3"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#5D4037" font-weight="bold">mountain</text></svg>',
+  '水': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><line x1="30" y1="6" x2="30" y2="42" stroke="#1565C0" stroke-width="4" stroke-linecap="round"/><path d="M30 18 Q18 24 14 36" fill="none" stroke="#1976D2" stroke-width="3" stroke-linecap="round"/><path d="M30 18 Q42 24 46 36" fill="none" stroke="#1976D2" stroke-width="3" stroke-linecap="round"/><path d="M30 28 Q22 32 18 42" fill="none" stroke="#42A5F5" stroke-width="2" stroke-linecap="round"/><path d="M30 28 Q38 32 42 42" fill="none" stroke="#42A5F5" stroke-width="2" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#1565C0" font-weight="bold">water</text></svg>',
+  '火': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF3E0" rx="4"/><path d="M24 38 Q18 28 22 18 Q26 10 30 8" fill="none" stroke="#F44336" stroke-width="3.5" stroke-linecap="round"/><path d="M36 38 Q42 28 38 18 Q34 10 30 8" fill="none" stroke="#FF5722" stroke-width="3.5" stroke-linecap="round"/><path d="M18 42 Q24 32 30 22" fill="none" stroke="#FF9800" stroke-width="3" stroke-linecap="round"/><path d="M42 42 Q36 32 30 22" fill="none" stroke="#FF9800" stroke-width="3" stroke-linecap="round"/><circle cx="30" cy="14" r="3" fill="#FFC107"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#E65100" font-weight="bold">fire</text></svg>',
+  '日': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF8E1" rx="4"/><rect x="14" y="8" width="32" height="32" rx="2" fill="#FFC107" stroke="#F57F17" stroke-width="3"/><line x1="14" y1="24" x2="46" y2="24" stroke="#F57F17" stroke-width="3"/><line x1="6" y1="24" x2="10" y2="24" stroke="#FFD54F" stroke-width="2"/><line x1="50" y1="24" x2="54" y2="24" stroke="#FFD54F" stroke-width="2"/><line x1="30" y1="2" x2="30" y2="6" stroke="#FFD54F" stroke-width="2"/><line x1="30" y1="42" x2="30" y2="46" stroke="#FFD54F" stroke-width="2"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#F57F17" font-weight="bold">sun</text></svg>',
+  '月': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#1A237E" rx="4"/><path d="M20 6 L20 42 Q20 44 22 44 L38 44" fill="none" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/><path d="M38 6 L38 44" fill="none" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/><line x1="20" y1="18" x2="38" y2="18" stroke="#FBC02D" stroke-width="2.5"/><line x1="20" y1="30" x2="38" y2="30" stroke="#FBC02D" stroke-width="2.5"/><circle cx="46" cy="10" r="1.5" fill="#FFF9C4" opacity="0.6"/><circle cx="50" cy="20" r="1" fill="#FFF9C4" opacity="0.4"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#FDD835" font-weight="bold">moon</text></svg>',
+  '天': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><line x1="8" y1="10" x2="52" y2="10" stroke="#42A5F5" stroke-width="4" stroke-linecap="round"/><line x1="14" y1="24" x2="46" y2="24" stroke="#1976D2" stroke-width="3"/><line x1="30" y1="10" x2="30" y2="42" stroke="#1976D2" stroke-width="3.5"/><path d="M30 28 L14 42" stroke="#1565C0" stroke-width="3" stroke-linecap="round"/><path d="M30 28 L46 42" stroke="#1565C0" stroke-width="3" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#1565C0" font-weight="bold">sky</text></svg>',
+  '田': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E8F5E9" rx="4"/><rect x="10" y="6" width="40" height="36" rx="2" fill="#A5D6A7" stroke="#2E7D32" stroke-width="3"/><line x1="30" y1="6" x2="30" y2="42" stroke="#2E7D32" stroke-width="3"/><line x1="10" y1="24" x2="50" y2="24" stroke="#2E7D32" stroke-width="3"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#2E7D32" font-weight="bold">field</text></svg>',
+  '石': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#EFEBE9" rx="4"/><line x1="14" y1="10" x2="46" y2="10" stroke="#616161" stroke-width="3.5" stroke-linecap="round"/><path d="M30 10 L30 20 L14 20 L14 42 L42 42 L42 20 L30 20" fill="#9E9E9E" stroke="#616161" stroke-width="3"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#616161" font-weight="bold">stone</text></svg>',
+  '云': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><line x1="10" y1="12" x2="50" y2="12" stroke="#90A4AE" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="24" x2="46" y2="24" stroke="#B0BEC5" stroke-width="3" stroke-linecap="round"/><path d="M16 24 Q10 30 16 36 Q22 42 30 38 Q38 42 44 36 Q50 30 44 24" fill="#CFD8DC" stroke="#90A4AE" stroke-width="2.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#78909C" font-weight="bold">cloud</text></svg>',
+  '雨': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><line x1="8" y1="8" x2="52" y2="8" stroke="#546E7A" stroke-width="3"/><path d="M12 8 L12 28 L48 28 L48 8" fill="none" stroke="#546E7A" stroke-width="2.5"/><line x1="30" y1="8" x2="30" y2="20" stroke="#546E7A" stroke-width="2"/><line x1="20" y1="18" x2="18" y2="26" stroke="#42A5F5" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="22" x2="28" y2="28" stroke="#42A5F5" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="18" x2="38" y2="26" stroke="#42A5F5" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="30" x2="19" y2="40" stroke="#64B5F6" stroke-width="2" stroke-linecap="round"/><line x1="38" y1="30" x2="35" y2="40" stroke="#64B5F6" stroke-width="2" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#1565C0" font-weight="bold">rain</text></svg>',
+  '星': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#1A237E" rx="4"/><polygon points="30,4 33,16 46,16 36,24 39,36 30,28 21,36 24,24 14,16 27,16" fill="#FDD835" stroke="#F9A825" stroke-width="1"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#FDD835" font-weight="bold">star</text></svg>',
+  '人': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF3E0" rx="4"/><path d="M30 6 L18 42" stroke="#E65100" stroke-width="4.5" stroke-linecap="round"/><path d="M30 6 L42 42" stroke="#E65100" stroke-width="4.5" stroke-linecap="round"/><circle cx="30" cy="5" r="4" fill="#FFB74D" stroke="#E65100" stroke-width="1.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#E65100" font-weight="bold">person</text></svg>',
+  '口': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FCE4EC" rx="4"/><rect x="14" y="10" width="32" height="30" rx="3" fill="#FFCDD2" stroke="#E53935" stroke-width="3.5"/><path d="M24 32 Q30 38 36 32" fill="#E57373" stroke="#C62828" stroke-width="1.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#C62828" font-weight="bold">mouth</text></svg>',
+  '手': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF3E0" rx="4"/><line x1="12" y1="12" x2="48" y2="12" stroke="#E65100" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="46" y2="22" stroke="#E65100" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="6" x2="30" y2="42" stroke="#BF360C" stroke-width="4" stroke-linecap="round"/><path d="M20 30 Q14 34 10 42" fill="none" stroke="#E65100" stroke-width="2.5" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#BF360C" font-weight="bold">hand</text></svg>',
+  '目': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF8E1" rx="4"/><rect x="14" y="6" width="32" height="36" rx="4" fill="white" stroke="#424242" stroke-width="3"/><line x1="14" y1="18" x2="46" y2="18" stroke="#424242" stroke-width="2.5"/><line x1="14" y1="30" x2="46" y2="30" stroke="#424242" stroke-width="2.5"/><circle cx="30" cy="24" r="4" fill="#5D4037"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#424242" font-weight="bold">eye</text></svg>',
+  '耳': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF3E0" rx="4"/><rect x="14" y="6" width="28" height="36" rx="2" fill="none" stroke="#BF360C" stroke-width="3"/><line x1="14" y1="16" x2="42" y2="16" stroke="#E65100" stroke-width="2.5"/><line x1="14" y1="26" x2="42" y2="26" stroke="#E65100" stroke-width="2.5"/><line x1="14" y1="36" x2="46" y2="36" stroke="#E65100" stroke-width="2.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#BF360C" font-weight="bold">ear</text></svg>',
+  '心': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FCE4EC" rx="4"/><path d="M14 22 Q20 10 30 20 Q40 10 46 22 Q50 32 30 42 Q10 32 14 22Z" fill="#F44336" stroke="#C62828" stroke-width="2"/><circle cx="20" cy="20" r="2" fill="#FFCDD2"/><circle cx="30" cy="16" r="2" fill="#FFCDD2"/><circle cx="40" cy="20" r="2" fill="#FFCDD2"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#C62828" font-weight="bold">heart</text></svg>',
+  '鱼': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E3F2FD" rx="4"/><path d="M10 8 L50 8" stroke="#1565C0" stroke-width="3" stroke-linecap="round"/><path d="M14 8 L14 28 Q14 36 22 36 L38 36 Q46 36 46 28 L46 8" fill="none" stroke="#1976D2" stroke-width="3"/><line x1="10" y1="42" x2="50" y2="42" stroke="#1565C0" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="46" y2="22" stroke="#42A5F5" stroke-width="2"/><circle cx="24" cy="15" r="2" fill="#0D47A1"/><polygon points="46,22 56,16 56,28" fill="#42A5F5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#1565C0" font-weight="bold">fish</text></svg>',
+  '鸟': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF8E1" rx="4"/><path d="M16 10 Q20 6 28 10 L28 22 L16 22 Z" fill="none" stroke="#E65100" stroke-width="3"/><circle cx="22" cy="14" r="2" fill="#E65100"/><line x1="12" y1="16" x2="16" y2="16" stroke="#FF9800" stroke-width="2"/><path d="M28 16 Q40 12 46 20 Q50 28 44 34 L20 34 L20 22" fill="none" stroke="#E65100" stroke-width="3"/><line x1="20" y1="28" x2="44" y2="28" stroke="#F57C00" stroke-width="2"/><line x1="26" y1="34" x2="26" y2="42" stroke="#BF360C" stroke-width="2.5"/><line x1="36" y1="34" x2="36" y2="42" stroke="#BF360C" stroke-width="2.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#E65100" font-weight="bold">bird</text></svg>',
+  '马': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#EFEBE9" rx="4"/><path d="M14 8 L46 8 L46 28 Q46 34 40 34 L14 34 L14 8" fill="none" stroke="#5D4037" stroke-width="3"/><line x1="14" y1="18" x2="46" y2="18" stroke="#795548" stroke-width="2.5"/><line x1="14" y1="28" x2="46" y2="28" stroke="#795548" stroke-width="2.5"/><path d="M14 34 L14 42" stroke="#5D4037" stroke-width="3"/><path d="M46 34 L46 42" stroke="#5D4037" stroke-width="3"/><line x1="8" y1="42" x2="52" y2="42" stroke="#5D4037" stroke-width="3"/><circle cx="22" cy="13" r="1.5" fill="#3E2723"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#5D4037" font-weight="bold">horse</text></svg>',
+  '木': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E8F5E9" rx="4"/><line x1="30" y1="6" x2="30" y2="42" stroke="#5D4037" stroke-width="4.5" stroke-linecap="round"/><line x1="8" y1="20" x2="52" y2="20" stroke="#2E7D32" stroke-width="4" stroke-linecap="round"/><path d="M30 32 L14 42" stroke="#795548" stroke-width="3" stroke-linecap="round"/><path d="M30 32 L46 42" stroke="#795548" stroke-width="3" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#2E7D32" font-weight="bold">tree</text></svg>',
+  '花': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FCE4EC" rx="4"/><line x1="20" y1="6" x2="20" y2="16" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="6" x2="40" y2="16" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><line x1="10" y1="16" x2="50" y2="16" stroke="#4CAF50" stroke-width="3"/><circle cx="30" cy="28" r="10" fill="#F48FB1" stroke="#E91E63" stroke-width="2"/><circle cx="30" cy="28" r="4" fill="#FFC107"/><line x1="30" y1="38" x2="30" y2="44" stroke="#4CAF50" stroke-width="2.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#C2185B" font-weight="bold">flower</text></svg>',
+  '大': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF3E0" rx="4"/><line x1="8" y1="22" x2="52" y2="22" stroke="#E65100" stroke-width="4.5" stroke-linecap="round"/><line x1="30" y1="6" x2="30" y2="42" stroke="#BF360C" stroke-width="4.5" stroke-linecap="round"/><path d="M30 28 L12 42" stroke="#E65100" stroke-width="3.5" stroke-linecap="round"/><path d="M30 28 L48 42" stroke="#E65100" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="5" r="3.5" fill="#FFB74D" stroke="#E65100" stroke-width="1.5"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#BF360C" font-weight="bold">big</text></svg>',
+  '小': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF8E1" rx="4"/><line x1="30" y1="6" x2="30" y2="38" stroke="#F57F17" stroke-width="3.5" stroke-linecap="round"/><path d="M30 22 L16 36" stroke="#F9A825" stroke-width="3" stroke-linecap="round"/><path d="M30 22 L44 36" stroke="#F9A825" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="14" r="2.5" fill="#FBC02D"/><circle cx="44" cy="14" r="2.5" fill="#FBC02D"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#F57F17" font-weight="bold">small</text></svg>',
+  '上': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#E8F5E9" rx="4"/><line x1="30" y1="8" x2="30" y2="36" stroke="#2E7D32" stroke-width="4.5" stroke-linecap="round"/><line x1="18" y1="22" x2="42" y2="22" stroke="#388E3C" stroke-width="3.5" stroke-linecap="round"/><line x1="10" y1="40" x2="50" y2="40" stroke="#1B5E20" stroke-width="4" stroke-linecap="round"/><polygon points="30,4 24,14 36,14" fill="#4CAF50"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#1B5E20" font-weight="bold">up</text></svg>',
+  '下': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FBE9E7" rx="4"/><line x1="10" y1="10" x2="50" y2="10" stroke="#BF360C" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="10" x2="30" y2="38" stroke="#E64A19" stroke-width="4.5" stroke-linecap="round"/><line x1="18" y1="24" x2="42" y2="24" stroke="#D84315" stroke-width="3.5" stroke-linecap="round"/><polygon points="30,42 24,32 36,32" fill="#FF5722"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#BF360C" font-weight="bold">down</text></svg>',
+  '门': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#EFEBE9" rx="4"/><path d="M14 42 L14 8 Q14 6 16 6 L44 6 Q46 6 46 8 L46 42" fill="none" stroke="#5D4037" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="26" r="2.5" fill="#FFC107"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#5D4037" font-weight="bold">door</text></svg>',
+  '米': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FFF8E1" rx="4"/><line x1="30" y1="6" x2="30" y2="42" stroke="#F57F17" stroke-width="3.5" stroke-linecap="round"/><line x1="10" y1="24" x2="50" y2="24" stroke="#F57F17" stroke-width="3.5" stroke-linecap="round"/><line x1="14" y1="10" x2="46" y2="38" stroke="#FFA000" stroke-width="2.5" stroke-linecap="round"/><line x1="46" y1="10" x2="14" y2="38" stroke="#FFA000" stroke-width="2.5" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#E65100" font-weight="bold">rice</text></svg>',
+  '果': '<svg viewBox="0 0 60 54"><rect x="0" y="0" width="60" height="54" fill="#FBE9E7" rx="4"/><rect x="16" y="4" width="28" height="20" rx="2" fill="#F44336" stroke="#C62828" stroke-width="2.5"/><line x1="30" y1="4" x2="30" y2="24" stroke="#C62828" stroke-width="2"/><line x1="16" y1="14" x2="44" y2="14" stroke="#C62828" stroke-width="2"/><line x1="30" y1="24" x2="30" y2="42" stroke="#5D4037" stroke-width="3.5"/><path d="M30 32 L16 42" stroke="#795548" stroke-width="2.5" stroke-linecap="round"/><path d="M30 32 L44 42" stroke="#795548" stroke-width="2.5" stroke-linecap="round"/><text x="30" y="52" text-anchor="middle" font-size="7" fill="#C62828" font-weight="bold">fruit</text></svg>',
+}
+
+function renderChineseChars() {
+  const customChars = getCustomChars();
+  const groups = Object.keys(CHAR_DB);
+  let allCount = ALL_CHARS_FLAT.length + customChars.length;
+  let tabsHtml = '<button class="filter-btn ' + (charGroup==='all'?'active':'') + '" onclick="charGroup=\'all\';charPage=0;renderChineseChars();">' + t('allCat') + ' (' + allCount + ')</button>';
+  for (const gk of groups) {
+    const g = CHAR_DB[gk];
+    tabsHtml += '<button class="filter-btn ' + (charGroup===gk?'active':'') + '" onclick="charGroup=\'' + gk + '\';charPage=0;renderChineseChars();">' + g.icon + ' ' + (g[currentLang]||g.en) + ' (' + g.items.length + ')</button>';
+  }
+  if (customChars.length > 0) {
+    tabsHtml += '<button class="filter-btn ' + (charGroup==='custom'?'active':'') + '" onclick="charGroup=\'custom\';charPage=0;renderChineseChars();">\u2B50 ' + (currentLang==='zh'?'自定义':'Custom') + ' (' + customChars.length + ')</button>';
+  }
+  tabsHtml += '<button class="filter-btn" onclick="showAddCharUI()" style="background:var(--accent);color:white;border-color:var(--accent);">+ ' + (currentLang==='zh'?'添加':'Add') + '</button>';
+  document.getElementById('charCategoryTabs').innerHTML = tabsHtml;
+
+  let allWithCustom = [...ALL_CHARS_FLAT, ...customChars.map(function(c) { return {c:c[0],p:c[1],e:c[2],m:c[3],g:'custom'}; })];
+  let chars = charGroup === 'all' ? allWithCustom :
+              charGroup === 'custom' ? allWithCustom.filter(c => c.g === 'custom') :
+              allWithCustom.filter(c => c.g === charGroup);
+  const total = chars.length;
+  const totalPages = Math.ceil(total / CHARS_PER_PAGE);
+  if (charPage >= totalPages) charPage = Math.max(0, totalPages - 1);
+  const pageChars = chars.slice(charPage * CHARS_PER_PAGE, (charPage + 1) * CHARS_PER_PAGE);
+
+  const phase = data.phases[data.learning.currentPhase];
+  const phaseChars = phase ? phase.chinese : [];
+  let html = '';
+  pageChars.forEach(ch => {
+    const learned = data.learning.learnedChinese.includes(ch.c);
+    const isCurrent = phaseChars.includes(ch.c);
+    const cls = learned ? 'learned' : (isCurrent ? 'current' : '');
+    html += '<div class="char-cell ' + cls + '" onclick="flipCard(this,\'' + ch.c + '\')" title="' + ch.p + ' ' + ch.e + '">' +
+      '<div class="char-text">' + ch.c + '</div>' +
+      '<div class="char-pinyin">' + ch.p + '</div></div>';
+  });
+  document.getElementById('chineseGrid').innerHTML = html;
+
+  let pagHtml = '';
+  if (totalPages > 1) {
+    pagHtml += '<button class="btn btn-outline btn-small" ' + (charPage===0?'disabled':'') + ' onclick="charPage--;renderChineseChars();">◀</button>';
+    pagHtml += '<span style="font-size:12px;padding:4px 8px;">' + (charPage+1) + '/' + totalPages + '</span>';
+    pagHtml += '<button class="btn btn-outline btn-small" ' + (charPage>=totalPages-1?'disabled':'') + ' onclick="charPage++;renderChineseChars();">▶</button>';
+  }
+  document.getElementById('charPagination').innerHTML = pagHtml;
+
+  const customCharsAll = getCustomChars();
+  const allCharsForCount = [...ALL_CHARS_FLAT, ...customCharsAll.map(function(c){ return {c:c[0]}; })];
+  const learnedCount = allCharsForCount.filter(c => data.learning.learnedChinese.includes(c.c)).length;
+  document.getElementById('charCountInfo').textContent = learnedCount + '/' + allCharsForCount.length + ' ' + t('charsKnown');
+}
+
+// ==================== CUSTOM CHARACTERS ====================
+function getCustomChars() {
+  try { return JSON.parse(localStorage.getItem('customChars') || '[]'); } catch(e) { return []; }
+}
+function saveCustomChars(chars) { localStorage.setItem('customChars', JSON.stringify(chars)); }
+
+function showAddCharUI() {
+  var ph1 = currentLang==='zh'?'输入汉字':'Enter character';
+  var ph2 = currentLang==='zh'?'拼音 (如 mā)':'Pinyin (e.g. mā)';
+  var ph3 = currentLang==='zh'?'英文含义':'English meaning';
+  var ph4 = currentLang==='zh'?'表情符号 (如 🐱)':'Emoji (e.g. 🐱)';
+  openModal('<h3>' + (currentLang==='zh'?'添加汉字':'Add Character') + '</h3>' +
+    '<label>' + (currentLang==='zh'?'汉字':'Character') + '</label>' +
+    '<input id="addCharChar" placeholder="' + ph1 + '" maxlength="1" style="font-size:24px;text-align:center;">' +
+    '<label>' + (currentLang==='zh'?'拼音':'Pinyin') + '</label><input id="addCharPinyin" placeholder="' + ph2 + '">' +
+    '<label>' + (currentLang==='zh'?'含义':'Meaning') + '</label><input id="addCharMeaning" placeholder="' + ph3 + '">' +
+    '<label>' + (currentLang==='zh'?'表情':'Emoji') + '</label><input id="addCharEmoji" placeholder="' + ph4 + '">' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="addCustomChar()">' + t('saveBtn') + '</button></div>');
+}
+
+function addCustomChar() {
+  var ch = (document.getElementById('addCharChar').value || '').trim();
+  var py = (document.getElementById('addCharPinyin').value || '').trim();
+  var meaning = (document.getElementById('addCharMeaning').value || '').trim();
+  var emoji = (document.getElementById('addCharEmoji').value || '').trim() || '📝';
+  if (!ch) return;
+  if (CHAR_LOOKUP[ch]) { alert(currentLang==='zh'?'此字已在字库中':'Character already in database'); return; }
+  var customs = getCustomChars();
+  if (customs.find(function(c){ return c[0] === ch; })) { alert(currentLang==='zh'?'此字已添加过':'Character already added'); return; }
+  customs.push([ch, py, meaning, emoji]);
+  saveCustomChars(customs);
+  CHAR_LOOKUP[ch] = { c: ch, p: py, e: meaning, m: emoji, g: 'custom' };
+  closeModal();
+  charGroup = 'custom'; charPage = 0;
+  renderChineseChars();
+}
+
+function removeCustomChar(ch) {
+  var customs = getCustomChars();
+  customs = customs.filter(function(c){ return c[0] !== ch; });
+  saveCustomChars(customs);
+  delete CHAR_LOOKUP[ch];
+  renderChineseChars();
+}
+
+// ==================== MATCHING GAME ====================
+let matchState = { chars: [], selected: null, matched: [], attempts: 0 };
+
+function shuffleArr(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+function startMatchingGame() {
+  var phase = data.phases[data.learning.currentPhase];
+  var phaseChars = phase ? phase.chinese : ['一','二','三','大','小','上'];
+  var gameChars = phaseChars.filter(function(c) { return !!CHAR_LOOKUP[c]; });
+  if (gameChars.length > 8) gameChars = gameChars.slice(0, 8);
+  if (gameChars.length < 3) gameChars = ALL_CHARS_FLAT.slice(0, 6).map(function(c) { return c.c; });
+
+  matchState = {
+    chars: gameChars,
+    charOrder: shuffleArr(gameChars.slice()),
+    emojiOrder: shuffleArr(gameChars.slice()),
+    selected: null,
+    selectedType: null,
+    matched: [],
+    attempts: 0
+  };
+  renderMatchingGame();
+  document.getElementById('matchOverlay').classList.add('show');
+}
+
+function renderMatchingGame() {
+  var s = matchState;
+  var isZh = currentLang === 'zh';
+  var html = '<div style="text-align:center;margin-bottom:12px;">';
+  html += '<div class="match-game-title">🎮 ' + (isZh ? '汉字配对' : 'Match Up!') + '</div>';
+  html += '<div class="match-game-subtitle">' + (isZh ? '找到每个汉字对应的表情！' : 'Find each character\'s emoji!') + '</div>';
+  html += '<div style="display:inline-flex;gap:12px;background:var(--primary-light);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--primary);">' +
+    '<span>✅ ' + s.matched.length + '/' + s.chars.length + '</span>' +
+    '<span>🎯 ' + s.attempts + '</span></div>';
+  html += '</div>';
+
+  html += '<div class="match-row-label">📝 ' + (isZh ? '汉字' : 'Characters') + '</div>';
+  html += '<div class="match-row">';
+  s.charOrder.forEach(function(c) {
+    var isMatched = s.matched.indexOf(c) >= 0;
+    var isSelected = s.selected === c && s.selectedType === 'char';
+    html += '<div class="match-card char-type' + (isMatched ? ' matched' : '') + (isSelected ? ' selected' : '') +
+      '" data-char="' + c + '" onclick="' + (isMatched ? '' : 'selectMatchCard(\'' + c + '\',\'char\')') + '">' +
+      '<div style="font-size:28px;font-weight:800;">' + c + '</div>' +
+      '<div style="font-size:9px;color:var(--text-light);">' + (CHAR_LOOKUP[c] ? CHAR_LOOKUP[c].p : '') + '</div></div>';
+  });
+  html += '</div>';
+
+  html += '<div style="text-align:center;margin:8px 0;font-size:18px;opacity:0.4;">↕️</div>';
+
+  html += '<div class="match-row-label">😊 ' + (isZh ? '表情' : 'Emojis') + '</div>';
+  html += '<div class="match-row">';
+  s.emojiOrder.forEach(function(c) {
+    var isMatched = s.matched.indexOf(c) >= 0;
+    var isSelected = s.selected === c && s.selectedType === 'emoji';
+    html += '<div class="match-card emoji-type' + (isMatched ? ' matched' : '') + (isSelected ? ' selected' : '') +
+      '" data-char="' + c + '" onclick="' + (isMatched ? '' : 'selectMatchCard(\'' + c + '\',\'emoji\')') + '">' +
+      (CHAR_LOOKUP[c] ? CHAR_LOOKUP[c].m : '❓') + '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="match-actions" style="margin-top:16px;">';
+  html += '<button class="btn btn-outline" onclick="closeMatchingGame()">' + t('cancelBtn') + '</button>';
+  html += '<button class="btn btn-accent" onclick="startMatchingGame()">' + (isZh ? '🔄 重来' : '🔄 Restart') + '</button>';
+  html += '</div>';
+  document.getElementById('matchGameContent').innerHTML = html;
+}
+
+function selectMatchCard(char, type) {
+  var s = matchState;
+  if (s.matched.indexOf(char) >= 0) return;
+
+  if (!s.selected) {
+    s.selected = char;
+    s.selectedType = type;
+    renderMatchingGame();
+  } else if (s.selectedType === type) {
+    s.selected = char;
+    s.selectedType = type;
+    renderMatchingGame();
+  } else {
+    s.attempts++;
+    var charClicked = type === 'char' ? char : s.selected;
+    var emojiClicked = type === 'emoji' ? char : s.selected;
+
+    if (charClicked === emojiClicked) {
+      s.matched.push(charClicked);
+      s.selected = null;
+      s.selectedType = null;
+      renderMatchingGame();
+      if (s.matched.length === s.chars.length) {
+        setTimeout(showMatchCelebration, 400);
+      }
+    } else {
+      var prevSelected = s.selected;
+      s.selected = null;
+      s.selectedType = null;
+      renderMatchingGame();
+      var cards = document.querySelectorAll('.match-card');
+      cards.forEach(function(card) {
+        var dc = card.getAttribute('data-char');
+        if ((dc === char || dc === prevSelected) && s.matched.indexOf(dc) < 0) {
+          card.classList.add('wrong');
+          setTimeout(function() { card.classList.remove('wrong'); }, 400);
+        }
+      });
+    }
+  }
+}
+
+function closeMatchingGame() {
+  document.getElementById('matchOverlay').classList.remove('show');
+}
+
+function showMatchCelebration() {
+  var confettiEmojis = ['🌟','⭐','🎉','🎊','✨','💫','🏆','🎈','🎀','💖'];
+  for (var i = 0; i < 30; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-30px';
+        el.style.animationDuration = (2 + Math.random() * 2) + 's';
+        el.style.fontSize = (16 + Math.random() * 20) + 'px';
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 4000);
+      }, idx * 80);
+    })(i);
+  }
+
+  var isZh = currentLang === 'zh';
+  var overlay = document.createElement('div');
+  overlay.className = 'celebration-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML = '<div class="celebration-box">' +
+    '<div class="celebration-emoji">🏆</div>' +
+    '<div class="celebration-text">' + (isZh ? '太棒了！' : 'Amazing!') + '</div>' +
+    '<div class="celebration-sub">' + (isZh ? '全部配对成功！只用了 ' + matchState.attempts + ' 次！' : 'All matched in ' + matchState.attempts + ' tries!') + '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:16px;justify-content:center;">' +
+    '<button class="btn btn-primary" onclick="this.closest(\'.celebration-overlay\').remove();startMatchingGame();">' + (isZh ? '再玩一次' : 'Play Again') + '</button>' +
+    '<button class="btn btn-outline" onclick="this.closest(\'.celebration-overlay\').remove();closeMatchingGame();">' + (isZh ? '完成' : 'Done') + '</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+}
+
+// ==================== PHONICS GAME ====================
+var PHONICS_DATA = [
+  { letter: 'A', sound: '/æ/', word: 'Apple', emoji: '🍎' },
+  { letter: 'B', sound: '/b/', word: 'Ball', emoji: '⚽' },
+  { letter: 'C', sound: '/k/', word: 'Cat', emoji: '🐱' },
+  { letter: 'D', sound: '/d/', word: 'Dog', emoji: '🐕' },
+  { letter: 'E', sound: '/ɛ/', word: 'Egg', emoji: '🥚' },
+  { letter: 'F', sound: '/f/', word: 'Fish', emoji: '🐟' },
+  { letter: 'G', sound: '/g/', word: 'Grapes', emoji: '🍇' },
+  { letter: 'H', sound: '/h/', word: 'Hat', emoji: '🎩' },
+  { letter: 'I', sound: '/ɪ/', word: 'Ice cream', emoji: '🍦' },
+  { letter: 'J', sound: '/dʒ/', word: 'Juice', emoji: '🧃' },
+  { letter: 'K', sound: '/k/', word: 'Kite', emoji: '🪁' },
+  { letter: 'L', sound: '/l/', word: 'Lion', emoji: '🦁' },
+  { letter: 'M', sound: '/m/', word: 'Moon', emoji: '🌙' },
+  { letter: 'N', sound: '/n/', word: 'Nose', emoji: '👃' },
+  { letter: 'O', sound: '/ɒ/', word: 'Orange', emoji: '🍊' },
+  { letter: 'P', sound: '/p/', word: 'Pig', emoji: '🐷' },
+  { letter: 'Q', sound: '/kw/', word: 'Queen', emoji: '👸' },
+  { letter: 'R', sound: '/r/', word: 'Rainbow', emoji: '🌈' },
+  { letter: 'S', sound: '/s/', word: 'Sun', emoji: '☀️' },
+  { letter: 'T', sound: '/t/', word: 'Tree', emoji: '🌳' },
+  { letter: 'U', sound: '/ʌ/', word: 'Umbrella', emoji: '☂️' },
+  { letter: 'V', sound: '/v/', word: 'Violin', emoji: '🎻' },
+  { letter: 'W', sound: '/w/', word: 'Water', emoji: '💧' },
+  { letter: 'X', sound: '/ks/', word: 'Fox', emoji: '🦊' },
+  { letter: 'Y', sound: '/j/', word: 'Yak', emoji: '🐃' },
+  { letter: 'Z', sound: '/z/', word: 'Zebra', emoji: '🦓' },
+];
+
+var phonicsState = {
+  mode: 'browse',
+  quizType: 'beginSound',
+  currentQ: 0,
+  totalQ: 8,
+  questions: [],
+  score: 0,
+  streak: 0,
+  answered: false
+};
+
+function renderPhonics() {
+  var isZh = currentLang === 'zh';
+  var phase = data.phases[data.learning.currentPhase];
+  var phaseLetters = phase ? phase.letters : ['A','B','C','D','E'];
+  var html = '';
+
+  // Phase letters as compact horizontal scroll strip
+  html += '<div style="font-size:11px;font-weight:600;color:var(--text-light);margin-bottom:4px;">' +
+    (isZh ? '点击听发音 🔊' : 'Tap to hear 🔊') + '</div>';
+  html += '<div style="display:flex;gap:10px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch;">';
+  phaseLetters.forEach(function(letter) {
+    var pd = PHONICS_DATA.find(function(p) { return p.letter === letter; });
+    if (pd) {
+      html += '<div class="phonics-letter-card" onclick="speakPhonics(\'' + letter + '\')" style="min-width:68px;flex-shrink:0;">' +
+        '<div class="ph-letter">' + pd.letter + '</div>' +
+        '<div class="ph-sound">' + pd.sound + '</div>' +
+        '<div class="ph-example">' + pd.emoji + '</div>' +
+        '<div style="font-size:9px;color:var(--text-light);">' + pd.word + '</div></div>';
+    }
+  });
+  html += '</div>';
+
+  // Quiz area (takes over when active)
+  if (phonicsState.mode === 'quiz') {
+    html += renderPhonicsQuiz();
+  } else {
+    // Game mode cards
+    html += '<div style="display:flex;gap:10px;margin:4px 0 6px;">';
+    html += '<div onclick="startPhonicsQuiz(\'beginSound\')" style="flex:1;background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:transform 0.15s;" onmousedown="this.style.transform=\'scale(0.97)\'" onmouseup="this.style.transform=\'\'" ontouchstart="this.style.transform=\'scale(0.97)\'" ontouchend="this.style.transform=\'\'">' +
+      '<div style="font-size:30px;">🖼️➡️🔤</div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--primary);margin-top:4px;">' + (isZh ? '看图猜字母' : 'Picture → Letter') + '</div>' +
+      '<div style="font-size:10px;color:var(--text-light);margin-top:2px;">' + (isZh ? '看表情选首字母' : 'What letter starts it?') + '</div></div>';
+    html += '<div onclick="startPhonicsQuiz(\'emojiToLetter\')" style="flex:1;background:linear-gradient(135deg,#F3E5F5,#E1BEE7);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:transform 0.15s;" onmousedown="this.style.transform=\'scale(0.97)\'" onmouseup="this.style.transform=\'\'" ontouchstart="this.style.transform=\'scale(0.97)\'" ontouchend="this.style.transform=\'\'">' +
+      '<div style="font-size:30px;">🔤➡️🖼️</div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--purple);margin-top:4px;">' + (isZh ? '字母找图片' : 'Letter → Picture') + '</div>' +
+      '<div style="font-size:10px;color:var(--text-light);margin-top:2px;">' + (isZh ? '看字母选配图' : 'Find the matching picture') + '</div></div>';
+    html += '</div>';
+
+    // All letters reference (collapsed)
+    html += '<details style="margin-top:6px;"><summary style="font-size:11px;font-weight:600;color:var(--text-light);cursor:pointer;">' +
+      (isZh ? '所有字母 A-Z →' : 'All letters A-Z →') + '</summary>';
+    html += '<div class="phonics-card-grid" style="margin-top:8px;">';
+    PHONICS_DATA.forEach(function(pd) {
+      var learned = data.learning.learnedLetters.indexOf(pd.letter) >= 0;
+      html += '<div class="phonics-letter-card" style="' + (learned ? 'border-color:var(--green);background:var(--green-light);' : '') +
+        '" onclick="speakPhonics(\'' + pd.letter + '\')">' +
+        '<div class="ph-letter">' + pd.letter + '</div>' +
+        '<div class="ph-sound">' + pd.sound + '</div>' +
+        '<div class="ph-example">' + pd.emoji + '</div></div>';
+    });
+    html += '</div></details>';
+  }
+
+  document.getElementById('phonicsContent').innerHTML = html;
+}
+
+function speakPhonics(letter) {
+  if (!window.speechSynthesis) return;
+  var pd = PHONICS_DATA.find(function(p) { return p.letter === letter; });
+  if (!pd) return;
+  var u = new SpeechSynthesisUtterance(pd.letter + '. ' + pd.sound + '. ' + pd.word);
+  u.lang = 'en-US';
+  u.rate = 0.7;
+  window.speechSynthesis.speak(u);
+}
+
+function startPhonicsQuiz(type) {
+  var questions = [];
+  var available = PHONICS_DATA.slice();
+  for (var i = 0; i < 8 && available.length > 0; i++) {
+    var idx = Math.floor(Math.random() * available.length);
+    var correct = available.splice(idx, 1)[0];
+    var wrongs = PHONICS_DATA.filter(function(p) { return p.letter !== correct.letter; });
+    var wrongChoices = [];
+    while (wrongChoices.length < 3 && wrongs.length > 0) {
+      var wi = Math.floor(Math.random() * wrongs.length);
+      wrongChoices.push(wrongs.splice(wi, 1)[0]);
+    }
+    var choices = shuffleArr([correct].concat(wrongChoices));
+    questions.push({ correct: correct, choices: choices, type: type });
+  }
+  phonicsState = {
+    mode: 'quiz',
+    quizType: type,
+    currentQ: 0,
+    totalQ: questions.length,
+    questions: questions,
+    score: 0,
+    streak: 0,
+    answered: false
+  };
+  renderPhonics();
+}
+
+function renderPhonicsQuiz() {
+  var s = phonicsState;
+  var isZh = currentLang === 'zh';
+
+  if (s.currentQ >= s.totalQ) {
+    var pct = Math.round((s.score / s.totalQ) * 100);
+    var stars = pct >= 90 ? '⭐⭐⭐' : pct >= 70 ? '⭐⭐' : pct >= 50 ? '⭐' : '';
+    var resultHtml = '<div class="phonics-quiz-area">';
+    resultHtml += '<div style="font-size:48px;">' + (pct >= 70 ? '🎉' : '💪') + '</div>';
+    resultHtml += '<div class="phonics-prompt-word">' + (isZh ? '完成！' : 'Complete!') + ' ' + stars + '</div>';
+    resultHtml += '<div style="font-size:24px;font-weight:800;color:var(--green);margin:8px 0;">' + s.score + '/' + s.totalQ + '</div>';
+    resultHtml += '<div class="phonics-prompt-hint">' + (isZh ? '正确率 ' + pct + '%' : pct + '% correct') + '</div>';
+    resultHtml += '<div style="display:flex;gap:8px;margin-top:12px;justify-content:center;">';
+    resultHtml += '<button class="btn btn-primary" onclick="startPhonicsQuiz(\'' + s.quizType + '\')">' + (isZh ? '再玩一次' : 'Play Again') + '</button>';
+    resultHtml += '<button class="btn btn-outline" onclick="phonicsState.mode=\'browse\';renderPhonics();">' + (isZh ? '返回' : 'Back') + '</button>';
+    resultHtml += '</div></div>';
+    if (pct >= 90) {
+      setTimeout(function() {
+        var emojis = ['⭐','✨','🌟','💫','🎉'];
+        for (var ci = 0; ci < 15; ci++) {
+          (function(idx) {
+            setTimeout(function() {
+              var el = document.createElement('div');
+              el.className = 'confetti-piece';
+              el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+              el.style.left = Math.random() * 100 + 'vw';
+              el.style.top = '-30px';
+              el.style.animationDuration = (2 + Math.random() * 2) + 's';
+              document.body.appendChild(el);
+              setTimeout(function() { el.remove(); }, 4000);
+            }, idx * 100);
+          })(ci);
+        }
+      }, 200);
+    }
+    return resultHtml;
+  }
+
+  var q = s.questions[s.currentQ];
+  var html = '<div class="phonics-quiz-area">';
+  html += '<div class="phonics-progress">';
+  for (var i = 0; i < s.totalQ; i++) {
+    html += '<div class="phonics-dot' + (i < s.currentQ ? ' done' : '') + (i === s.currentQ ? ' current' : '') + '"></div>';
+  }
+  html += '</div>';
+
+  if (s.quizType === 'beginSound') {
+    html += '<div class="phonics-prompt-emoji">' + q.correct.emoji + '</div>';
+    html += '<div class="phonics-prompt-word">' + q.correct.word + '</div>';
+    html += '<div class="phonics-prompt-hint">' + (isZh ? '这个词的首字母是什么？' : 'What letter does this start with?') + '</div>';
+  } else {
+    html += '<div style="font-size:72px;font-weight:800;color:var(--primary);line-height:1;">' + q.correct.letter + '</div>';
+    html += '<div style="font-size:16px;color:var(--accent);font-weight:600;margin:4px 0;">' + q.correct.sound + '</div>';
+    html += '<div class="phonics-prompt-hint">' + (isZh ? '哪个图片和这个字母配对？' : 'Which picture matches this letter?') + '</div>';
+  }
+
+  html += '<div class="phonics-choices">';
+  if (s.quizType === 'emojiToLetter') {
+    q.choices.forEach(function(choice) {
+      html += '<button class="phonics-choice-btn" id="phBtn_' + choice.letter + '" onclick="answerPhonics(\'' + choice.letter + '\')" style="font-size:28px;width:64px;height:64px;flex-direction:column;">' + choice.emoji + '<div class="ph-word-label" style="font-size:8px;margin-top:1px;color:var(--text-light);font-weight:400;opacity:0;transition:opacity 0.3s;">' + choice.word + '</div></button>';
+    });
+  } else {
+    q.choices.forEach(function(choice) {
+      html += '<button class="phonics-choice-btn" id="phBtn_' + choice.letter + '" onclick="answerPhonics(\'' + choice.letter + '\')">' + choice.letter + '</button>';
+    });
+  }
+  html += '</div>';
+
+  if (s.streak >= 3) {
+    html += '<div class="phonics-streak">🔥 ' + s.streak + ' ' + (isZh ? '连对！' : 'in a row!') + '</div>';
+  }
+  html += '</div>';
+
+  html += '<div style="text-align:center;margin-top:8px;">';
+  html += '<button class="btn btn-outline btn-small" onclick="phonicsState.mode=\'browse\';renderPhonics();">' + (isZh ? '退出游戏' : 'Quit Game') + '</button>';
+  html += '</div>';
+
+  return html;
+}
+
+function answerPhonics(letter) {
+  var s = phonicsState;
+  if (s.answered) return;
+  s.answered = true;
+  var q = s.questions[s.currentQ];
+  var isCorrect = letter === q.correct.letter;
+
+  var btn = document.getElementById('phBtn_' + letter);
+  if (isCorrect) {
+    s.score++;
+    s.streak++;
+    if (btn) btn.classList.add('correct');
+  } else {
+    s.streak = 0;
+    if (btn) btn.classList.add('wrong');
+    var correctBtn = document.getElementById('phBtn_' + q.correct.letter);
+    if (correctBtn) correctBtn.classList.add('correct');
+  }
+
+  // Reveal hidden word labels after answering
+  var labels = document.querySelectorAll('.ph-word-label');
+  labels.forEach(function(el) { el.style.opacity = '1'; });
+
+  setTimeout(function() {
+    s.currentQ++;
+    s.answered = false;
+    renderPhonics();
+  }, isCorrect ? 600 : 1200);
+}
+
+// ==================== TIPS DATA ====================
+const LEARNING_TIPS = [
+  { en: '<strong>Keep sessions short</strong> — 10-15 min per activity.', zh: '<strong>保持简短</strong> — 每个活动10-15分钟。' },
+  { en: '<strong>Play-based learning</strong> — use songs, games, flashcards.', zh: '<strong>游戏化学习</strong> — 用歌曲、游戏、图片卡来学习。' },
+  { en: '<strong>Repetition is key</strong> — review at the start of each session.', zh: '<strong>重复是关键</strong> — 每次学习开始时复习。' },
+  { en: '<strong>Multi-sensory approach</strong> — trace letters in sand, form with playdough.', zh: '<strong>多感官方法</strong> — 在沙子上描字、用橡皮泥捏汉字。' },
+  { en: '<strong>Follow the child\'s interest</strong> — extend activities they engage with.', zh: '<strong>跟随孩子兴趣</strong> — 延长他们感兴趣的活动。' },
+  { en: '<strong>Celebrate small wins</strong> — stickers, high-fives, and praise.', zh: '<strong>庆祝小进步</strong> — 贴纸、击掌和表扬。' },
+];
+const BEDTIME_TIPS = [
+  { en: '<strong>Consistent wind-down:</strong> Start 45 min before target bedtime.', zh: '<strong>固定放松流程：</strong>在目标就寝前45分钟开始。' },
+  { en: '<strong>No screens</strong> for at least 1 hour before bed.', zh: '<strong>睡前至少1小时不看屏幕。</strong>' },
+  { en: '<strong>Physical activity during the day</strong> — playground and swimming help.', zh: '<strong>白天保持运动</strong> — 游乐场和游泳有帮助。' },
+  { en: '<strong>Cool, dark room</strong> — set AC to 24-25°C.', zh: '<strong>凉爽暗室</strong> — 空调24-25°C。' },
+  { en: '<strong>Gradual shift:</strong> Move bedtime 15 min earlier every 3-4 days.', zh: '<strong>逐步调整：</strong>每3-4天提前15分钟。' },
+  { en: '<strong>Books before bed:</strong> Reading 2-3 short books signals sleep.', zh: '<strong>睡前读书：</strong>读2-3本短故事。' },
+  { en: '<strong>Avoid sugar after dinner.</strong>', zh: '<strong>晚餐后避免糖分。</strong>' },
+  { en: '<strong>White noise or soft music</strong> helps block out sounds.', zh: '<strong>白噪音或轻音乐</strong>帮助隔绝噪音。' },
+];
+
+function renderTips() {
+  let ltHtml = '';
+  LEARNING_TIPS.forEach((tip, i) => {
+    ltHtml += '<div class="tip-item"><div class="tip-num">' + (i+1) + '</div><div class="tip-text">' + tip[currentLang] + '</div></div>';
+  });
+  const ltEl = document.getElementById('learningTipsContent');
+  if (ltEl) ltEl.innerHTML = ltHtml;
+  let btHtml = '';
+  BEDTIME_TIPS.forEach((tip, i) => {
+    btHtml += '<div class="tip-item"><div class="tip-num">' + (i+1) + '</div><div class="tip-text">' + tip[currentLang] + '</div></div>';
+  });
+  const btEl = document.getElementById('bedtimeTipsContent');
+  if (btEl) btEl.innerHTML = btHtml;
+}
+
+// ==================== STORIES ====================
+const KNOWN_CHARS_BASE = '一二三四五山水火上下石木哭笑大小了子月日田'.split('');
+function getCharLearningOrder() {
+  const order = [...KNOWN_CHARS_BASE];
+  if (typeof DEFAULT_DATA !== 'undefined') {
+    DEFAULT_DATA.phases.forEach(p => p.chinese.forEach(c => { if (!order.includes(c)) order.push(c); }));
+  }
+  ALL_CHARS_FLAT.forEach(ch => { if (!order.includes(ch.c)) order.push(ch.c); });
+  return order;
+}
+function getCharBatches() {
+  const order = getCharLearningOrder();
+  const toLearn = order.filter(c => !KNOWN_CHARS_BASE.includes(c));
+  const batches = [];
+  for (let i = 0; i < toLearn.length; i += 3) batches.push(toLearn.slice(i, i + 3));
+  return batches;
+}
+const STORY_TPLS = [
+  function(a,b,c){ return a+'在上面，'+b+'在下面。看了'+c+'，'+c+'好大！笑了笑了。'; },
+  function(a,b,c){ return '一个'+a+'，二个'+b+'，三个'+c+'。大'+a+'小'+b+'，上上下下。'; },
+  function(a,b,c){ return '山上有'+a+'。水里有'+b+'。田里有'+c+'。大大小小，一二三四五。'; },
+  function(a,b,c){ return '我有'+a+'。你有'+b+'。他也有'+c+'。大的小的，好好好！'; },
+  function(a,b,c){ return '日出了，'+a+'来了。月上了，'+b+'走了。天上地下，'+c+'大大小小。'; },
+];
+function generateBatchStories(batchIdx) {
+  const batches = getCharBatches();
+  if (batchIdx < 0 || batchIdx >= batches.length) return [];
+  const nc = batches[batchIdx];
+  const a = nc[0], b = nc[1]||a, c = nc[2]||a;
+  const stories = [];
+  const base = (batchIdx * 3) % STORY_TPLS.length;
+  for (let s = 0; s < 3; s++) {
+    const tpl = STORY_TPLS[(base + s) % STORY_TPLS.length];
+    stories.push({ title: { en: 'Batch ' + (batchIdx+1) + ' #' + (s+1), zh: '第' + (batchIdx+1) + '组 · ' + (s+1) },
+      text: tpl(a, b, c), chars: [...nc], level: Math.min(5, Math.floor(batchIdx / 33) + 1), pinyin: {}, batch: batchIdx });
+  }
+  return stories;
+}
+let storyBatchPage = 0;
+const BATCH_PAGE_SIZE = 5;
+
+const STORIES = [
+  { title:{en:'Counting Fun',zh:'数一数'}, text:'一二三四五，五四三二一。大的上，小的下。笑了笑了，一二三！', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'Big Mountain',zh:'大山小石'}, text:'大山上有大石，小山下有小石。山上有木，山下有水。一二三四五，上上下下。', chars:['一','二','三','大','小','上','下'], level:1, pinyin:{} },
+  { title:{en:'My Home',zh:'我的家'}, text:'我有一个家。家里有爸爸，有妈妈。爸爸好大，我好小。妈妈笑了，我也笑了。家在大山下。', chars:['爸','妈','我','你','他','好','家'], level:4, pinyin:{} },
+  { title:{en:'Cat and Dog',zh:'小猫小狗'}, text:'我家有猫有狗。猫小了，狗大了。猫笑了，狗哭了。猫在上面，狗在下面。猫和狗是好朋友。', chars:['鱼','鸟','马','牛','羊','猫','狗','虫'], level:5, pinyin:{} },
+];
+
+function renderStories() {
+  const learned = data.learning.learnedChinese;
+  let html = '<div style="font-size:13px;font-weight:700;margin-bottom:6px;">' + (currentLang==='zh'?'精选故事':'Featured Stories') + '</div>';
+  STORIES.forEach(function(story, i) {
+    var knownCount = story.chars.filter(function(c){ return learned.includes(c); }).length;
+    var total = story.chars.length;
+    var pct = total > 0 ? Math.round((knownCount / total) * 100) : 0;
+    var unlocked = pct >= 60;
+    html += '<div class="story-card ' + (unlocked ? '' : 'locked') + '" onclick="' + (unlocked ? 'showStoryObj(STORIES['+i+'])' : '') + '">';
+    html += '<div class="story-title">' + (story.title[currentLang] || story.title.en) + '</div>';
+    html += '<div class="story-level">' + knownCount + '/' + total + ' ' + t('charsKnown') + (unlocked ? '' : ' · ' + t('locked')) + '</div>';
+    html += '<div class="story-progress"><div class="fill" style="width:' + pct + '%"></div></div></div>';
+  });
+  var batches = getCharBatches();
+  var totalBatches = batches.length;
+  var totalPages = Math.ceil(totalBatches / BATCH_PAGE_SIZE);
+  if (storyBatchPage >= totalPages) storyBatchPage = totalPages - 1;
+  if (storyBatchPage < 0) storyBatchPage = 0;
+  var startBatch = storyBatchPage * BATCH_PAGE_SIZE;
+  var endBatch = Math.min(startBatch + BATCH_PAGE_SIZE, totalBatches);
+  html += '<div style="font-size:13px;font-weight:700;margin:16px 0 6px;">' + (currentLang==='zh'?'分组练习':'Batch Practice') + '</div>';
+  for (var bi = startBatch; bi < endBatch; bi++) {
+    var batch = batches[bi];
+    var batchMeanings = batch.map(function(c){ var lu = CHAR_LOOKUP[c]; return lu ? lu.m + c : c; }).join(' ');
+    var knownCount = batch.filter(function(c){ return learned.includes(c); }).length;
+    html += '<div style="background:var(--purple-light);border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid var(--purple);">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--purple);">' + (currentLang==='zh'?'第':'Batch ') + (bi+1) + (currentLang==='zh'?'组：':'：') + batchMeanings + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);margin:4px 0;">' + knownCount + '/' + batch.length + ' ' + t('charsKnown') + '</div>';
+    html += '<div style="display:flex;gap:6px;margin-top:6px;">';
+    for (var si = 0; si < 3; si++) {
+      html += '<button class="btn btn-outline btn-small" style="flex:1;" onclick="showBatchStory(' + bi + ',' + si + ')">' + (currentLang==='zh'?'故事':'Story') + ' ' + (si+1) + '</button>';
+    }
+    html += '</div></div>';
+  }
+  if (totalPages > 1) {
+    html += '<div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">';
+    html += '<button class="btn btn-outline btn-small" ' + (storyBatchPage===0?'disabled':'') + ' onclick="storyBatchPage--;renderStories();">◀</button>';
+    html += '<span style="font-size:12px;padding:4px 8px;">' + (storyBatchPage+1) + '/' + totalPages + '</span>';
+    html += '<button class="btn btn-outline btn-small" ' + (storyBatchPage>=totalPages-1?'disabled':'') + ' onclick="storyBatchPage++;renderStories();">▶</button>';
+    html += '</div>';
+  }
+  document.getElementById('storiesContainer').innerHTML = html;
+}
+
+function showBatchStory(batchIdx, storyIdx) {
+  var stories = generateBatchStories(batchIdx);
+  if (storyIdx < stories.length) showStoryObj(stories[storyIdx]);
+}
+
+function showStoryObj(story) {
+  if (!story) return;
+  var learned = data.learning.learnedChinese;
+  var textHtml = '';
+  for (var i = 0; i < story.text.length; i++) {
+    var char = story.text[i];
+    if (/[\s，。！？、；：""''（）]/.test(char)) { textHtml += char; }
+    else if (learned.includes(char) || KNOWN_CHARS_BASE.includes(char)) { textHtml += '<span class="known">' + char + '</span>'; }
+    else {
+      var lu = CHAR_LOOKUP[char];
+      var py = lu ? lu.p : (story.pinyin[char] || '');
+      if (py) { textHtml += '<ruby class="unknown">' + char + '<rt>' + py + '</rt></ruby>'; }
+      else { textHtml += '<span class="unknown">' + char + '</span>'; }
+    }
+  }
+  var newCharsHtml = story.chars.map(function(c) {
+    var lu = CHAR_LOOKUP[c];
+    var isLearned = learned.includes(c);
+    return '<span style="display:inline-block;margin:2px 4px;padding:4px 8px;border-radius:6px;font-size:18px;' +
+      (isLearned ? 'background:var(--green-light);color:var(--green);' : 'background:var(--yellow-light);color:#F57F17;') +
+      '">' + (lu?lu.m:'') + c + (lu?' <small style="font-size:10px;">'+lu.p+'</small>':'') + '</span>';
+  }).join('');
+  openModal('<h3>' + (story.title[currentLang] || story.title.en) + '</h3>' +
+    '<div style="margin:8px 0;">' + (currentLang==='zh'?'本组生字：':'New chars: ') + newCharsHtml + '</div>' +
+    '<div class="story-modal-text">' + textHtml + '</div>' +
+    '<div class="modal-actions"><button class="btn btn-outline btn-block" onclick="closeModal()">' + t('cancelBtn') + '</button></div>');
+}
+
+// ==================== RECIPES (compact) ====================
+let recipeFilter = 'all';
+const RECIPES = [
+  { name:{en:'Tomato Egg Stir-Fry',zh:'番茄炒蛋'}, cat:'main', diff:1, time:15, emoji:'🍳', ing:['番茄 2个/2 tomatoes','鸡蛋 3个/3 eggs','盐/salt','油/oil'], steps:['打蛋搅拌/Beat eggs','热油炒蛋盛出/Scramble eggs, set aside','炒番茄/Stir-fry tomatoes','加入蛋翻炒/Add eggs back'], tags:['quick'] },
+  { name:{en:'Steamed Egg Custard',zh:'蒸蛋'}, cat:'main', diff:1, time:15, emoji:'🥚', ing:['鸡蛋 2个/2 eggs','温水 150ml/150ml warm water','盐/salt'], steps:['打蛋加温水搅拌/Beat eggs with warm water','过滤蛋液/Strain','盖保鲜膜蒸10分钟/Steam 10 min','淋酱油香油/Drizzle soy sauce'], tags:['easy'] },
+  { name:{en:'Egg Fried Rice',zh:'蛋炒饭'}, cat:'main', diff:1, time:10, emoji:'🍚', ing:['隔夜饭/leftover rice','鸡蛋 2个/2 eggs','葱/scallion','盐/salt'], steps:['热油炒蛋碎/Scramble eggs','加冷饭翻炒/Add rice, stir-fry','加盐调味/Season','撒葱花/Top with scallion'], tags:['quick'] },
+  { name:{en:'Banana Pancakes',zh:'香蕉煎饼'}, cat:'breakfast', diff:1, time:15, emoji:'🥞', ing:['香蕉 1根/1 banana','鸡蛋 1个/1 egg','面粉/flour'], steps:['香蕉压泥/Mash banana','加蛋面粉搅拌/Mix with egg, flour','小火煎/Pan-fry','配蜂蜜/Serve with honey'], tags:['sweet'] },
+  { name:{en:'Noodle Soup',zh:'汤面'}, cat:'noodle', diff:1, time:15, emoji:'🍜', ing:['面条/noodles','鸡蛋/egg','青菜/greens','酱油/soy sauce'], steps:['水开下面条/Boil noodles','煮蛋和青菜/Cook egg & greens','面条盛入碗/Place noodles in bowl','加汤/Add broth'], tags:['quick'] },
+  { name:{en:'Sweet Potato Congee',zh:'红薯粥'}, cat:'soup', diff:1, time:30, emoji:'🍠', ing:['大米/rice','红薯/sweet potato','水/water'], steps:['大米洗净/Wash rice','红薯去皮切块/Dice sweet potato','大火煮开转小火/Boil then simmer','煮至粘稠/Cook until thick'], tags:['warm'] },
+  { name:{en:'Stir-Fried Broccoli',zh:'炒西兰花'}, cat:'veggie', diff:1, time:10, emoji:'🥦', ing:['西兰花/broccoli','蒜/garlic','盐/salt','油/oil'], steps:['西兰花切小朵焯水/Blanch broccoli','热油爆香蒜/Sauté garlic','加入翻炒/Add broccoli','加盐/Season'], tags:['quick'] },
+  { name:{en:'Seaweed Rice Balls',zh:'海苔饭团'}, cat:'snack', diff:1, time:10, emoji:'🍙', ing:['米饭/rice','海苔/seaweed','盐/salt','芝麻/sesame'], steps:['米饭加盐/Mix rice with salt','捏成团/Shape into balls','撒芝麻/Sprinkle sesame','包海苔/Wrap with seaweed'], tags:['fun'] },
+  { name:{en:'Curry Chicken Rice',zh:'咖喱鸡饭'}, cat:'main', diff:2, time:35, emoji:'🍛', ing:['鸡腿肉/chicken','土豆/potato','胡萝卜/carrot','咖喱块/curry cubes','米饭/rice'], steps:['切块/Dice all','炒鸡肉/Brown chicken','加水煮软/Add water, cook','加咖喱块/Add curry cubes','配米饭/Serve with rice'], tags:['one-pot'] },
+  { name:{en:'Pork Dumplings',zh:'猪肉水饺'}, cat:'main', diff:3, time:60, emoji:'🥟', ing:['饺子皮/wrappers','猪肉末/ground pork','白菜/cabbage','姜/ginger','酱油/soy sauce'], steps:['白菜切碎挤水/Chop cabbage','肉末加调料/Mix pork with seasonings','包饺子/Wrap dumplings','煮8分钟/Boil 8 min'], tags:['family'] },
+];
+
+function renderRecipes() {
+  const searchVal = (document.getElementById('recipeSearchInput')?.value || '').toLowerCase();
+  const cats = ['all','main','soup','noodle','breakfast','veggie','snack'];
+  const catLabels = { all:t('allCat'), main:t('mainDish'), soup:t('soupCat'), noodle:t('noodleCat'), breakfast:t('bfastCat'), veggie:t('vegCat'), snack:t('snackCat') };
+  let filterHtml = cats.map(c => '<button class="filter-btn ' + (recipeFilter===c?'active':'') + '" onclick="recipeFilter=\'' + c + '\';renderRecipes()">' + catLabels[c] + '</button>').join('');
+  document.getElementById('recipeFilters').innerHTML = filterHtml;
+  let filtered = RECIPES.filter(r => {
+    if (recipeFilter !== 'all' && r.cat !== recipeFilter) return false;
+    if (searchVal) {
+      const n = (r.name[currentLang] || r.name.en).toLowerCase();
+      const nOther = (r.name[currentLang === 'en' ? 'zh' : 'en'] || '').toLowerCase();
+      if (!n.includes(searchVal) && !nOther.includes(searchVal)) return false;
+    }
+    return true;
+  });
+  let html = '';
+  filtered.forEach((r, i) => {
+    const realIdx = RECIPES.indexOf(r);
+    html += '<div class="recipe-item" onclick="showRecipeDetail(' + realIdx + ')"><div class="recipe-emoji">' + r.emoji + '</div><div class="recipe-info"><div class="recipe-name">' + (r.name[currentLang] || r.name.en) + '</div><div class="recipe-meta">' + '⭐'.repeat(r.diff) + ' · ' + r.time + t('mins') + '</div></div></div>';
+  });
+  if (!html) html = '<div style="text-align:center;color:var(--text-light);padding:16px;">No recipes found</div>';
+  document.getElementById('recipeList').innerHTML = html;
+}
+
+function showRecipeDetail(idx) {
+  const r = RECIPES[idx];
+  if (!r) return;
+  const isZh = currentLang === 'zh';
+  const getName = (biStr) => { const parts = biStr.split('/'); return isZh ? (parts[0] || biStr) : (parts[1] || parts[0] || biStr); };
+  let ingHtml = r.ing.map(i => '<li>' + getName(i) + '</li>').join('');
+  let stepsHtml = r.steps.map(s => '<li>' + getName(s) + '</li>').join('');
+  openModal('<h3>' + r.emoji + ' ' + (r.name[currentLang] || r.name.en) + '</h3>' +
+    '<div class="recipe-detail-section"><h4>' + t('ingredients') + '</h4><ul>' + ingHtml + '</ul></div>' +
+    '<div class="recipe-detail-section"><h4>' + t('steps') + '</h4><ol>' + stepsHtml + '</ol></div>' +
+    '<div class="modal-actions"><button class="btn btn-outline btn-block" onclick="closeModal()">' + t('cancelBtn') + '</button></div>');
+}
+
+function getRecipeForMeal(mealName) {
+  if (!mealName) return null;
+  const lower = (typeof mealName === 'string' ? mealName : '').toLowerCase();
+  if (!lower) return null;
+  return RECIPES.find(r => {
+    const en = (r.name.en || '').toLowerCase();
+    const zh = r.name.zh || '';
+    return lower.includes(en) || lower.includes(zh) || en.includes(lower) || zh.includes(lower);
+  });
+}
+
+// ==================== DATA MODEL ====================
+const DEFAULT_DATA = {
+  currentSleepMinutes: 23 * 60,
+  targetSleepMinutes: 22 * 60,
+  remindersEnabled: false,
+  schedule: {
+    weekday: [
+      { time: "07:30", activity: "Wake up & morning routine", icon: "☀️", nameKey: "wakeUpMorning" },
+      { time: "08:00", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:00", activity: "Go to school", icon: "🏫", nameKey: "goToSchool" },
+      { time: "16:30", activity: "Pick up from school", icon: "🎒", nameKey: "pickUpSchool" },
+      { time: "17:00", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Learning time", icon: "📚", type: "learning", nameKey: "learningTime" },
+      { time: "20:15", activity: "Free play / wind-down", icon: "🧸", nameKey: "freePlayWindDown" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
+    ],
+    weekend: [
+      { time: "08:00", activity: "Wake up", icon: "☀️", nameKey: "wakeUp" },
+      { time: "08:30", activity: "Breakfast", icon: "🥣", mealType: "breakfast", nameKey: "breakfastTime" },
+      { time: "09:30", activity: "Free play / family time", icon: "🏠", nameKey: "familyTime" },
+      { time: "10:00", activity: "Sunday Outing (if Sunday)", icon: "🌳", nameKey: "sundayOuting" },
+      { time: "12:30", activity: "Lunch", icon: "🍱", nameKey: "lunchTime" },
+      { time: "13:00", activity: "Nap / quiet time", icon: "😴", nameKey: "napTime" },
+      { time: "15:00", activity: "Snack", icon: "🍎", nameKey: "snackTime" },
+      { time: "15:30", activity: "Playground / Swimming", icon: "🏊", nameKey: "playgroundSwimming" },
+      { time: "17:30", activity: "Learning time (light)", icon: "📚", type: "learning", nameKey: "lightLearning" },
+      { time: "18:30", activity: "Dinner", icon: "🍽️", mealType: "dinner", nameKey: "dinnerTime" },
+      { time: "19:15", activity: "Shower time", icon: "🚿", nameKey: "showerTime" },
+      { time: "19:30", activity: "Free play / family time", icon: "🧸", nameKey: "familyTime" },
+      { time: "21:00", activity: "Read books", icon: "📖", nameKey: "readBooks" },
+      { time: "21:30", activity: "Bedtime routine", icon: "🌙", nameKey: "bedtimeRoutine" },
+      { time: "22:00", activity: "Sleep", icon: "😴", nameKey: "sleepTime" },
+    ],
+  },
+  foods: {
+    breakfast: ["燕麦粥配水果/Oatmeal with fruits","炒蛋吐司/Scrambled eggs & toast","松饼/Pancakes","肉松粥/Congee with pork floss","汤面/Noodle soup","蛋炒饭/Rice with egg","包子/Steamed buns","香蕉煎饼/Banana pancakes"],
+    dinner: ["米饭+蒸鸡/Rice + steamed chicken","水饺/Dumplings","蛋炒饭/Fried rice with egg","咖喱鸡饭/Curry chicken with rice","鱼粥/Congee with fish","海南鸡饭/Chicken rice","蒸蛋配饭/Steamed egg with rice","通心粉汤/Macaroni soup"],
+    snack: ["苹果片/Apple slices","香蕉/Banana","酸奶/Yogurt","葡萄/Grapes","蒸玉米/Steamed corn","蓝莓/Blueberries"],
+    sides: ["炒西兰花/Stir-fried broccoli","蒜蓉菠菜/Garlic spinach","番茄蛋花汤/Tomato egg soup","土豆泥/Mashed potato","蒸蛋/Steamed egg custard"],
+  },
+  weeklyMenu: {},
+  mealHistory: [],
+  learning: {
+    currentPhase: 0,
+    learnedLetters: [],
+    learnedChinese: [],
+    learnedNumbers: [],
+    learningLog: [],
+    learnedDates: {},
+  },
+  phases: [
+    { name: "Phase 1: Foundation", duration: "Weeks 1-4", desc: "Build familiarity through play",
+      letters: ["A","B","C","D","E"], chinese: ["一","二","三","大","小","上","下"], numbers: [1,2,3,4,5],
+      activities: ["Sing the ABC song (A-E)","Flashcards with pictures","Trace letters in sand","Count toys (1-5)","Chinese stroke practice","Shape sorting","Color scavenger hunt"] },
+    { name: "Phase 2: Building", duration: "Weeks 5-8", desc: "Expand recognition",
+      letters: ["F","G","H","I","J"], chinese: ["人","口","手","日","月","水","火"], numbers: [6,7,8,9,10],
+      activities: ["Letter matching game","Phonics practice","Chinese: new characters","Count everything (6-10)","Pattern recognition","Draw shapes","I spy with letter sounds"] },
+    { name: "Phase 3: Expanding", duration: "Weeks 9-12", desc: "Connect letters to sounds",
+      letters: ["K","L","M","N","O"], chinese: ["山","木","石","田","天","地","花"], numbers: [11,12,13,14,15],
+      activities: ["Letter-sound matching","Simple word building","Chinese character stories","Count and compare","Trace numbers","Build letters with playdough","Nature walk"] },
+    { name: "Phase 4: Growing", duration: "Weeks 13-16", desc: "Strengthen skills, writing readiness",
+      letters: ["P","Q","R","S","T"], chinese: ["爸","妈","我","你","他","好","家"], numbers: [16,17,18,19,20],
+      activities: ["Write first letter of name","Sight words","Chinese: family words","Simple addition","Letter hunt in books","Tracing worksheets","Chinese coloring pages"] },
+    { name: "Phase 5: Mastery", duration: "Weeks 17-24", desc: "Complete alphabet, reading readiness",
+      letters: ["U","V","W","X","Y","Z"], chinese: ["鱼","鸟","马","牛","羊","猫","狗","虫"], numbers: [21,22,23,24,25,26,27,28,29,30],
+      activities: ["Complete alphabet song","Recognize all 26 letters","Read simple words","Chinese: read sentences","Count to 30","Write own name","Create mini storybook"] },
+  ],
+  venues: {
+    parks: [
+      { name: "Singapore Botanic Gardens", desc: "Jacob Ballas Children's Garden", icon: "🌿", lastVisited: null },
+      { name: "Gardens by the Bay", desc: "Children's Garden with water play", icon: "🌺", lastVisited: null },
+      { name: "East Coast Park", desc: "Cycling, playground, beach", icon: "🏖️", lastVisited: null },
+      { name: "West Coast Park", desc: "Adventure playground, sandpit", icon: "🏕️", lastVisited: null },
+      { name: "Jurong Lake Gardens", desc: "Forest Ramble, water play", icon: "🌳", lastVisited: null },
+    ],
+    indoor: [
+      { name: "Singapore Zoo", desc: "Rainforest Kidzworld", icon: "🦁", lastVisited: null },
+      { name: "S.E.A. Aquarium", desc: "Marine life, touch pool", icon: "🐙", lastVisited: null },
+      { name: "Science Centre", desc: "KidsSTOP, interactive exhibits", icon: "🔬", lastVisited: null },
+      { name: "KidZania", desc: "Role-play city for kids", icon: "👷", lastVisited: null },
+      { name: "LEGO Discovery Centre", desc: "Build & play", icon: "🧱", lastVisited: null },
+    ],
+  },
+  sundayPlan: {},
+  customEvents: [],
+  outingHistory: [],
+};
+
+// ==================== STATE ====================
+let data;
+let selectedDate = new Date();
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+let reminderInterval = null;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('toddlerPlanner');
+    if (saved) {
+      data = JSON.parse(saved);
+      for (const key of Object.keys(DEFAULT_DATA)) {
+        if (!(key in data)) data[key] = JSON.parse(JSON.stringify(DEFAULT_DATA[key]));
+      }
+      if (!data.phases) data.phases = JSON.parse(JSON.stringify(DEFAULT_DATA.phases));
+      if (!data.venues) data.venues = JSON.parse(JSON.stringify(DEFAULT_DATA.venues));
+      if (data.foods && !data.foods.sides) data.foods.sides = JSON.parse(JSON.stringify(DEFAULT_DATA.foods.sides));
+      if (!data.learning.learningLog) data.learning.learningLog = [];
+      if (!data.learning.learnedDates) data.learning.learnedDates = {};
+      if (data.remindersEnabled === undefined) data.remindersEnabled = false;
+    } else {
+      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+  } catch(e) {
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
+
+function saveData() {
+  try { localStorage.setItem('toddlerPlanner', JSON.stringify(data)); } catch(e) {}
+}
+
+// ==================== UTILITIES ====================
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_ZH = ['日','一','二','三','四','五','六'];
+const DAYS_FULL_ZH = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+function getWeekKey(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.setDate(diff));
+  return monday.toISOString().split('T')[0];
+}
+function formatDate(date) {
+  if (currentLang === 'zh') return DAYS_FULL_ZH[date.getDay()] + '，' + date.getFullYear() + '年' + (date.getMonth()+1) + '月' + date.getDate() + '日';
+  return DAYS_FULL[date.getDay()] + ', ' + date.toLocaleDateString('en-SG', { day:'numeric', month:'short', year:'numeric' });
+}
+function isWeekend(date) { return date.getDay() === 0 || date.getDay() === 6; }
+function timeToMinutes(t) { const [h,m] = t.split(':').map(Number); return h * 60 + m; }
+function minutesToTime(m) {
+  const h = Math.floor(m / 60); const mm = m % 60;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+  return h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
+}
+function getNow() { const now = new Date(); return now.getHours() * 60 + now.getMinutes(); }
+function getDayOfWeek(date) { return date.getDay(); }
+function getDateKey(date) { return date.toISOString().split('T')[0]; }
+function changeDate(delta) { selectedDate.setDate(selectedDate.getDate() + delta); renderAll(); }
+function goToday() { selectedDate = new Date(); renderAll(); }
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ==================== MODAL ====================
+function openModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('editModal').classList.add('show');
+}
+function closeModal() { document.getElementById('editModal').classList.remove('show'); }
+document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ==================== RENDER: TODAY (Visual Timeline) ====================
+function renderToday() {
+  document.getElementById('currentDate').textContent = formatDate(selectedDate);
+  const weekend = isWeekend(selectedDate);
+  document.getElementById('dayType').textContent = weekend ? t('weekendLabel') : t('weekdayLabel');
+  document.getElementById('dayType').className = 'badge ' + (weekend ? 'badge-yellow' : 'badge-green');
+
+  const schedule = weekend ? data.schedule.weekend : data.schedule.weekday;
+  const nowMin = getNow();
+  const isToday = selectedDate.toDateString() === new Date().toDateString();
+
+  // Calculate progress percentage through the day
+  let progressPct = 0;
+  if (isToday && schedule.length > 0) {
+    const firstMin = timeToMinutes(schedule[0].time);
+    const lastMin = timeToMinutes(schedule[schedule.length - 1].time);
+    if (lastMin > firstMin) {
+      progressPct = Math.max(0, Math.min(100, ((nowMin - firstMin) / (lastMin - firstMin)) * 100));
+    }
+  }
+
+  let html = '<div class="visual-timeline">';
+  html += '<div class="vt-progress-line" style="height:' + progressPct + '%;"></div>';
+  schedule.forEach((item, idx) => {
+    const itemMin = timeToMinutes(item.time);
+    const nextMin = idx < schedule.length - 1 ? timeToMinutes(schedule[idx + 1].time) : 24 * 60;
+    const isCurrent = isToday && nowMin >= itemMin && nowMin < nextMin;
+    const isPast = isToday && nowMin >= nextMin;
+    const cls = isCurrent ? 'current' : (isPast ? 'past' : '');
+    const activityName = item.nameKey ? t(item.nameKey) : item.activity;
+    const delay = idx * 0.05;
+
+    html += '<div class="vt-item ' + cls + '" style="animation-delay:' + delay + 's" onclick="editScheduleItem(\'' + (weekend ? 'weekend' : 'weekday') + '\',' + idx + ')">';
+    html += '<div class="vt-dot"></div>';
+    if (isPast) html += '<div class="vt-check">✓</div>';
+    html += '<div class="activity-icon">' + (item.icon || '📌') + '</div>';
+    html += '<div class="activity-col">';
+    html += '<div style="display:flex;align-items:center;gap:6px;"><div class="time-col">' + item.time + '</div><div class="activity-name">' + activityName + '</div></div>';
+    if (item.mealType) html += '<div class="activity-detail">' + getTodayMeal(item.mealType) + '</div>';
+    if (item.type === 'learning') html += '<div class="activity-detail">' + getTodayLearningSummary() + '</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('todayTimeline').innerHTML = html;
+
+  // Today's meals
+  const weekKey = getWeekKey(selectedDate);
+  const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
+  const menu = data.weeklyMenu[weekKey];
+  if (menu && menu[dayKey]) {
+    const m = menu[dayKey];
+    document.getElementById('todayMeals').innerHTML =
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
+      '<div style="flex:1;min-width:120px;padding:8px;background:var(--yellow-light);border-radius:8px;">' +
+      '<div style="font-size:11px;font-weight:600;color:#F57F17;">' + t('breakfast') + '</div>' +
+      '<div style="font-size:13px;margin-top:2px;">' + (getMealDisplay(m.breakfast) || '—') + '</div></div>' +
+      '<div style="flex:1;min-width:120px;padding:8px;background:var(--green-light);border-radius:8px;">' +
+      '<div style="font-size:11px;font-weight:600;color:#2E7D32;">' + t('dinner') + '</div>' +
+      '<div style="font-size:13px;margin-top:2px;">' + (getMealDisplay(m.dinner) || '—') + '</div></div></div>';
+  } else {
+    document.getElementById('todayMeals').innerHTML = '<div style="font-size:13px;color:var(--text-light);">' + t('noMealPlan') + '</div>';
+  }
+  renderTodayLearnWidget();
+}
+
+function getTodayMeal(type) {
+  const weekKey = getWeekKey(selectedDate);
+  const dayKey = DAYS[getDayOfWeek(selectedDate)].toLowerCase();
+  const menu = data.weeklyMenu[weekKey];
+  if (menu && menu[dayKey] && menu[dayKey][type]) return getMealDisplay(menu[dayKey][type]);
+  return t('notPlanned');
+}
+function getTodayLearningSummary() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return '';
+  const dayIdx = getDayOfWeek(selectedDate);
+  return phase.activities[dayIdx % phase.activities.length] || 'Review & practice';
+}
+function renderTodayLearnWidget() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return;
+  const dayIdx = getDayOfWeek(selectedDate);
+  const acts = phase.activities;
+  document.getElementById('todayLearn').innerHTML =
+    '<div class="learn-card"><div class="learn-title">' + phase.name + '</div>' +
+    '<div class="learn-desc" style="margin-top:6px;">' +
+    '<strong>10 min:</strong> ' + t('lettersLabel') + ' — ' + phase.letters.join(', ') + '<br>' +
+    '<strong>10 min:</strong> ' + t('chineseLabel') + ' — ' + phase.chinese.join(' ') + '<br>' +
+    '<strong>10 min:</strong> ' + t('numbersLabel') + ' — ' + phase.numbers.join(', ') + '<br>' +
+    '<strong>' + t('activityLabel') + ':</strong> ' + acts[dayIdx % acts.length] +
+    '</div></div>';
+}
+
+// ==================== RENDER: MEALS ====================
+function renderMeals() {
+  const weekKey = getWeekKey(selectedDate);
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  const menu = data.weeklyMenu[weekKey];
+  let html = '<div class="week-grid"><div class="cell header-cell"></div>';
+  const dayLabels = currentLang === 'zh' ? ['一','二','三','四','五','六','日'] : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  dayLabels.forEach(d => { html += '<div class="cell header-cell">' + d + '</div>'; });
+  html += '<div class="cell row-header">' + t('bfast') + '</div>';
+  ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
+    const { main } = getMealParts(menu[d]?.breakfast);
+    html += '<div class="cell ' + (main?'filled':'empty') + '" onclick="editMeal(\'' + weekKey + '\',\'' + d + '\',\'breakfast\')">' + (main ? fd(main) : '+') + '</div>';
+  });
+  html += '<div class="cell row-header">' + t('dinner') + '</div>';
+  ['mon','tue','wed','thu','fri','sat','sun'].forEach(d => {
+    const { main } = getMealParts(menu[d]?.dinner);
+    html += '<div class="cell ' + (main?'filled':'empty') + '" onclick="editMeal(\'' + weekKey + '\',\'' + d + '\',\'dinner\')">' + (main ? fd(main) : '+') + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('weekMenuGrid').innerHTML = html;
+  renderFoodList('breakfast', 'breakfastList');
+  renderFoodList('dinner', 'dinnerList');
+  renderFoodList('snack', 'snackList');
+  renderFoodList('sides', 'sidesList');
+  renderMealHistory();
+  renderRecipes();
+}
+
+function renderFoodList(type, containerId) {
+  const list = data.foods[type] || [];
+  let html = '';
+  list.forEach((food, idx) => { html += '<span class="food-tag">' + fd(food) + '<span class="remove" onclick="removeFood(\'' + type + '\',' + idx + ')">×</span></span>'; });
+  document.getElementById(containerId).innerHTML = html;
+}
+function addFood(type) {
+  const inputMap = { breakfast: 'addBreakfast', dinner: 'addDinner', snack: 'addSnack', sides: 'addSides' };
+  const input = document.getElementById(inputMap[type]);
+  const val = input.value.trim();
+  if (!val) return;
+  if (!data.foods[type]) data.foods[type] = [];
+  data.foods[type].push(val);
+  input.value = '';
+  saveData(); renderMeals();
+}
+function removeFood(type, idx) { data.foods[type].splice(idx, 1); saveData(); renderMeals(); }
+
+function generateWeeklyMenu() {
+  const weekKey = getWeekKey(selectedDate);
+  const menu = {};
+  const days = ['mon','tue','wed','thu','fri','sat','sun'];
+  const bList = [...data.foods.breakfast]; const dList = [...data.foods.dinner]; const sList = [...(data.foods.sides || [])];
+  shuffle(bList); shuffle(dList); shuffle(sList);
+  days.forEach((day, i) => {
+    menu[day] = {
+      breakfast: { main: bList[i % bList.length], side: '' },
+      dinner: { main: dList[i % dList.length], side: sList.length > 0 ? sList[i % sList.length] : '' }
+    };
+  });
+  data.weeklyMenu[weekKey] = menu;
+  saveData(); renderMeals(); renderToday();
+}
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } }
+
+function editMeal(weekKey, day, type) {
+  const mainFoods = data.foods[type] || [];
+  const esc = s => (s || '').replace(/'/g, "\\'");
+  let html = '<h3>' + t('pickMealTitle').replace('{type}',type).replace('{day}',day) + '</h3>';
+  html += '<div style="max-height:200px;overflow-y:auto;">';
+  mainFoods.forEach(f => {
+    html += '<div class="venue-card" style="padding:6px 10px;margin-bottom:4px;cursor:pointer;" onclick="document.getElementById(\'editMealMain\').value=\'' + esc(f) + '\'">' + fd(f) + '</div>';
+  });
+  html += '</div>';
+  html += '<div class="add-input-row"><input id="editMealMain" placeholder="' + t('customMealPH') + '"></div>';
+  html += '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>';
+  html += '<button class="btn btn-primary" onclick="saveMealEdit(\'' + weekKey + '\',\'' + day + '\',\'' + type + '\')">' + t('saveBtn') + '</button></div>';
+  openModal(html);
+}
+function saveMealEdit(weekKey, day, type) {
+  const main = document.getElementById('editMealMain').value.trim();
+  if (!main) { closeModal(); return; }
+  if (!data.weeklyMenu[weekKey]) data.weeklyMenu[weekKey] = {};
+  if (!data.weeklyMenu[weekKey][day]) data.weeklyMenu[weekKey][day] = {};
+  data.weeklyMenu[weekKey][day][type] = { main, side: '' };
+  data.mealHistory.push({ type, meal: fd(main), date: selectedDate.toISOString().split('T')[0] });
+  if (data.mealHistory.length > 100) data.mealHistory = data.mealHistory.slice(-50);
+  saveData(); closeModal(); renderMeals(); renderToday();
+}
+function renderMealHistory() {
+  const recent = data.mealHistory.slice(-14).reverse();
+  if (recent.length === 0) return;
+  let html = '<div style="font-size:12px;">';
+  recent.forEach(m => { html += '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0;"><span>' + fd(m.meal) + '</span><span style="color:var(--text-light);">' + m.type + ' · ' + m.date + '</span></div>'; });
+  html += '</div>';
+  document.getElementById('mealHistory').innerHTML = html;
+}
+
+// ==================== RENDER: LEARN ====================
+function renderLearn() {
+  const phase = data.phases[data.learning.currentPhase];
+  const sel = document.getElementById('phaseSelect');
+  sel.innerHTML = data.phases.map((p, i) => '<option value="' + i + '" ' + (i === data.learning.currentPhase ? 'selected' : '') + '>' + p.name + '</option>').join('');
+  if (phase) {
+    document.getElementById('phaseInfo').innerHTML =
+      '<div style="font-size:13px;margin-bottom:6px;"><strong>' + phase.duration + '</strong> — ' + phase.desc + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<div class="badge badge-green">' + t('lettersLabel') + ': ' + phase.letters.join(' ') + '</div>' +
+      '<div class="badge badge-purple">' + t('chineseLabel') + ': ' + phase.chinese.join(' ') + '</div>' +
+      '<div class="badge badge-yellow">' + t('numbersLabel') + ': ' + phase.numbers.join(' ') + '</div></div>';
+  }
+  renderTodayActivities();
+  // Letter grid
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  let letterHtml = '';
+  letters.forEach(l => {
+    const learned = data.learning.learnedLetters.includes(l);
+    const isCurrent = phase && phase.letters.includes(l);
+    letterHtml += '<div class="char-cell ' + (learned?'learned':(isCurrent?'current':'')) + '" onclick="toggleLearned(\'letter\',\'' + l + '\')">' + l + '</div>';
+  });
+  document.getElementById('letterGrid').innerHTML = letterHtml;
+  renderChineseChars();
+  renderStories();
+  renderPhonics();
+  // Number grid
+  let numberHtml = '';
+  for (let n = 1; n <= 30; n++) {
+    const learned = data.learning.learnedNumbers.includes(n);
+    const isCurrent = phase && phase.numbers.includes(n);
+    numberHtml += '<div class="char-cell ' + (learned?'learned':(isCurrent?'current':'')) + '" onclick="toggleLearned(\'number\',' + n + ')">' + n + '</div>';
+  }
+  document.getElementById('numberGrid').innerHTML = numberHtml;
+  // Dashboard + Review
+  renderLearningDashboard();
+  renderReviewSuggestions();
+}
+
+function renderTodayActivities() {
+  const phase = data.phases[data.learning.currentPhase];
+  if (!phase) return;
+  const dayIdx = getDayOfWeek(selectedDate);
+  const acts = phase.activities;
+  document.getElementById('todayActivities').innerHTML =
+    '<div class="learn-card" style="border-left-color:#4A90D9;background:var(--primary-light);">' +
+    '<div class="learn-title" style="color:var(--primary);">' + t('sessionPlan') + '</div>' +
+    '<div class="learn-desc" style="color:var(--primary);">' +
+    '<div style="margin:4px 0;">1. <strong>' + t('review') + '</strong> (5 min)</div>' +
+    '<div style="margin:4px 0;">2. <strong>' + t('lettersLabel') + '</strong> (10 min) — ' + t('focus') + ': ' + phase.letters.join(', ') + '</div>' +
+    '<div style="margin:4px 0;">3. <strong>' + t('chineseLabel') + '</strong> (10 min) — ' + t('focus') + ': ' + phase.chinese.join(' ') + '</div>' +
+    '<div style="margin:4px 0;">4. <strong>' + t('numbersLabel') + '</strong> (10 min) — ' + t('focus') + ': ' + phase.numbers.join(', ') + '</div>' +
+    '<div style="margin:4px 0;">5. <strong>' + t('activityLabel') + '</strong> — ' + acts[dayIdx % acts.length] + '</div>' +
+    '</div></div>';
+}
+
+function changePhase(val) { data.learning.currentPhase = parseInt(val); saveData(); renderLearn(); }
+
+function toggleLearned(type, val) {
+  const key = type === 'letter' ? 'learnedLetters' : type === 'chinese' ? 'learnedChinese' : 'learnedNumbers';
+  const arr = data.learning[key];
+  const idx = arr.indexOf(val);
+  if (idx > -1) {
+    arr.splice(idx, 1);
+    // Remove from learnedDates
+    if (type === 'chinese') delete data.learning.learnedDates[val];
+  } else {
+    arr.push(val);
+    // Track learnedDates for spaced repetition
+    if (type === 'chinese') data.learning.learnedDates[val] = getDateKey(new Date());
+    // Log learning activity
+    logLearningActivity(type);
+  }
+  saveData(); renderLearn();
+}
+
+function logLearningActivity(type) {
+  const today = getDateKey(new Date());
+  let log = data.learning.learningLog;
+  let entry = log.find(e => e.date === today);
+  if (!entry) { entry = { date: today, letters: 0, chinese: 0, numbers: 0, timerSeconds: 0 }; log.push(entry); }
+  if (type === 'letter') entry.letters++;
+  else if (type === 'chinese') entry.chinese++;
+  else if (type === 'number') entry.numbers++;
+  // Keep only last 90 days
+  if (log.length > 90) data.learning.learningLog = log.slice(-90);
+}
+
+// ==================== LEARNING DASHBOARD ====================
+function renderLearningDashboard() {
+  const customChars = getCustomChars();
+  const totalLetters = 26;
+  const totalChinese = ALL_CHARS_FLAT.length + customChars.length;
+  const totalNumbers = 30;
+  const learnedL = data.learning.learnedLetters.length;
+  const learnedC = data.learning.learnedChinese.length;
+  const learnedN = data.learning.learnedNumbers.length;
+  const pctL = Math.round((learnedL / totalLetters) * 100);
+  const pctC = Math.round((learnedC / totalChinese) * 100);
+  const pctN = Math.round((learnedN / totalNumbers) * 100);
+
+  let html = '';
+  // Bar charts
+  html += '<div class="dashboard-bar"><div class="bar-label">' + t('lettersLabel') + '</div><div class="bar-track"><div class="bar-fill" style="width:' + pctL + '%;background:var(--green);"></div></div><div class="bar-value">' + learnedL + '/' + totalLetters + '</div></div>';
+  html += '<div class="dashboard-bar"><div class="bar-label">' + t('chineseLabel') + '</div><div class="bar-track"><div class="bar-fill" style="width:' + pctC + '%;background:var(--purple);"></div></div><div class="bar-value">' + learnedC + '/' + totalChinese + '</div></div>';
+  html += '<div class="dashboard-bar"><div class="bar-label">' + t('numbersLabel') + '</div><div class="bar-track"><div class="bar-fill" style="width:' + pctN + '%;background:var(--primary);"></div></div><div class="bar-value">' + learnedN + '/' + totalNumbers + '</div></div>';
+
+  // Streak counter
+  const streak = calculateStreak();
+  if (streak > 0) {
+    html += '<div style="margin:10px 0;"><span class="streak-badge">🔥 ' + streak + ' ' + t('days') + ' ' + t('streak') + '</span></div>';
+  }
+
+  // Weekly summary
+  const thisWeekCount = getWeekLearningCount(0);
+  const lastWeekCount = getWeekLearningCount(1);
+  const diff = thisWeekCount - lastWeekCount;
+  const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
+  html += '<div style="display:flex;gap:12px;margin:10px 0;">';
+  html += '<div style="flex:1;background:var(--green-light);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">' + t('thisWeek') + '</div><div style="font-size:20px;font-weight:700;">' + thisWeekCount + '</div></div>';
+  html += '<div style="flex:1;background:var(--primary-light);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">' + t('lastWeek') + '</div><div style="font-size:20px;font-weight:700;">' + lastWeekCount + '</div></div>';
+  html += '<div style="flex:0.5;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:' + (diff >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + arrow + '</div>';
+  html += '</div>';
+
+  // Calendar heatmap (last 30 days)
+  html += '<div style="font-size:12px;font-weight:600;margin:10px 0 4px;">' + t('last30Days') + '</div>';
+  html += '<div class="heatmap-grid">';
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = getDateKey(d);
+    const entry = data.learning.learningLog.find(e => e.date === key);
+    const count = entry ? (entry.letters + entry.chinese + entry.numbers) : 0;
+    const intensity = count === 0 ? '#e0e0e0' : count <= 2 ? '#c8e6c9' : count <= 5 ? '#81c784' : count <= 10 ? '#4caf50' : '#2e7d32';
+    const title = key + ': ' + count + ' items';
+    html += '<div class="heatmap-cell" style="background:' + intensity + ';" title="' + title + '"></div>';
+  }
+  html += '</div>';
+
+  document.getElementById('learningDashboard').innerHTML = html;
+}
+
+function calculateStreak() {
+  const log = data.learning.learningLog;
+  if (log.length === 0) return 0;
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i <= 90; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = getDateKey(d);
+    const entry = log.find(e => e.date === key);
+    if (entry && (entry.letters + entry.chinese + entry.numbers) > 0) {
+      streak++;
+    } else if (i === 0) {
+      continue; // today might not have activity yet
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function getWeekLearningCount(weeksAgo) {
+  const log = data.learning.learningLog;
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay() - (weeksAgo * 7));
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
+  let count = 0;
+  log.forEach(e => {
+    const d = new Date(e.date);
+    if (d >= startOfWeek && d < endOfWeek) count += e.letters + e.chinese + e.numbers;
+  });
+  return count;
+}
+
+// ==================== SPACED REPETITION ====================
+function renderReviewSuggestions() {
+  const dates = data.learning.learnedDates || {};
+  const today = new Date();
+  const dueItems = [];
+  for (const [char, dateStr] of Object.entries(dates)) {
+    const learnedDate = new Date(dateStr);
+    const daysSince = Math.floor((today - learnedDate) / (1000 * 60 * 60 * 24));
+    if (daysSince >= 7) {
+      dueItems.push({ char, daysSince, data: CHAR_LOOKUP[char] });
+    }
+  }
+  const card = document.getElementById('reviewSuggestionsCard');
+  if (dueItems.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  dueItems.sort((a, b) => b.daysSince - a.daysSince);
+  const shown = dueItems.slice(0, 12);
+  let html = '<div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">' + t('dueForReview') + ' (' + dueItems.length + ')</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  shown.forEach(item => {
+    const d = item.data;
+    const label = t('learnedDaysAgo').replace('{n}', item.daysSince);
+    html += '<div style="display:flex;flex-direction:column;align-items:center;padding:6px 8px;background:var(--yellow-light);border:1px solid var(--yellow);border-radius:8px;cursor:pointer;min-width:50px;" onclick="showCharDetail(\'' + item.char + '\')" title="' + label + '">';
+    html += '<div style="font-size:20px;font-weight:700;">' + (d ? d.m : '') + item.char + '</div>';
+    html += '<div style="font-size:9px;color:var(--text-light);">' + item.daysSince + t('days') + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('reviewSuggestions').innerHTML = html;
+}
+
+// ==================== TIMER ====================
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerBtn').textContent = t('resumeBtn');
+    document.getElementById('timerLabel').textContent = t('pausedLabel');
+  } else {
+    timerRunning = true;
+    document.getElementById('timerBtn').textContent = t('pauseBtn');
+    document.getElementById('timerLabel').textContent = t('learningInProgress');
+    timerInterval = setInterval(function() {
+      timerSeconds++;
+      const m = Math.floor(timerSeconds / 60);
+      const s = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      if (timerSeconds === 30 * 60) { document.getElementById('timerLabel').textContent = t('min30reached'); document.getElementById('timerDisplay').style.color = 'var(--green)'; }
+      if (timerSeconds === 45 * 60) { document.getElementById('timerLabel').textContent = t('min45wrapUp'); document.getElementById('timerDisplay').style.color = 'var(--accent)'; }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = 0;
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('timerDisplay').style.color = 'var(--purple)';
+  document.getElementById('timerBtn').textContent = t('start');
+  document.getElementById('timerLabel').textContent = t('readyToStart');
+}
+
+// ==================== WEEKEND ====================
+function renderWeekend() {
+  const today = new Date(selectedDate);
+  const dayOfWeek = today.getDay();
+  const nextSunday = new Date(today);
+  nextSunday.setDate(today.getDate() + (7 - dayOfWeek) % 7);
+  if (dayOfWeek !== 0) nextSunday.setDate(today.getDate() + (7 - dayOfWeek));
+  document.getElementById('sundayDate').textContent = nextSunday.toLocaleDateString('en-SG', { day:'numeric', month:'short' });
+
+  const sundayKey = nextSunday.toISOString().split('T')[0];
+  if (data.sundayPlan[sundayKey]) {
+    const plan = data.sundayPlan[sundayKey];
+    document.getElementById('sundayPlan').innerHTML =
+      '<div class="venue-card selected"><div class="venue-icon">' + (plan.icon || '🌳') + '</div><div class="venue-info"><div class="venue-name">' + plan.name + '</div><div class="venue-desc">' + (plan.desc || '') + '</div></div></div>' +
+      '<button class="btn btn-outline btn-small" onclick="clearSundayPlan(\'' + sundayKey + '\')">' + t('changePlan') + '</button>';
+  }
+  let parksHtml = '';
+  data.venues.parks.forEach((v, i) => {
+    parksHtml += '<div class="venue-card" onclick="setSundayPlan(\'parks\',' + i + ',\'' + sundayKey + '\')"><div class="venue-icon">' + v.icon + '</div><div class="venue-info"><div class="venue-name">' + v.name + '</div><div class="venue-desc">' + v.desc + '</div>' + (v.lastVisited ? '<div class="venue-last">' + t('lastVisitedLabel') + ': ' + v.lastVisited + '</div>' : '') + '</div></div>';
+  });
+  document.getElementById('parksList').innerHTML = parksHtml;
+  let indoorHtml = '';
+  data.venues.indoor.forEach((v, i) => {
+    indoorHtml += '<div class="venue-card" onclick="setSundayPlan(\'indoor\',' + i + ',\'' + sundayKey + '\')"><div class="venue-icon">' + v.icon + '</div><div class="venue-info"><div class="venue-name">' + v.name + '</div><div class="venue-desc">' + v.desc + '</div>' + (v.lastVisited ? '<div class="venue-last">' + t('lastVisitedLabel') + ': ' + v.lastVisited + '</div>' : '') + '</div></div>';
+  });
+  document.getElementById('indoorList').innerHTML = indoorHtml;
+  renderCustomEvents();
+  renderOutingHistory();
+}
+
+function setSundayPlan(type, idx, sundayKey) {
+  const venue = data.venues[type][idx];
+  openModal('<h3>' + t('planLabel') + ' ' + venue.name + '</h3><label>' + t('notesOptional') + '</label><textarea id="venueNotes" rows="3"></textarea>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="confirmSundayPlan(\'' + type + '\',' + idx + ',\'' + sundayKey + '\')">' + t('setPlan') + '</button></div>');
+}
+function confirmSundayPlan(type, idx, sundayKey) {
+  const venue = data.venues[type][idx];
+  const notes = document.getElementById('venueNotes').value.trim();
+  data.sundayPlan[sundayKey] = { name: venue.name, desc: venue.desc, icon: venue.icon, notes, type };
+  venue.lastVisited = sundayKey;
+  data.outingHistory.push({ name: venue.name, date: sundayKey, notes });
+  saveData(); closeModal(); renderWeekend();
+}
+function clearSundayPlan(key) { delete data.sundayPlan[key]; saveData(); renderWeekend(); }
+function suggestSundayPlan() {
+  const allVenues = [...data.venues.parks, ...data.venues.indoor];
+  const unvisited = allVenues.filter(v => !v.lastVisited);
+  const pick = unvisited.length > 0 ? unvisited[Math.floor(Math.random() * unvisited.length)] : allVenues.sort((a,b) => (a.lastVisited||'').localeCompare(b.lastVisited||''))[0];
+  if (pick) openModal('<h3>' + t('suggestion') + '</h3><div class="venue-card selected"><div class="venue-icon">' + pick.icon + '</div><div class="venue-info"><div class="venue-name">' + pick.name + '</div><div class="venue-desc">' + pick.desc + '</div></div></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal();suggestSundayPlan();">' + t('tryAnother') + '</button><button class="btn btn-primary" onclick="closeModal()">' + t('pickFromList') + '</button></div>');
+}
+function openCustomEvent() {
+  openModal('<h3>' + t('addCustomEventTitle') + '</h3><label>' + t('eventNameLabel') + '</label><input id="eventName"><label>' + t('dateLabel') + '</label><input id="eventDate" type="date"><label>' + t('detailsLabel') + '</label><textarea id="eventDetails" rows="3"></textarea>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button><button class="btn btn-primary" onclick="addCustomEvent()">' + t('addEventBtn') + '</button></div>');
+}
+function addCustomEvent() {
+  const name = document.getElementById('eventName').value.trim();
+  const date = document.getElementById('eventDate').value;
+  const details = document.getElementById('eventDetails').value.trim();
+  if (!name) return;
+  data.customEvents.push({ name, date, details }); saveData(); closeModal(); renderWeekend();
+}
+function renderCustomEvents() {
+  if (data.customEvents.length === 0) return;
+  let html = '';
+  data.customEvents.forEach((e, i) => {
+    html += '<div class="venue-card"><div class="venue-icon">🎉</div><div class="venue-info"><div class="venue-name">' + e.name + '</div><div class="venue-desc">' + (e.date || '') + ' ' + (e.details || '') + '</div></div><button class="btn btn-small" style="background:var(--red);color:white;flex-shrink:0;" onclick="data.customEvents.splice(' + i + ',1);saveData();renderWeekend();">×</button></div>';
+  });
+  document.getElementById('customEvents').innerHTML = html;
+}
+function renderOutingHistory() {
+  const history = data.outingHistory.slice(-10).reverse();
+  if (history.length === 0) return;
+  let html = '';
+  history.forEach(h => { html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;"><span>' + h.name + '</span><span style="color:var(--text-light);">' + h.date + '</span></div>'; });
+  document.getElementById('outingHistory').innerHTML = html;
+}
+
+// ==================== SETTINGS ====================
+function renderSettings() {
+  const current = data.currentSleepMinutes;
+  const target = data.targetSleepMinutes;
+  const original = 23 * 60;
+  const progress = Math.min(100, Math.max(0, ((original - current) / (original - target)) * 100));
+  document.getElementById('currentSleepTime').textContent = minutesToTime(current);
+  document.getElementById('sleepProgress').style.width = progress + '%';
+  document.getElementById('sleepProgressText').textContent = progress >= 100 ? t('targetReached') : Math.round(progress) + '% ' + t('toGoal');
+  renderScheduleEditor();
+  // Reminders toggle state
+  document.getElementById('remindersToggle').checked = data.remindersEnabled;
+  document.getElementById('remindersStatusText').textContent = data.remindersEnabled ? t('remindersOn') : t('remindersOff');
+}
+function adjustSleep(delta) {
+  data.currentSleepMinutes += delta;
+  if (data.currentSleepMinutes < data.targetSleepMinutes) data.currentSleepMinutes = data.targetSleepMinutes;
+  if (data.currentSleepMinutes > 24 * 60) data.currentSleepMinutes = 24 * 60;
+  saveData(); renderSettings();
+}
+
+// ==================== SCHEDULE EDITOR WITH DRAG ====================
+var dragState = null;
+
+function renderScheduleEditor() {
+  let html = '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">' + t('weekdaySchedule') + '</div>';
+  html += '<div id="schedEdWeekday">';
+  data.schedule.weekday.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
+    html += '<div class="schedule-drag-item" data-type="weekday" data-idx="' + idx + '">' +
+      '<span class="drag-handle" ontouchstart="startDrag(event,\'weekday\',' + idx + ')" onmousedown="startDrag(event,\'weekday\',' + idx + ')">⠿</span>' +
+      '<span style="font-weight:600;color:var(--primary);min-width:50px;">' + item.time + '</span>' +
+      '<span style="flex:1;">' + (item.icon || '') + ' ' + actName + '</span>' +
+      '<span style="color:var(--text-light);cursor:pointer;" onclick="editScheduleItem(\'weekday\',' + idx + ')">✏️</span></div>';
+  });
+  html += '</div>';
+  html += '<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">' + t('weekendSchedule') + '</div>';
+  html += '<div id="schedEdWeekend">';
+  data.schedule.weekend.forEach((item, idx) => {
+    const actName = item.nameKey ? t(item.nameKey) : item.activity;
+    html += '<div class="schedule-drag-item" data-type="weekend" data-idx="' + idx + '">' +
+      '<span class="drag-handle" ontouchstart="startDrag(event,\'weekend\',' + idx + ')" onmousedown="startDrag(event,\'weekend\',' + idx + ')">⠿</span>' +
+      '<span style="font-weight:600;color:var(--primary);min-width:50px;">' + item.time + '</span>' +
+      '<span style="flex:1;">' + (item.icon || '') + ' ' + actName + '</span>' +
+      '<span style="color:var(--text-light);cursor:pointer;" onclick="editScheduleItem(\'weekend\',' + idx + ')">✏️</span></div>';
+  });
+  html += '</div>';
+  document.getElementById('scheduleEditor').innerHTML = html;
+}
+
+function startDrag(e, type, idx) {
+  e.preventDefault();
+  const items = document.querySelectorAll('#schedEd' + (type === 'weekday' ? 'Weekday' : 'Weekend') + ' .schedule-drag-item');
+  const item = items[idx];
+  if (!item) return;
+  item.classList.add('dragging');
+  dragState = { type, fromIdx: idx, currentIdx: idx };
+
+  const moveHandler = function(ev) {
+    const clientY = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    const container = item.parentElement;
+    const children = Array.from(container.children);
+    let newIdx = idx;
+    children.forEach((child, i) => {
+      const rect = child.getBoundingClientRect();
+      if (clientY > rect.top + rect.height / 2) newIdx = i;
+    });
+    if (newIdx !== dragState.currentIdx) {
+      dragState.currentIdx = newIdx;
+      // Visual reorder
+      if (newIdx > idx) container.insertBefore(item, children[newIdx + 1] || null);
+      else container.insertBefore(item, children[newIdx]);
+    }
+  };
+
+  const endHandler = function() {
+    item.classList.remove('dragging');
+    document.removeEventListener('mousemove', moveHandler);
+    document.removeEventListener('mouseup', endHandler);
+    document.removeEventListener('touchmove', moveHandler);
+    document.removeEventListener('touchend', endHandler);
+    if (dragState && dragState.fromIdx !== dragState.currentIdx) {
+      const arr = data.schedule[dragState.type];
+      const [moved] = arr.splice(dragState.fromIdx, 1);
+      arr.splice(dragState.currentIdx, 0, moved);
+      saveData();
+      renderScheduleEditor();
+      renderToday();
+    }
+    dragState = null;
+  };
+
+  document.addEventListener('mousemove', moveHandler);
+  document.addEventListener('mouseup', endHandler);
+  document.addEventListener('touchmove', moveHandler, { passive: false });
+  document.addEventListener('touchend', endHandler);
+}
+
+function autoSortSchedule() {
+  data.schedule.weekday.sort((a, b) => a.time.localeCompare(b.time));
+  data.schedule.weekend.sort((a, b) => a.time.localeCompare(b.time));
+  saveData(); renderScheduleEditor(); renderToday();
+}
+
+function editScheduleItem(type, idx) {
+  const item = data.schedule[type][idx];
+  openModal('<h3>' + t('editActivityTitle') + '</h3><label>' + t('timeLabel') + '</label><input id="editTime" type="time" value="' + item.time + '"><label>' + t('activityInput') + '</label><input id="editActivity" value="' + item.activity + '"><label>' + t('iconLabel') + '</label><input id="editIcon" value="' + (item.icon || '') + '">' +
+    '<div class="modal-actions"><button class="btn" style="background:var(--red);color:white;" onclick="deleteScheduleItem(\'' + type + '\',' + idx + ')">' + t('deleteBtn') + '</button><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button><button class="btn btn-primary" onclick="saveScheduleItem(\'' + type + '\',' + idx + ')">' + t('saveBtn') + '</button></div>');
+}
+function saveScheduleItem(type, idx) {
+  data.schedule[type][idx].time = document.getElementById('editTime').value;
+  data.schedule[type][idx].activity = document.getElementById('editActivity').value;
+  data.schedule[type][idx].icon = document.getElementById('editIcon').value;
+  saveData(); closeModal(); renderAll();
+}
+function deleteScheduleItem(type, idx) {
+  if (confirm(t('deleteConfirm'))) { data.schedule[type].splice(idx, 1); saveData(); closeModal(); renderAll(); }
+}
+function openAddScheduleItem() {
+  openModal('<h3>' + t('addActivityTitle') + '</h3><label>' + t('scheduleLabel') + '</label><select id="addSchedType"><option value="weekday">' + t('weekdayLabel') + '</option><option value="weekend">' + t('weekendLabel') + '</option></select><label>' + t('timeLabel') + '</label><input id="addSchedTime" type="time" value="12:00"><label>' + t('activityInput') + '</label><input id="addSchedActivity" placeholder="' + t('activityNamePH') + '"><label>' + t('iconLabel') + '</label><input id="addSchedIcon" placeholder="🏊">' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button><button class="btn btn-primary" onclick="addScheduleItem()">' + t('add') + '</button></div>');
+}
+function addScheduleItem() {
+  const type = document.getElementById('addSchedType').value;
+  const time = document.getElementById('addSchedTime').value;
+  const activity = document.getElementById('addSchedActivity').value.trim();
+  const icon = document.getElementById('addSchedIcon').value.trim();
+  if (!activity) return;
+  data.schedule[type].push({ time, activity, icon: icon || '📌' });
+  data.schedule[type].sort((a, b) => a.time.localeCompare(b.time));
+  saveData(); closeModal(); renderAll();
+}
+
+// ==================== BROWSER NOTIFICATIONS ====================
+function toggleReminders() {
+  const checked = document.getElementById('remindersToggle').checked;
+  if (checked) {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(function(permission) {
+        if (permission === 'granted') {
+          data.remindersEnabled = true;
+          saveData();
+          startReminderCheck();
+          renderSettings();
+        } else {
+          document.getElementById('remindersToggle').checked = false;
+          data.remindersEnabled = false;
+          saveData();
+          renderSettings();
+        }
+      });
+    }
+  } else {
+    data.remindersEnabled = false;
+    saveData();
+    if (reminderInterval) { clearInterval(reminderInterval); reminderInterval = null; }
+    renderSettings();
+  }
+}
+
+function startReminderCheck() {
+  if (reminderInterval) clearInterval(reminderInterval);
+  reminderInterval = setInterval(checkReminders, 60000);
+}
+
+function checkReminders() {
+  if (!data.remindersEnabled) return;
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const weekend = isWeekend(now);
+  const schedule = weekend ? data.schedule.weekend : data.schedule.weekday;
+  schedule.forEach(function(item) {
+    const itemMin = timeToMinutes(item.time);
+    if (Math.abs(nowMin - itemMin) <= 1) {
+      const activityName = item.nameKey ? t(item.nameKey) : item.activity;
+      new Notification(t('reminderTitle'), {
+        body: (item.icon || '') + ' ' + activityName + ' (' + item.time + ')',
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + (item.icon || '📅') + '</text></svg>'
+      });
+    }
+  });
+}
+
+// ==================== CHILD PROFILES & SYNC ====================
+function getChildProfiles() { try { return JSON.parse(localStorage.getItem('childProfiles') || '[]'); } catch(e) { return []; } }
+function saveChildProfiles(profiles) { localStorage.setItem('childProfiles', JSON.stringify(profiles)); }
+function getActiveChildCode() { return localStorage.getItem('activeChildCode') || ''; }
+function setActiveChildCode(code) { localStorage.setItem('activeChildCode', code); }
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+function packData(childName, code) {
+  const payload = { v: 1, code, name: childName, ts: Date.now(), data };
+  const json = JSON.stringify(payload);
+  try { return btoa(unescape(encodeURIComponent(json))); } catch(e) { return json; }
+}
+function unpackData(str) {
+  try { const json = decodeURIComponent(escape(atob(str.trim()))); return JSON.parse(json); }
+  catch(e) { try { return JSON.parse(str.trim()); } catch(e2) { return null; } }
+}
+
+function renderSyncUI() {
+  const profiles = getChildProfiles();
+  const activeCode = getActiveChildCode();
+  const activeProfile = profiles.find(p => p.code === activeCode);
+  let html = '';
+  if (activeProfile) {
+    html += '<div style="background:var(--green-light);border-radius:8px;padding:12px;margin-bottom:10px;">';
+    html += '<div style="font-size:14px;font-weight:700;color:#2E7D32;">🧒 ' + activeProfile.name + '</div>';
+    html += '<div style="font-size:20px;font-weight:800;letter-spacing:4px;color:var(--primary);margin:6px 0;font-family:monospace;">' + activeProfile.code + '</div>';
+    html += '<div style="font-size:11px;color:var(--text-light);">' + t('shareCodeHint') + '</div></div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    html += '<button class="btn btn-primary btn-small" onclick="pushToFamily()">⬆️ Push</button>';
+    html += '<button class="btn btn-green btn-small" onclick="pullFromFamily()">⬇️ Pull</button></div>';
+    html += '<div id="syncStatus" style="font-size:11px;color:var(--text-light);margin-top:6px;"></div>';
+  } else {
+    html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;">' + t('noChildYet') + '</div>';
+    html += '<div style="display:flex;gap:8px;">';
+    html += '<button class="btn btn-primary" onclick="showAddChildUI()">' + t('createChild') + '</button>';
+    html += '<button class="btn btn-outline" onclick="showJoinChildUI()">' + t('joinChild') + '</button></div>';
+  }
+  document.getElementById('syncUI').innerHTML = html;
+}
+
+function showAddChildUI() {
+  openModal('<h3>' + t('createChild') + '</h3><label>' + t('childName') + '</label><input id="newChildName">' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="createChild()">' + t('saveBtn') + '</button></div>');
+}
+function showJoinChildUI() {
+  openModal('<h3>' + t('joinChild') + '</h3><textarea id="joinDataInput" rows="4" placeholder="Paste data..."></textarea>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="joinChild()">' + t('saveBtn') + '</button></div>');
+}
+function createChild() {
+  const name = document.getElementById('newChildName').value.trim();
+  if (!name) return;
+  const code = generateCode();
+  const profiles = getChildProfiles();
+  profiles.push({ code, name, lastSynced: Date.now() });
+  saveChildProfiles(profiles);
+  setActiveChildCode(code);
+  localStorage.setItem('toddlerPlanner_' + code, JSON.stringify(data));
+  closeModal(); renderAll(); renderSyncUI();
+  alert((currentLang==='zh' ? '已创建！代码: ' : 'Created! Code: ') + code);
+}
+function joinChild() {
+  const raw = (document.getElementById('joinDataInput').value || '').trim();
+  if (!raw) return;
+  const payload = unpackData(raw);
+  if (!payload || !payload.data) { alert(t('importError')); return; }
+  const profiles = getChildProfiles();
+  if (!profiles.find(p => p.code === payload.code)) {
+    profiles.push({ code: payload.code, name: payload.name || 'Child', lastSynced: Date.now() });
+    saveChildProfiles(profiles);
+  }
+  const curCode = getActiveChildCode();
+  if (curCode) localStorage.setItem('toddlerPlanner_' + curCode, JSON.stringify(data));
+  data = payload.data; saveData();
+  setActiveChildCode(payload.code);
+  localStorage.setItem('toddlerPlanner_' + payload.code, JSON.stringify(data));
+  closeModal(); renderAll(); renderSyncUI();
+}
+function pushToFamily() {
+  const code = getActiveChildCode();
+  const profiles = getChildProfiles();
+  const profile = profiles.find(p => p.code === code);
+  if (!profile) return;
+  const packed = packData(profile.name, code);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(packed).then(function() {
+      profile.lastSynced = Date.now(); saveChildProfiles(profiles);
+      alert(currentLang==='zh'?'已复制！请发送给家人。':'Copied! Send to family.');
+    });
+  } else { prompt('Copy:', packed); }
+}
+function pullFromFamily() {
+  openModal('<h3>' + (currentLang==='zh'?'从家人拉取':'Pull from Family') + '</h3><textarea id="pullDataInput" rows="4"></textarea>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('cancelBtn') + '</button>' +
+    '<button class="btn btn-primary" onclick="doPull()">' + t('saveBtn') + '</button></div>');
+}
+function doPull() {
+  const raw = (document.getElementById('pullDataInput').value || '').trim();
+  if (!raw) return;
+  const payload = unpackData(raw);
+  if (!payload || !payload.data) { alert(t('importError')); return; }
+  data = payload.data; saveData();
+  const code = getActiveChildCode();
+  if (code) localStorage.setItem('toddlerPlanner_' + code, JSON.stringify(data));
+  closeModal(); renderAll(); renderSyncUI();
+}
+function switchToChild(code) {
+  const activeCode = getActiveChildCode();
+  if (activeCode) localStorage.setItem('toddlerPlanner_' + activeCode, JSON.stringify(data));
+  setActiveChildCode(code);
+  const saved = localStorage.getItem('toddlerPlanner_' + code);
+  if (saved) { try { data = JSON.parse(saved); } catch(e) { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); } }
+  else { data = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+  saveData(); renderAll(); renderSyncUI();
+}
+
+// ==================== EXPORT/IMPORT ====================
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(json).then(() => alert(t('exportSuccess'))).catch(() => prompt('Copy:', json));
+  } else { prompt('Copy:', json); }
+}
+function importData() {
+  const json = prompt(t('importPrompt'));
+  if (!json) return;
+  try { data = JSON.parse(json); saveData(); renderAll(); alert(t('importSuccess')); }
+  catch (e) { alert(t('importError')); }
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  updateI18nLabels();
+  renderToday();
+  renderMeals();
+  renderLearn();
+  renderWeekend();
+  renderSettings();
+  renderTips();
+  renderSyncUI();
+}
+
+// ==================== INIT ====================
+loadData();
+getCustomChars().forEach(function(c) {
+  if (!CHAR_LOOKUP[c[0]]) CHAR_LOOKUP[c[0]] = { c:c[0], p:c[1], e:c[2], m:c[3], g:'custom' };
+});
+renderAll();
+
+// Start reminders if enabled
+if (data.remindersEnabled && 'Notification' in window && Notification.permission === 'granted') {
+  startReminderCheck();
+}
+
+// Auto-refresh every minute
+setInterval(function() {
+  if (selectedDate.toDateString() === new Date().toDateString()) {
+    renderToday();
+  }
+}, 60000);
+</script>
+</body>
+</html>
